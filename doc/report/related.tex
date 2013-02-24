@@ -3,7 +3,15 @@
 
 %% Describe related work here.
 
-This project is guided under Paxson's work in \cite{paxson2004strategies} where he advocates rigorous calibration of network measurement tools.
+% the following related works are more from end-host perspective.
+
+There are numbers of tools existing for Internet measurement, and they differ in the characteristics they measure. To name a few, {\em ping} is famous to test reachability and measure Round-trip time (RTT). {\em traceroute}\cite{jacobson1989traceroute} and {\em tcptraceroute}\cite{toren2001tcptraceroute} could tell the path as well as RTT. Except for time characteristics estimation, {\em pathchar}\cite{jacobson1997pathchar} measures the hop-by-hop bandwidth and \cite{jain2002pathload} tells the available bandwidth of a path. King\cite{gummadi2002king} measures the end-to-end latency using recursive DNS queries. 
+
+Many large Internet monitor projects (such as pingER\cite{matthews2000pinger}) are built using these tools. And researchers have been trying to infer the Internet performance (such as \cite{downey1999using} utilized {\em pathchar} tool to estimate Internet link characteristics) based on the measurement results. 
+
+With the advent of cloud computing and mobile computing, people are also characterizing the performance of each. \cite{kandula2009nature, benson2010network} analyzes traffic patterns in data center, and \cite{huang2011mobiperf} is an ongoing project in measuring mobile end-host network performance. But it's unclear how the Internet's performance is when in comparison.
+
+Paxson's work in \cite{paxson2004strategies} serves as guidelines in our design and implementation of all measurement experiements.
 
 
 %%% Local Variables: 
