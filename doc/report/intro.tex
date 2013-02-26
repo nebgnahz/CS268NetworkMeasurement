@@ -1,28 +1,28 @@
 \section{Introduction}
 \label{sec:introduction}
 
-The measurement of Internet has become increasingly important and challenging due to its complexity, large-scale and variability. A numbers of tools have been proposed to accomplish this task (see Sec.\,\ref{sec:related-work} for a complete review). In this project, our primary goal is not to introduce any novel network measurement tool; instead, we use existing measurement techniques to characterize the performance of current Internet. We base our work on previous investigations, and try to elucidate the changes in measurement strategies. Specifically, the cloud computing service model and mobile computing have re-shaped the Internet in unanticipated ways. Specifically, the impact of these new models on end-to-end latency have never formally studied by measurements. We propose the questions listed bellow as motivations for our study.
+The measurement of Internet has become increasingly important and challenging due to its complexity, large-scale and variability. A numbers of tools have been proposed to accomplish this task (see Sec.\,\ref{sec:related-work} for a complete review). In this project, our primary goal is not to introduce any novel network measurement tool; instead, we use existing measurement techniques to characterize the performance of current Internet. We base our work on previous investigations, and try to elucidate the changes in measurement strategies and outcomes. Specifically, the cloud computing service model and mobile computing have re-shaped the Internet in unanticipated ways. The impact of these new models on end-to-end latency and measurement techniques have never been formally studied. We propose the questions listed bellow as motivations for our study.
 
 \begin{itemize}
-\item How the network latency varies among different kinds of end hosts -- generic end users(including mobile/wireless end hosts), regular web servers, and cloud service from data centers?
+\item How does network latency vary among different kinds of end hosts -- generic end users(including mobile/wireless end hosts), regular web servers, and cloud service from data centers?
 \item How current Internet latency performs in comparison to the speed-of-light limit?
 \item How wide-area networks and data centers contribute to end-to-end latency experienced by end users?
 \item How the latency is affected by edge caching of content, especially on mobile networks?
-\item What's the characteristics of time-series analysis for latency on a daily/weekly/yearly basis?
+\item What are the characteristics of time-series analysis for latency on a daily/weekly/yearly basis?
 \end{itemize}
 
-Our initial approach will be re-implementing and re-producing previous measurement works in the context of current Internet, following the guidelines outlined in \cite{paxson2004strategies}. One major strategy we intend to re-implement is King \cite{gummadi2002king} that leverages the DNS infrastructure to measure end-to-end latency of arbitrary end hosts. To guarantee deliverables, we have a rough plan (see Table.\,\ref{tab:plan}).
+Our initial approach will consist of re-implementing and re-producing previous measurement works in the context of current Internet, following the guidelines outlined in \cite{paxson2004strategies}. One major strategy we intend to re-implement is King \cite{gummadi2002king}, a strategy which leverages the DNS infrastructure to measure end-to-end latency of arbitrary end hosts. To guarantee deliverables, we have a outlined an initial timetable for our study below(see Table.\,\ref{tab:plan}).
 
 \begin{table}
   \centering
   \begin{tabular}{ c|p{4cm} }
     \hline
-    time & task \\
+    Period & Task \\
     \hline
-    late Feburary & literature review \\
-    March & re-implementation and initial measurements \\
-    April & revision/correction of any possible methodology flaws \\
-    early May & wrap up and report \\ 
+    Late Feburary & Literature review \\
+    March & Re-implementation and initial measurements \\
+    April & Revision/correction of any possible methodology flaws \\
+    Early May & Wrap up and report \\ 
     \hline
   \end{tabular}
   \label{tab:plan}
