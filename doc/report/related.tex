@@ -2,17 +2,17 @@
 \label{sec:related-work}
 
 %% Describe related work here.
-
 % the following related works are more from end-host perspective.
 
-There are numbers of tools existing for Internet measurement, and they differ in the characteristics they measure. To name a few, {\em ping} is famous to test reachability and measure round-trip time (RTT). {\em traceroute} \cite{jacobson1989traceroute} and {\em tcptraceroute} \cite{toren2001tcptraceroute} could tell the path as well as RTT. Except for time characteristics estimation, {\em pathchar} \cite{jacobson1997pathchar} measures the hop-by-hop bandwidth and \cite{jain2002pathload} tells the available bandwidth of a path. King \cite{gummadi2002king} measures the end-to-end latency using recursive DNS queries. 
+We first review to possible tools and methodologies that will be valuable for our projects in this section.
 
-Many large Internet monitor projects (such as pingER \cite{matthews2000pinger}) are built using these tools. And researchers have been trying to infer the Internet performance (such as \cite{downey1999using} utilized {\em pathchar} tool to estimate Internet link characteristics) and security \cite{paxson1999bro} based on the measurement results. 
+There are sizable tools existing for Internet measurement, and they differ in the characteristics they measure. To name a few, {\em ping} is famous to test reachability and measure round-trip time (RTT). {\em traceroute} \cite{jacobson1989traceroute} and {\em tcptraceroute} \cite{toren2001tcptraceroute} could tell the routing path as well as RTT. King \cite{gummadi2002king} measures the end-to-end latency using recursive DNS queries. Other than time characteristics, {\em pathchar} \cite{jacobson1997pathchar} measures the hop-by-hop bandwidth and \cite{jain2002pathload} tells the available bandwidth of a path. \cite{paxson2002experiences} provides dedicated hardware for measurements, only affiliated  users can access. Therefore in \cite{spring2003scriptroute}, Spring {\em et al.}\, seeks to build a generic platform for ordinary users to conduct measurements from remote vantage points.
 
-With the advent of cloud computing and mobile computing, people are also characterizing their performance. \cite{kandula2009nature, benson2010network} analyzes traffic patterns in data center, and \cite{huang2011mobiperf} is an ongoing project in measuring mobile end-host network performance. But it's unclear how the Internet's performance is when in comparison.
+On top of these tools, many large Internet monitor projects (such as pingER \cite{matthews2000pinger}) are built. And researchers are also trying to infer the Internet performance (such as \cite{downey1999using} utilized {\em pathchar} tool to estimate Internet link characteristics) and security \cite{paxson1999bro} based on the measurement results. 
 
-Paxson's work in \cite{paxson2004strategies} serves as guidelines in our design and implementation of all measurement experiements.
+With the advent of cloud computing and mobile computing, it becomes important to characterize their performance. \cite{kandula2009nature, benson2010network} analyzes traffic patterns in data center, and \cite{huang2011mobiperf} is an ongoing project in measuring mobile end-host network performance. But it's unclear how the Internet's performance is when in comparison.
 
+Paxson's work in \cite{paxson1997measurements, paxson1997end, paxson2004strategies} serves as guidelines in our design and implementation of all measurement experiements.
 
 %%% Local Variables: 
 %%% mode: latex
