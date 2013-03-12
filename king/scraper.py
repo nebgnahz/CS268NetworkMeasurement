@@ -1,18 +1,18 @@
-from dns import name, resolver, reversename
+import dns.resolver, dns.name, dns.rdatatype
 
-ip = "206.190.36.45"
+ips = ["74.125.224.52", "74.125.224"]
 
-def flipIP(ip):
+def getAddr(ip):
 	ip = ip.split('.')
 	ip.reverse()
-	return '.'.join(ip)
+	addr = dns.name.from_text("%s.in-addr.arpa" % '.'.join(ip))
+	return addr
 
-addr = name.from_text("%s.in-addr.arpa" % flipIP(ip))
-print addr
-print str(resolver.query(addr,"PTR")[0])
 
-'''
-addr=reversename.from_address(ip)
-print addr
-str(resolver.query(addr,"PTR")[0])
-''
+for ip in ips:
+	addr = getAddr(ip)
+	print addr
+	authority = dns.resolver.query(addr, rdtype="PTR", rdclass="IN", raise_on_no_answer=False).response.authority
+	for rr in authority:
+		print rr
+	print '\n'
