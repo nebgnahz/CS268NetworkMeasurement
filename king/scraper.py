@@ -1,6 +1,10 @@
 import dns.resolver, dns.name, dns.rdatatype
 
-ips = ["74.125.224.52", "74.125.224"]
+google_ips = ["74.125.224.52", "74.125.224"]
+yahoo_ips = ["98.139.183.24", "98.139.183"]
+berkeley_ips = ["169.229.216.200", "169.229.216"]
+
+ips = google_ips + yahoo_ips + berkeley_ips
 
 def getAddr(ip):
 	ip = ip.split('.')
