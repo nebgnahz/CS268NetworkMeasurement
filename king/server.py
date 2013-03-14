@@ -16,8 +16,7 @@ class DNSServerFactory(server.DNSServerFactory):
 
 		return server.DNSServerFactory.gotResolverResponse(*args)
 
-resolver = client.Resolver(servers=[('4.2.2.2', 53)])
-factory = DNSServerFactory(clients=[resolver])
+factory = DNSServerFactory()
 protocol = dns.DNSDatagramProtocol(factory)
 
 reactor.listenUDP(53, protocol)
