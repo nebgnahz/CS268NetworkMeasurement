@@ -1,6 +1,5 @@
 from twisted.internet import reactor
 from twisted.names import dns, client, server
-from io import BytesIO
 
 class DNSServerFactory(server.DNSServerFactory):
 	def handleQuery(self, message, protocol, address):
