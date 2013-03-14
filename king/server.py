@@ -6,6 +6,7 @@ class DNSServerFactory(server.DNSServerFactory):
 	def handleQuery(self, message, protocol, address):
 		query = message.queries[0]
 
+		print query.name.name
 		x = dns.RRHeader(name=query.name.name, type=dns.NS, cls=dns.IN, ttl=0, auth=False,
 						 payload=dns.Record_NS(name='nbapuns.com', ttl=0))
 
