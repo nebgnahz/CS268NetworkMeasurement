@@ -1,22 +1,20 @@
-import dns.resolver, dns.name, dns.rdatatype
+from twisted.internet import reactor, defer
+from twisted.names import client
 
-google_ips = ["74.125.224.52", "74.125.224"]
-yahoo_ips = ["98.139.183.24", "98.139.183"]
-berkeley_ips = ["169.229.216.200", "169.229.216"]
+def got_ptr(*args):
+	print "Good", args
 
-ips = google_ips + yahoo_ips + berkeley_ips
+def no_ptr(*args):
+	print "Bad", args
 
-def getAddr(ip):
-	ip = ip.split('.')
-	ip.reverse()
-	addr = dns.name.from_text("%s.in-addr.arpa" % '.'.join(ip))
-	return addr
+def lookup(postfix=None):
+	for octet in range(0,256):
+		if postfix:
+			addr = "%i.%s" % (octet, postfix)
+		else:
+			addr = "%i.in-addr.arpa" % octet
 
+		d = client.lookupPointer(addr).addCallback(got_ptr,addr).addErrback(no_ptr, addr)
 
-for ip in ips:
-	addr = getAddr(ip)
-	print addr
-	authority = dns.resolver.query(addr, rdtype="PTR", rdclass="IN", raise_on_no_answer=False).response.authority
-	for rr in authority:
-		print rr
-	print '\n'
+lookup()
+reactor.run()
