@@ -1,11 +1,13 @@
-import sqlite3, socket, struct
+import psycopg2, socket, struct
 from twisted.internet import reactor, defer
 from twisted.names import client, dns
 
-conn = sqlite3.connect('dns.db')
+conn = psycopg2.connect('dbname=dns user=ahirreddy host=localhost')
 c = conn.cursor()
 
-c.execute('''CREATE TABLE dns (name TEXT, ip INTEGER)''')
+c.execute('''DROP TABLE dns;''')
+c.execute('''CREATE TABLE dns (name TEXT, ip BIGINT);''')
+conn.commit()
 
 sem = defer.DeferredSemaphore(112)
 
@@ -33,11 +35,18 @@ def got_ptr(args, addr, level):
 					#print NS.payload.name.name, "No IP"
 		for name, ip in records.items():
 			if ip:
-				#print "INSERT INTO dns VALUES ('%s',%i)" % (name, ip2int(ip))
-				c.execute("INSERT INTO dns VALUES ('%s',%i)" % (name, ip2int(ip)))
+				print "Have IP"
+				try:
+					query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s' and ip IS NOT NULL);''' % (name, ip2int(ip), name)
+					print query
+					c.execute(query)
+				except:
+					print "Error"
+				print "Done"
 			else:
-				#print "INSERT INTO dns VALUES ('%s', NULL)" % name
-				c.execute("INSERT INTO dns VALUES ('%s', NULL)" % name)
+				query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, ip, name)
+				print query
+				c.execute(query)
 			conn.commit()
 			print 'Commit %s', ip
 	else:
