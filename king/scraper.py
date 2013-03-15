@@ -46,6 +46,12 @@ def got_ptr(args, addr, level):
 def no_ptr(*args):
 	pass
 
+def crypt_error(*args):
+	print "crypt_error", args
+	f = lambda addr: client.lookupPointer(addr).addCallback(got_ptr, addr, args[2]).addErrback(no_ptr)
+	sem.run(f, args[1]).addErrback(crypt_error, args[1], args[2])
+	print "end error"
+
 def lookup(postfix=None, level=1):
 	for octet in range(0,10):
 		if postfix:
@@ -55,7 +61,7 @@ def lookup(postfix=None, level=1):
 
 		f = lambda addr: client.lookupPointer(addr).addCallback(got_ptr, addr, level).addErrback(no_ptr)
 
-		sem.run(f, addr)
+		sem.run(f, addr).addErrback(crypt_error, addr, level)
 
 lookup()
 reactor.run()
