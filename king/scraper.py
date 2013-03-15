@@ -5,14 +5,16 @@ from twisted.names import client, dns
 conn = sqlite3.connect('dns.db')
 c = conn.cursor()
 
-#c.execute('''CREATE TABLE dns (name varchar(255), ip int)''')
+c.execute('''CREATE TABLE dns (name varchar(255), ip int)''')
 
 
 sem = defer.DeferredSemaphore(112)
 
-def dottedQuadToNum(ip):
-    "convert decimal dotted quad string to long integer"
-    return struct.unpack('L',socket.inet_aton(ip))[0]
+def ip2int(addr):                                                               
+    return struct.unpack("!I", socket.inet_aton(addr))[0]                       
+
+def int2ip(addr):                                                               
+    return socket.inet_ntoa(struct.pack("!I", addr))   
 
 def got_ptr(args, addr, level):
 	(ans, auth, add) = args
@@ -23,13 +25,21 @@ def got_ptr(args, addr, level):
 		for A in add:
 			if A.type is dns.A:
 				print A.name, A.payload.dottedQuad()
-				records[A.name] = A.payload.dottedQuad()
+				records[A.name.name] = A.payload.dottedQuad()
 		print 'Authoritative:'
 		for NS in auth:
 			if NS.type is dns.NS:
-				if NS.payload.name not in records:
-					records[NS.payload.name] = None
-					print NS.payload.name, "No IP"
+				if NS.payload.name.name not in records:
+					records[NS.payload.name.name] = None
+					print NS.payload.name.name, "No IP"
+		for name, ip in records.items():
+			if ip:
+				t = name, ip, ip2int(ip), int2ip(ip2int(ip))
+			else:
+				t = name,
+			print t
+			#c.execute("INSERT INTO dns VALUES (?,?)", t)
+			#c.commit()
 	else:
 		lookup(postfix=addr, level=level + 1)
 
