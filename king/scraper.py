@@ -1,6 +1,6 @@
 import sqlite3, socket, struct
 from twisted.internet import reactor, defer
-from twisted.names import client
+from twisted.names import client, dns
 
 conn = sqlite3.connect('dns.db')
 c = conn.cursor()
@@ -17,9 +17,19 @@ def dottedQuadToNum(ip):
 def got_ptr(args, addr, level):
 	(ans, auth, add) = args
 	if level == 4:
-		print addr
-		for a in add:
-			print a.name, a.payload.dottedQuad()
+		records = {}
+		print '\n', addr
+		print 'Additional:'
+		for A in add:
+			if A.type is dns.A:
+				print A.name, A.payload.dottedQuad()
+				records[A.name] = A.payload.dottedQuad()
+		print 'Authoritative:'
+		for NS in auth:
+			if NS.type is dns.NS:
+				if NS.payload.name not in records:
+					records[NS.payload.name] = None
+					print NS.payload.name, "No IP"
 	else:
 		lookup(postfix=addr, level=level + 1)
 
