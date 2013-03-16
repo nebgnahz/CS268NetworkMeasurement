@@ -44,7 +44,7 @@ def got_ptr(args, addr, level):
 					print "Error"
 				print "Done"
 			else:
-				query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, ip, name)
+				query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
 				print query
 				c.execute(query)
 			conn.commit()
