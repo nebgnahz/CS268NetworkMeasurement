@@ -14,16 +14,21 @@ sem = defer.DeferredSemaphore(concurrent)
 conn = psycopg2.connect('dbname=postgres user=benzh host=localhost')
 c = conn.cursor()
 
+c.execute('''DROP TABLE dns;''')
+c.execute('''CREATE TABLE dns (name TEXT, ip BIGINT);''')
+conn.commit()
+
 def processResponse(args, addr, level):
-    processOne()
+    processRecords(addr, level, args[1], args[2])
     if level < 4:
         lookup(postfix=addr, level=level+1)
+    processOne()
 
 def processError(*args):
-    processOne()
     if isinstance(args[0],DNSNameError):
         reactor.stop()
         exit()
+    processOne()
 
 def processOne():
 	#print finished
