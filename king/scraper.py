@@ -19,6 +19,7 @@ def int2ip(addr):
 
 def got_ptr(args, addr, level):
 	(ans, auth, add) = args
+	print addr, auth, add
 	if level == 4:
 		records = {}
 		#print '\n', addr
