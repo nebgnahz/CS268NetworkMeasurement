@@ -43,6 +43,7 @@ def processRecords(addr, level, auth, add):
     if auth == add == []:
         return
     else:
+        pass
         #print addr, level, auth, add
     records = {}
     for A in add:
