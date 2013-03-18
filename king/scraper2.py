@@ -13,7 +13,7 @@ end += 1
 
 print start, end
 
-concurrent = 120
+concurrent = 115
 finished=itertools.count(1)
 count = 0;
 sem = defer.DeferredSemaphore(concurrent)
