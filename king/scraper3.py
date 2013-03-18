@@ -1,9 +1,12 @@
-import dns.query, dns.resolver
+import dns.query
+import dns.resolver
 from dns.exception import DNSException
-from multiprocessing import Process, JoinableQueue
+from threading import Thread
+import sys
+from Queue import Queue
 
 ip_range = 10
-concurrent = 100
+concurrent = 500
 
 default = dns.resolver.get_default_resolver()
 ns = default.nameservers[0]
@@ -24,38 +27,28 @@ def lookup(ip):
     else:
         return None, None
 
-def processToDo():
+def doWork():
     while True:
-        ip, level = todo.get()
+        ip, level = q.get()
         auth, add = lookup(ip)
-        if not auth and not add:
+        if auth is None and add is None:
             pass
         else:
             print auth, add
             if level < 4:
-                completed.put((ip, level))
+                for octect in range(0,ip_range):
+                    ip = "%s.%i" % (ip, octet)
+                    q.put((ip, level+1))
+        q.task_done()
 
-def processComplete():
-    while True:
-        ip, level = completed.get()
-        for octet in range(0,ip_range):
-            ip = "%s.%i" % (ip, octet)
-            todo.put((ip, level+1))
-        completed.task_done()
-        todo.task_done()
+q=Queue(concurrent*2)
 
-todo=JoinableQueue(concurrent*2)
-completed=JoinableQueue()
-
-for i in range(concurrent/2):
-    t=Process(target=processToDo)
+for i in range(concurrent):
+    t=Thread(target=doWork)
     t.daemon=True
     t.start()
-    c=Process(target=processComplete)
-    c.daemon=True
-    c.start()
+
 
 for octet in range(0,ip_range):
-    todo.put((str(octet), 1))
-todo.join()
-completed.join()
+    q.put((str(octet), 1))
+q.join()
