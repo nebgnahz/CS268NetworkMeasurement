@@ -2,10 +2,15 @@ import psycopg2, socket, struct, threading
 from twisted.internet import reactor, defer
 from twisted.names import client, dns
 from twisted.names.error import DNSNameError
-import itertools
+import itertools, argparse
 
-start = 0
-end = 2
+parser = argparse.ArgumentParser(description='Reverse DNS Crawler')
+parser.add_argument('range', metavar='octet', type=int, nargs='+',
+                   help='start and end range')
+
+start, end = parser.parse_args().range
+
+print start, end
 
 concurrent = 120
 finished=itertools.count(1)
@@ -42,7 +47,7 @@ def processRecords(addr, level, auth, add):
     if auth == add == []:
         return
     else:
-		    pass #print addr, level, auth, add
+        print addr, level, auth, add
     records = {}
     for A in add:
         if A.type is dns.A:
