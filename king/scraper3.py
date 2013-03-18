@@ -1,9 +1,7 @@
-import dns.query
-import dns.resolver
+import dns.query, dns.resolver
 from dns.exception import DNSException
-from threading import Thread
-import sys
-from Queue import Queue
+from multiprocessing import Process
+from multiprocessing import JoinableQueue as Queue
 
 ip_range = 10
 concurrent = 500
@@ -36,7 +34,7 @@ def doWork():
         else:
             print auth, add
             if level < 4:
-                for octect in range(0,ip_range):
+                for octet in range(0,ip_range):
                     ip = "%s.%i" % (ip, octet)
                     q.put((ip, level+1))
         q.task_done()
@@ -44,7 +42,7 @@ def doWork():
 q=Queue(concurrent*2)
 
 for i in range(concurrent):
-    t=Thread(target=doWork)
+    t=Process(target=doWork)
     t.daemon=True
     t.start()
 
