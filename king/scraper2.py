@@ -4,14 +4,17 @@ from twisted.names import client, dns
 from twisted.names.error import DNSNameError
 import itertools
 
+start = 0
+end = 2
+
 concurrent = 120
 finished=itertools.count(1)
 count = 0;
 sem = defer.DeferredSemaphore(concurrent)
 
 # comment for different machines
-# conn = psycopg2.connect('dbname=dns user=ahirreddy host=localhost')
-conn = psycopg2.connect('dbname=postgres user=benzh host=localhost')
+conn = psycopg2.connect('dbname=dns user=ahirreddy host=localhost')
+#conn = psycopg2.connect('dbname=postgres user=benzh host=localhost')
 c = conn.cursor()
 
 c.execute('''DROP TABLE dns;''')
@@ -59,7 +62,7 @@ def insertDB(records):
             query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s' and ip IS NOT NULL);''' % (name, ip2int(ip), name)
         else:
             query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
-						#print name, ip
+        print name, ip
         c.execute(query)
     conn.commit()
 
@@ -71,8 +74,8 @@ def addTask(addr, level):
     req.addErrback(processError, addr)
 		
 
-def lookup(postfix, level):
-    for octet in range(0,20):
+def lookup(postfix, level, start=0, end=256):
+    for octet in range(start,end):
         if postfix:
             addr = "%i.%s" % (octet, postfix)
         else:
@@ -82,7 +85,8 @@ def lookup(postfix, level):
         global count
         count = count + 1
 
-lookup(None, 1)
+lookup(None, 1, start=start, end=end)
+
 try:
     reactor.run()
 except KeyboardInterrupt:
