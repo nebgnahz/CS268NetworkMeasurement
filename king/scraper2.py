@@ -9,6 +9,7 @@ parser.add_argument('range', metavar='octet', type=int, nargs='+',
                    help='start and end range')
 
 start, end = parser.parse_args().range
+end += 1
 
 print start, end
 
@@ -18,13 +19,9 @@ count = 0;
 sem = defer.DeferredSemaphore(concurrent)
 
 # comment for different machines
-conn = psycopg2.connect('dbname=dns user=ahirreddy host=localhost')
-#conn = psycopg2.connect('dbname=postgres user=benzh host=localhost')
+#conn = psycopg2.connect('dbname=dns user=ahirreddy host=localhost')
+conn = psycopg2.connect('dbname=postgres user=benzh host=localhost')
 c = conn.cursor()
-
-c.execute('''DROP TABLE dns;''')
-c.execute('''CREATE TABLE dns (name TEXT, ip BIGINT);''')
-conn.commit()
 
 def processResponse(args, addr, level):
     processRecords(addr, level, args[1], args[2])
@@ -39,7 +36,6 @@ def processError(*args):
     processOne()
 
 def processOne():
-	#print finished
     if finished.next()==count:
         reactor.stop()
 
@@ -47,7 +43,7 @@ def processRecords(addr, level, auth, add):
     if auth == add == []:
         return
     else:
-        print addr, level, auth, add
+        #print addr, level, auth, add
     records = {}
     for A in add:
         if A.type is dns.A:
@@ -67,7 +63,7 @@ def insertDB(records):
             query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s' and ip IS NOT NULL);''' % (name, ip2int(ip), name)
         else:
             query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
-        print name, ip
+        #print name, ip
         c.execute(query)
     conn.commit()
 
