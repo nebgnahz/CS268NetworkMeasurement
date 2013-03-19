@@ -121,6 +121,13 @@ def ip2reverse(ip):
     ip.reverse()
     return '%s.in-addr.arpa' % '.'.join(ip)
 
+try:
+    main()
+except KeyboardInterrupt:
+    if arguments.debug:
+        from IPython import embed
+        embed()
+
 def processRecords(auth, add):
     if auth == add == []:
         return
@@ -149,10 +156,3 @@ def insertDB(records):
         #print name, ip
         c.execute(query)
     conn.commit()
-
-try:
-    main()
-except KeyboardInterrupt:
-    if arguments.debug:
-        from IPython import embed
-        embed()
