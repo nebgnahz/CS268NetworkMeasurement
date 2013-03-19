@@ -61,17 +61,15 @@ def main():
 
 def doWork(arr, id):
     batch = []
+    next_batch = []
     while True:
-        numFromQueue = 0
         try:
             while len(batch) < batch_size:
                 batch.append(q.get(timeout=1))
-                numFromQueue += 1
         except:
             pass
 
-        while len(batch) != 0:
-            prefix, level = batch.pop()
+        for prefix, level in batch:
             if prefix:
                 prefix = int2ip(prefix)
                 ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
@@ -83,15 +81,15 @@ def doWork(arr, id):
                 if auth is None and add is None:
                     pass
                 else:
-                    print ip, auth, add
+                    # print ip, auth, add
                     if level < 4:
-                        if len(batch) < batch_size:
-                            batch.append((ip2int(ip), level+1))
+                        if len(next_batch) < batch_size:
+                            next_batch.append((ip2int(ip), level+1))
                         else:
                             q.put((ip2int(ip), level+1))
-
-        for i in range(numFromQueue):
             q.task_done()
+        batch = next_batch
+        next_batch = []
 
 def lookup(ip, level, arr, id):
     addr = ip2reverse(ip)
