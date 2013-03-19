@@ -1,4 +1,4 @@
-import argparse, dns.query, dns.resolver, psycopg2
+import argparse, dns.query, dns.resolver, dns.rdatatype, psycopg2
 from dns.exception import DNSException
 from time import time
 from sys import stderr
@@ -25,13 +25,12 @@ except Exception as e:
     print >> stderr, e
     exit(1)
 
-'''
-conn = psycopg2.connect('dbname=dns password=test')
+conn = psycopg2.connect('dbname=dns host=localhost')
+conn.autocommit = True
+#conn = psycopg2.connect('dbname=dns password=test')
 c = conn.cursor()
 c.execute('DROP TABLE dns;')
 c.execute('CREATE TABLE dns (name TEXT, ip BIGINT);')
-conn.commit()
-'''
 
 default = dns.resolver.get_default_resolver()
 ns = default.nameservers[0]
@@ -77,12 +76,16 @@ def doWork(arr, id):
             ips = ("%i" % octet for octet in range(ip_start,ip_end))
         
         for ip in ips:
-            auth, add = lookup(ip, level, arr, id)
-            if auth is None and add is None:
+            addr, auth, add = lookup(ip, level, arr, id)
+            if not auth and not add:
                 pass
             else:
-                print ip, auth, add
-                # processRecords(auth, add)
+                #print addr, auth, add,
+                #if auth:
+                #    print auth[0][0].rname
+                #else:
+                #    print
+                processRecords(auth, add)
                 if level < 4:
                     q.put((ip2int(ip), level+1))
         q.task_done()
@@ -97,17 +100,17 @@ def lookup(ip, level, arr, id):
             arr[id] = time()
             rcode = response.rcode()
             if rcode == dns.rcode.NOERROR:
-                return response.authority, response.additional
+                return addr, response.authority, response.additional
             else:
-                return None, None
+                return addr, None, None
         except dns.exception.Timeout:
-            pass
-            #print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
+            continue
+            print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
         except dns.query.BadResponse:
-            pass
+            continue
             #print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
 
-    return None, None
+    return addr, None, None
 
 #############
 # Utilities #
@@ -126,31 +129,33 @@ def ip2reverse(ip):
 def processRecords(auth, add):
     if auth == add == []:
         return
-    else:
-        pass
-        #print addr, level, auth, add
     records = {}
-    for A in add:
-        if A.type is dns.A:
-            records[A.name.name] = A.payload.dottedQuad()
-    for NS in auth:
-        if NS.type is dns.NS:
-            if NS.payload.name.name not in records:
-                records[NS.payload.name.name] = None
+    for rrset in add:
+        for rec in rrset:
+            print rec
+#        if A.type is dns.A:
+#           records[A.name.name] = A.payload.dottedQuad()
+    for rrset in auth:
+        for rec in rrset:
+            if rec.rdtype is dns.rdatatype.SOA:
+                records[rec.rname] = None
+#        if NS.type is dns.NS:
+#            if NS.payload.name.name not in records:
+#               records[NS.payload.name.name] = None
     try:
         insertDB(records)
-    except e:
+    except Exception as e:
         print "DB Error", e
 
 def insertDB(records):
     for name, ip in records.items():
+        name = str(name).lower()
         if ip:
             query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s' and ip IS NOT NULL);''' % (name, ip2int(ip), name)
         else:
             query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
-        #print name, ip
+        print name, ip
         c.execute(query)
-    conn.commit()
 
 try:
     main()
