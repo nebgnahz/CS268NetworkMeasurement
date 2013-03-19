@@ -12,8 +12,8 @@ arguments = parser.parse_args()
 
 try:
     ip_start, ip_end = arguments.range
+    print "IP Range: %i - %i" % (ip_start, ip_end)
     ip_end += 1
-    print range(ip_start, ip_end)
 except:
     print >> stderr, 'Invalid Range'
     exit(1)
