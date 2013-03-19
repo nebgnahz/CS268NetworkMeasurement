@@ -82,6 +82,7 @@ def doWork(arr, id):
             for ip in ips:
                 auth, add = yield lookup_sync(ip, level, arr, id)
                 print auth, add
+                reactor.stop()
                 if auth is None and add is None:
                     pass
                 else:
@@ -124,6 +125,13 @@ def ip2reverse(ip):
     ip.reverse()
     return '%s.in-addr.arpa' % '.'.join(ip)
 
+try:
+    main()
+except KeyboardInterrupt:
+    if arguments.debug:
+        from IPython import embed
+        embed()
+
 def processRecords(auth, add):
     if auth == add == []:
         return
@@ -140,7 +148,7 @@ def processRecords(auth, add):
                 records[NS.payload.name.name] = None
     try:
         insertDB(records)
-    except Exception as e:
+    except e:
         print "DB Error", e
 
 def insertDB(records):
@@ -152,10 +160,3 @@ def insertDB(records):
         #print name, ip
         c.execute(query)
     conn.commit()
-
-try:
-    main()
-except KeyboardInterrupt:
-    if arguments.debug:
-        from IPython import embed
-        embed()
