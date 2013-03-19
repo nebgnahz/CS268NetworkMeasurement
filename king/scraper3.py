@@ -3,7 +3,7 @@ from dns.exception import DNSException
 from time import time
 from sys import stderr
 
-octet_range = 30
+octet_range = 256
 
 parser = argparse.ArgumentParser(description='Reverse DNS Scraper')
 parser.add_argument('range', metavar='octet', type=int, nargs='+',
