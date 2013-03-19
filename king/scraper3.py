@@ -19,7 +19,11 @@ def main():
 
 def doWork():
     while True:
-        prefix, level = q.get()
+        try:
+            prefix, level = q.get(timeout=1)
+        except:
+            continue
+
         if prefix:
             prefix = int2ip(prefix)
             ips = ("%s.%i" % (prefix, octet) for octet in range(0,ip_range))
@@ -31,6 +35,7 @@ def doWork():
             if auth is None and add is None:
                 pass
             else:
+                print ip, auth, add
                 if level < 4:
                     q.put((ip2int(ip), level+1))
         q.task_done()
@@ -38,12 +43,16 @@ def doWork():
 def lookup(ip):
     addr = ip2reverse(ip)
     query = dns.message.make_query(addr, dns.rdatatype.PTR)
-    response = dns.query.udp(query, ns)
     
-    rcode = response.rcode()
-    if rcode == dns.rcode.NOERROR:
-        return response.authority, response.additional
-    else:
+    try:
+        response = dns.query.udp(query, ns, timeout=10)
+        rcode = response.rcode()
+        if rcode == dns.rcode.NOERROR:
+            return response.authority, response.additional
+        else:
+            return None, None
+    except dns.exception.Timeout:
+        print 'Timeout'
         return None, None
 
 #############
@@ -60,4 +69,8 @@ def ip2reverse(ip):
     ip.reverse()
     return '%s.in-addr.arpa' % '.'.join(ip)
 
-main()
+try:
+    main()
+except KeyboardInterrupt:
+    from IPython import embed
+    embed()
