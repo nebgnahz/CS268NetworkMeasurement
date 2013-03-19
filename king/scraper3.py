@@ -85,7 +85,7 @@ def lookup(ip, level, arr, id):
 
     for i in range(5-level):
         try:
-            response = dns.query.udp(query, ns, timeout=1.0)
+            response = dns.query.udp(query, ns, timeout=.5)
             arr[id] = time()
             rcode = response.rcode()
             if rcode == dns.rcode.NOERROR:
