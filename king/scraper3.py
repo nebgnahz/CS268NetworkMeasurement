@@ -129,10 +129,10 @@ def processRecords(auth, add):
         #print addr, level, auth, add
     records = {}
     for A in add:
-        if A.rdtype is dns.A:
+        if A.type is dns.A:
             records[A.name.name] = A.payload.dottedQuad()
     for NS in auth:
-        if NS.rdtype is dns.NS:
+        if NS.type is dns.NS:
             if NS.payload.name.name not in records:
                 records[NS.payload.name.name] = None
     try:
