@@ -25,11 +25,13 @@ except Exception as e:
     print >> stderr, e
     exit(1)
 
+'''
 conn = psycopg2.connect('dbname=dns password=test')
 c = conn.cursor()
-c.execute('''DROP TABLE dns;''')
-c.execute('''CREATE TABLE dns (name TEXT, ip BIGINT);''')
+c.execute('DROP TABLE dns;')
+c.execute('CREATE TABLE dns (name TEXT, ip BIGINT);')
 conn.commit()
+'''
 
 default = dns.resolver.get_default_resolver()
 ns = default.nameservers[0]
@@ -79,8 +81,8 @@ def doWork(arr, id):
             if auth is None and add is None:
                 pass
             else:
-                # print ip, auth, add
-                processRecords(auth, add)
+                print ip, auth, add
+                # processRecords(auth, add)
                 if level < 4:
                     q.put((ip2int(ip), level+1))
         q.task_done()
@@ -121,13 +123,6 @@ def ip2reverse(ip):
     ip.reverse()
     return '%s.in-addr.arpa' % '.'.join(ip)
 
-try:
-    main()
-except KeyboardInterrupt:
-    if arguments.debug:
-        from IPython import embed
-        embed()
-
 def processRecords(auth, add):
     if auth == add == []:
         return
@@ -156,3 +151,10 @@ def insertDB(records):
         #print name, ip
         c.execute(query)
     conn.commit()
+
+try:
+    main()
+except KeyboardInterrupt:
+    if arguments.debug:
+        from IPython import embed
+        embed()
