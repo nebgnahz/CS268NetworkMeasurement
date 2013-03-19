@@ -3,7 +3,7 @@ from dns.exception import DNSException
 from multiprocessing import Process, JoinableQueue
 from types import GeneratorType
 
-ip_range = 10
+ip_range = 20
 concurrent = 500
 default = dns.resolver.get_default_resolver()
 ns = default.nameservers[0]
@@ -35,7 +35,7 @@ def doWork():
             if auth is None and add is None:
                 pass
             else:
-                print ip, auth, add
+                # print ip, auth, add
                 if level < 4:
                     q.put((ip2int(ip), level+1))
         q.task_done()
@@ -44,7 +44,7 @@ def lookup(ip, level):
     addr = ip2reverse(ip)
     query = dns.message.make_query(addr, dns.rdatatype.PTR)
 
-    for i in range(5-level):
+    for i in range(max(4-level,1)):
         try:
             response = dns.query.udp(query, ns, timeout=1)
             rcode = response.rcode()
@@ -53,7 +53,9 @@ def lookup(ip, level):
             else:
                 return None, None
         except dns.exception.Timeout:
-            print 'Timeout'
+            print 'Timeout, Count: %i, Level: %i' % (i, level)
+        except dns.query.BadResponse:
+            print 'Bad Response, Count: %i, Level: %i' % (i, level)
 
     return None, None
 
