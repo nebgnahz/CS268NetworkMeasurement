@@ -1,6 +1,7 @@
 import argparse, dns.query, dns.resolver
 from dns.exception import DNSException
 from time import time
+from sys import stderr
 
 parser = argparse.ArgumentParser(description='Reverse DNS Scraper')
 parser.add_argument('range', metavar='octet', type=int, nargs='+',
@@ -10,10 +11,12 @@ parser.add_argument('--threading', action='store_true', help='Use threads instea
 arguments = parser.parse_args()
 
 if arguments.threading:
+    print 'Using Threading'
     from threading import Thread as Split
     from Queue import Queue
     from array import array as Array
 else:
+    print 'Using Multiprocessing'
     from multiprocessing import Process as Split
     from multiprocessing import JoinableQueue as Queue
     from multiprocessing import Array
@@ -76,9 +79,9 @@ def lookup(ip, level, arr, id):
             else:
                 return None, None
         except dns.exception.Timeout:
-            print 'Timeout, Count: %i, Level: %i' % (i, level)
+            print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
         except dns.query.BadResponse:
-            print 'Bad Response, Count: %i, Level: %i' % (i, level)
+            print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
 
     return None, None
 
