@@ -3,6 +3,8 @@ from dns.exception import DNSException
 from time import time
 from sys import stderr
 
+octet_range = 30
+
 parser = argparse.ArgumentParser(description='Reverse DNS Scraper')
 parser.add_argument('range', metavar='octet', type=int, nargs='+',
                    help='Specify first octet range')
@@ -15,7 +17,7 @@ try:
     print "IP Range: %i - %i" % (ip_start, ip_end)
     ip_end += 1
 except:
-    print >> stderr, 'Invalid Range'
+    #print >> stderr, 'Invalid Range'
     exit(1)
 
 default = dns.resolver.get_default_resolver()
@@ -59,7 +61,7 @@ def doWork(arr, id):
 
         if prefix:
             prefix = int2ip(prefix)
-            ips = ("%s.%i" % (prefix, octet) for octet in range(0,256))
+            ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
         else:
             ips = ("%i" % octet for octet in range(ip_start,ip_end))
         
@@ -87,9 +89,11 @@ def lookup(ip, level, arr, id):
             else:
                 return None, None
         except dns.exception.Timeout:
-            print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
+            pass
+            #print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
         except dns.query.BadResponse:
-            print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
+            pass
+            #print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
 
     return None, None
 
