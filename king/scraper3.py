@@ -58,26 +58,29 @@ def main():
 
 def doWork(arr, id):
     while True:
+        batch = []
         try:
-            prefix, level = q.get(timeout=1)
+            for i in range(100):
+                batch.append(q.get(timeout=1))
         except:
-            continue
+            pass
 
-        if prefix:
-            prefix = int2ip(prefix)
-            ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
-        else:
-            ips = ("%i" % octet for octet in range(ip_start,ip_end))
-        
-        for ip in ips:
-            auth, add = lookup(ip, level, arr, id)
-            if auth is None and add is None:
-                pass
+        for prefix, level in batch:
+            if prefix:
+                prefix = int2ip(prefix)
+                ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
             else:
-                # print ip, auth, add
-                if level < 4:
-                    q.put((ip2int(ip), level+1))
-        q.task_done()
+                ips = ("%i" % octet for octet in range(ip_start,ip_end))
+        
+            for ip in ips:
+                auth, add = lookup(ip, level, arr, id)
+                if auth is None and add is None:
+                    pass
+                else:
+                    # print ip, auth, add
+                    if level < 4:
+                        q.put((ip2int(ip), level+1))
+            q.task_done()
 
 def lookup(ip, level, arr, id):
     addr = ip2reverse(ip)
