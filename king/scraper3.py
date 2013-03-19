@@ -3,11 +3,6 @@ from dns.exception import DNSException
 from time import time
 from sys import stderr
 
-from twisted.names import client, dns
-from twisted.internet import reactor
-from twisted.internet.defer import inlineCallbacks
-from twisted.names.error import DNSNameError
-
 parser = argparse.ArgumentParser(description='Reverse DNS Scraper')
 parser.add_argument('range', metavar='octet', type=int, nargs='+',
                    help='Specify first octet range')
@@ -67,49 +62,50 @@ def main():
     print "Total Time: %f seconds" % (end - start)
 
 def doWork(arr, id):
-    def run():
-        while True:
-            try:
-                prefix, level = q.get(timeout=1)
-            except:
-                continue
+    while True:
+        try:
+            prefix, level = q.get(timeout=1)
+        except:
+            continue
 
-            if prefix:
-                prefix = int2ip(prefix)
-                ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
-            else:
-                ips = ("%i" % octet for octet in range(ip_start,ip_end))
+        if prefix:
+            prefix = int2ip(prefix)
+            ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
+        else:
+            ips = ("%i" % octet for octet in range(ip_start,ip_end))
         
-            for ip in ips:
-                auth, add = lookup(ip, level, arr, id)
-                print auth, add
-                reactor.stop()
-                if auth is None and add is None:
-                    pass
-                else:
-                    # print ip, auth, add
-                    processRecords(auth, add)
-                    if level < 4:
-                        q.put((ip2int(ip), level+1))
-            q.task_done()
-    run()
-    reactor.run()
+        for ip in ips:
+            auth, add = lookup(ip, level, arr, id)
+            if auth is None and add is None:
+                pass
+            else:
+                # print ip, auth, add
+                processRecords(auth, add)
+                if level < 4:
+                    q.put((ip2int(ip), level+1))
+        q.task_done()
 
 def lookup(ip, level, arr, id):
     addr = ip2reverse(ip)
+    query = dns.message.make_query(addr, dns.rdatatype.PTR)
+
     for i in range(5-level):
         try:
-            ans, auth, add = yield client.lookupPointer(addr)
+            response = dns.query.udp(query, ns, timeout=.5)
             arr[id] = time()
-            defer.returnValue((auth, add))
-        except DNSNameError as err:
-            print >> stderr, 'Name Error, Count: %i, Level: %i' % (i, level)
-            defer.returnValue((None, None))
-        except Exception:
-            print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
-            defer.returnValue((None, None))
-    defer.returnValue((None, None))
-lookup = inlineCallbacks(lookup)
+            rcode = response.rcode()
+            if rcode == dns.rcode.NOERROR:
+                return response.authority, response.additional
+            else:
+                return None, None
+        except dns.exception.Timeout:
+            pass
+            #print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
+        except dns.query.BadResponse:
+            pass
+            #print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
+
+    return None, None
 
 #############
 # Utilities #
