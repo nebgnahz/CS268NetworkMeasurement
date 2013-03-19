@@ -1,19 +1,37 @@
-import dns.query, dns.resolver
+import argparse, dns.query, dns.resolver
 from dns.exception import DNSException
-from multiprocessing import Process, JoinableQueue, Array
 from time import time
+
+parser = argparse.ArgumentParser(description='Reverse DNS Scraper')
+parser.add_argument('range', metavar='octet', type=int, nargs='+',
+                   help='Specify first octet range')
+parser.add_argument('--threading', action='store_true', help='Use threads instead of processes')
+
+arguments = parser.parse_args()
+
+if arguments.threading:
+    from threading import Thread as Split
+    from Queue import Queue
+    from array import array as Array
+else:
+    from multiprocessing import Process as Split
+    from multiprocessing import JoinableQueue as Queue
+    from multiprocessing import Array
 
 ip_range = 10
 concurrent = 500
 default = dns.resolver.get_default_resolver()
 ns = default.nameservers[0]
-q = JoinableQueue()
+q = Queue()
 
 def main():
     start = time()
-    arr = Array('d', concurrent, lock=False)
+    if arguments.threading:
+        arr = Array('d', (0,)*concurrent)
+    else:
+        arr = Array('d', concurrent, lock=False)
     for i in range(concurrent):
-        t=Process(target=doWork, args=(arr, i))
+        t=Split(target=doWork, args=(arr, i))
         t.daemon=True
         t.start()
     q.put((None, 1))
