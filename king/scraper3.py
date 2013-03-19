@@ -7,8 +7,21 @@ parser = argparse.ArgumentParser(description='Reverse DNS Scraper')
 parser.add_argument('range', metavar='octet', type=int, nargs='+',
                    help='Specify first octet range')
 parser.add_argument('--threading', action='store_true', help='Use threads instead of processes')
-
+parser.add_argument('--debug', action='store_true', help='Launch interactive console on exception or forced exit')
 arguments = parser.parse_args()
+
+try:
+    ip_start, ip_end = arguments.range
+    ip_end += 1
+    print range(ip_start, ip_end)
+except:
+    print >> stderr, 'Invalid Range'
+    exit(1)
+
+default = dns.resolver.get_default_resolver()
+ns = default.nameservers[0]
+
+concurrent = 500
 
 if arguments.threading:
     print 'Using Threading'
@@ -20,11 +33,6 @@ else:
     from multiprocessing import Process as Split
     from multiprocessing import JoinableQueue as Queue
     from multiprocessing import Array
-
-ip_range = 10
-concurrent = 500
-default = dns.resolver.get_default_resolver()
-ns = default.nameservers[0]
 q = Queue()
 
 def main():
@@ -51,9 +59,9 @@ def doWork(arr, id):
 
         if prefix:
             prefix = int2ip(prefix)
-            ips = ("%s.%i" % (prefix, octet) for octet in range(0,ip_range))
+            ips = ("%s.%i" % (prefix, octet) for octet in range(0,256))
         else:
-            ips = ("%i" % octet for octet in range(0,ip_range))
+            ips = ("%i" % octet for octet in range(ip_start,ip_end))
         
         for ip in ips:
             auth, add = lookup(ip, level, arr, id)
@@ -102,5 +110,6 @@ def ip2reverse(ip):
 try:
     main()
 except KeyboardInterrupt:
-    from IPython import embed
-    embed()
+    if arguments.debug:
+        from IPython import embed
+        embed()
