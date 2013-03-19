@@ -4,7 +4,7 @@ from time import time
 from sys import stderr
 
 from twisted.names import client, dns
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.internet.defer import inlineCallbacks
 from twisted.names.error import DNSNameError
 
@@ -30,14 +30,13 @@ except Exception as e:
     print >> stderr, e
     exit(1)
 
+'''
 conn = psycopg2.connect('dbname=dns password=test')
 c = conn.cursor()
-c.execute('''DROP TABLE dns;''')
-c.execute('''CREATE TABLE dns (name TEXT, ip BIGINT);''')
+c.execute('DROP TABLE dns;')
+c.execute('CREATE TABLE dns (name TEXT, ip BIGINT);')
 conn.commit()
-
-default = dns.resolver.get_default_resolver()
-ns = default.nameservers[0]
+'''
 
 if arguments.threading:
     print 'Using Threading'
@@ -81,7 +80,7 @@ def doWork(arr, id):
                 ips = ("%i" % octet for octet in range(ip_start,ip_end))
         
             for ip in ips:
-                auth, add = lookup(ip, level, arr, id)
+                auth, add = yield lookup_sync(ip, level, arr, id)
                 print auth, add
                 reactor.stop()
                 if auth is None and add is None:
@@ -92,7 +91,8 @@ def doWork(arr, id):
                     if level < 4:
                         q.put((ip2int(ip), level+1))
             q.task_done()
-    run()
+    run_sync = inlineCallbacks(run)
+    run_sync()
     reactor.run()
 
 def lookup(ip, level, arr, id):
@@ -109,7 +109,7 @@ def lookup(ip, level, arr, id):
             print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
             defer.returnValue((None, None))
     defer.returnValue((None, None))
-lookup = inlineCallbacks(lookup)
+lookup_sync = inlineCallbacks(lookup)
 
 #############
 # Utilities #
