@@ -10,7 +10,6 @@ parser.add_argument('--threading', action='store_true', help='Use threads instea
 parser.add_argument('--debug', action='store_true', help='Launch interactive console on exception or forced exit')
 parser.add_argument('--octet', type=int, action='store', default=256)
 parser.add_argument('--concurrent', type=int, action='store', default=500)
-parser.add_argument('--batch', type=int, action='store', default=100)
 
 arguments = parser.parse_args()
 
@@ -18,11 +17,9 @@ try:
     ip_start, ip_end = arguments.range
     octet_range = arguments.octet
     concurrent = arguments.concurrent
-    batch_size = arguments.batch
     print "IP Range: %i - %i" % (ip_start, ip_end)
     print "Octet Range: %i" % octet_range
     print "Concurrent: %i" % concurrent
-    print "Batch Size: %i" % batch_size
     ip_end += 1
 except Exception as e:
     print >> stderr, e
@@ -63,7 +60,7 @@ def doWork(arr, id):
     while True:
         batch = []
         try:
-            for i in range(batch_size):
+            for i in range(100):
                 batch.append(q.get(timeout=1))
         except:
             pass
