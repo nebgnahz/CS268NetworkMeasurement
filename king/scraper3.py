@@ -10,7 +10,7 @@ parser.add_argument('--threading', action='store_true', help='Use threads instea
 parser.add_argument('--debug', action='store_true', help='Launch interactive console on exception or forced exit')
 parser.add_argument('--octet', type=int, action='store', default=256)
 parser.add_argument('--concurrent', type=int, action='store', default=500)
-parser.add_argument('--batch', type=int, action='store', default=100)
+parser.add_argument('--batch', type=int, action='store', default=256)
 
 arguments = parser.parse_args()
 
@@ -60,10 +60,11 @@ def main():
     print "Total Time: %f seconds" % (end - start)
 
 def doWork(arr, id):
+    batch = []
+    next_batch = []
     while True:
-        batch = []
         try:
-            for i in range(batch_size):
+            while len(batch) < batch_size:
                 batch.append(q.get(timeout=1))
         except:
             pass
@@ -82,8 +83,13 @@ def doWork(arr, id):
                 else:
                     # print ip, auth, add
                     if level < 4:
-                        q.put((ip2int(ip), level+1))
+                        if len(next_batch) < batch_size:
+                            next_batch.append((ip2int(ip), level+1))
+                        else:
+                            q.put((ip2int(ip), level+1))
             q.task_done()
+        batch = next_batch
+        next_batch = []
 
 def lookup(ip, level, arr, id):
     addr = ip2reverse(ip)
