@@ -1,4 +1,4 @@
-import argparse, dns.query, dns.resolver
+import argparse, dns.query, dns.resolver, psycopg2
 from dns.exception import DNSException
 from time import time
 from sys import stderr
@@ -25,6 +25,11 @@ except Exception as e:
     print >> stderr, e
     exit(1)
 
+conn = psycopg2.connect('dbname=dns password=test')
+c = conn.cursor()
+c.execute('''DROP TABLE dns;''')
+c.execute('''CREATE TABLE dns (name TEXT, ip BIGINT);''')
+conn.commit()
 
 default = dns.resolver.get_default_resolver()
 ns = default.nameservers[0]
@@ -75,6 +80,7 @@ def doWork(arr, id):
                 pass
             else:
                 # print ip, auth, add
+                processRecords(auth, add)
                 if level < 4:
                     q.put((ip2int(ip), level+1))
         q.task_done()
@@ -121,3 +127,32 @@ except KeyboardInterrupt:
     if arguments.debug:
         from IPython import embed
         embed()
+
+def processRecords(auth, add):
+    if auth == add == []:
+        return
+    else:
+        pass
+        #print addr, level, auth, add
+    records = {}
+    for A in add:
+        if A.type is dns.A:
+            records[A.name.name] = A.payload.dottedQuad()
+    for NS in auth:
+        if NS.type is dns.NS:
+            if NS.payload.name.name not in records:
+                records[NS.payload.name.name] = None
+    try:
+        insertDB(records)
+    except e:
+        print "DB Error", e
+
+def insertDB(records):
+    for name, ip in records.items():
+        if ip:
+            query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s' and ip IS NOT NULL);''' % (name, ip2int(ip), name)
+        else:
+            query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
+        #print name, ip
+        c.execute(query)
+    conn.commit()
