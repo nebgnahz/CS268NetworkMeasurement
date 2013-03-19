@@ -25,12 +25,12 @@ def got_ptr(args, addr, level):
 		#print '\n', addr
 		#print 'Additional:'
 		for A in add:
-			if A.rdtype is dns.A:
+			if A.type is dns.A:
 				#print A.name, A.payload.dottedQuad()
 				records[A.name.name] = A.payload.dottedQuad()
 		#print 'Authoritative:'
 		for NS in auth:
-			if NS.rdtype is dns.NS:
+			if NS.type is dns.NS:
 				if NS.payload.name.name not in records:
 					records[NS.payload.name.name] = None
 					#print NS.payload.name.name, "No IP"
