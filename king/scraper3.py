@@ -1,4 +1,4 @@
-import argparse, dns.query, dns.resolver, psycopg2
+import argparse, dns.query, dns.resolver, dns.rdatatype, psycopg2
 from dns.exception import DNSException
 from time import time
 from sys import stderr
@@ -129,10 +129,10 @@ def processRecords(auth, add):
         #print addr, level, auth, add
     records = {}
     for A in add:
-        if A.rdtype is dns.A:
+        if A.rdtype is dns.rdatatype.A:
             records[A.name.name] = A.payload.dottedQuad()
     for NS in auth:
-        if NS.rdtype is dns.NS:
+        if NS.rdtype is dns.rdatatype.NS:
             if NS.payload.name.name not in records:
                 records[NS.payload.name.name] = None
     try:
