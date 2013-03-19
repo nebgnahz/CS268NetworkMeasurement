@@ -1,5 +1,4 @@
 import argparse, dns.query, dns.resolver, dns.rdatatype, psycopg2
-from dns.exception import DNSException
 from time import time
 from sys import stderr
 
@@ -25,14 +24,13 @@ except Exception as e:
     print >> stderr, e
     exit(1)
 
+'''
 conn = psycopg2.connect('dbname=dns password=test')
 c = conn.cursor()
-c.execute('''DROP TABLE dns;''')
-c.execute('''CREATE TABLE dns (name TEXT, ip BIGINT);''')
+c.execute('DROP TABLE dns;')
+c.execute('CREATE TABLE dns (name TEXT, ip BIGINT);')
 conn.commit()
-
-default = dns.resolver.get_default_resolver()
-ns = default.nameservers[0]
+'''
 
 if arguments.threading:
     print 'Using Threading'
@@ -45,6 +43,9 @@ else:
     from multiprocessing import JoinableQueue as Queue
     from multiprocessing import Array
 q = Queue()
+
+default = dns.resolver.get_default_resolver()
+default.lifetime = .5
 
 def main():
     start = time()
@@ -91,7 +92,7 @@ def lookup(ip, level, arr, id):
 
     for i in range(5-level):
         try:
-            response = dns.query.udp(query, ns, timeout=.5)
+            response = default.query(addr, rdtype=dns.rdatatype.PTR, raise_on_no_answer=False).response
             arr[id] = time()
             rcode = response.rcode()
             if rcode == dns.rcode.NOERROR:
@@ -101,9 +102,12 @@ def lookup(ip, level, arr, id):
         except dns.exception.Timeout:
             pass
             #print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
-        except dns.query.BadResponse:
+        except dns.resolver.NoNameservers:
             pass
-            #print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
+            #print >> stderr, 'No Name Server, Count: %i, Level: %i' % (i, level)
+        except dns.resolver.NXDOMAIN:
+            pass
+            #print >> stderr, "NXDomain", addr
 
     return None, None
 
@@ -135,11 +139,13 @@ def processRecords(auth, add):
         if NS.rdtype is dns.rdatatype.NS:
             if NS.payload.name.name not in records:
                 records[NS.payload.name.name] = None
-    try:
+    if records:
+        print records
+'''    try:
         insertDB(records)
     except e:
         print "DB Error", e
-
+'''
 def insertDB(records):
     for name, ip in records.items():
         if ip:
