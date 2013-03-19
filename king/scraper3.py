@@ -1,23 +1,27 @@
 import dns.query, dns.resolver
 from dns.exception import DNSException
-from multiprocessing import Process, JoinableQueue
-from types import GeneratorType
+from multiprocessing import Process, JoinableQueue, Array
+from time import time
 
-ip_range = 20
+ip_range = 10
 concurrent = 500
 default = dns.resolver.get_default_resolver()
 ns = default.nameservers[0]
 q = JoinableQueue()
 
 def main():
+    start = time()
+    arr = Array('d', concurrent, lock=False)
     for i in range(concurrent):
-        t=Process(target=doWork)
+        t=Process(target=doWork, args=(arr, i))
         t.daemon=True
         t.start()
     q.put((None, 1))
     q.join()
+    end = max(arr)
+    print "Total Time: %f seconds" % (end - start)
 
-def doWork():
+def doWork(arr, id):
     while True:
         try:
             prefix, level = q.get(timeout=1)
@@ -31,7 +35,7 @@ def doWork():
             ips = ("%i" % octet for octet in range(0,ip_range))
         
         for ip in ips:
-            auth, add = lookup(ip, level)
+            auth, add = lookup(ip, level, arr, id)
             if auth is None and add is None:
                 pass
             else:
@@ -40,13 +44,14 @@ def doWork():
                     q.put((ip2int(ip), level+1))
         q.task_done()
 
-def lookup(ip, level):
+def lookup(ip, level, arr, id):
     addr = ip2reverse(ip)
     query = dns.message.make_query(addr, dns.rdatatype.PTR)
 
-    for i in range(max(4-level,1)):
+    for i in range(5-level):
         try:
             response = dns.query.udp(query, ns, timeout=1)
+            arr[id] = time()
             rcode = response.rcode()
             if rcode == dns.rcode.NOERROR:
                 return response.authority, response.additional
