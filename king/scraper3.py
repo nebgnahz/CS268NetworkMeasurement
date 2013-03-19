@@ -9,14 +9,17 @@ parser.add_argument('range', metavar='octet', type=int, nargs='+',
 parser.add_argument('--threading', action='store_true', help='Use threads instead of processes')
 parser.add_argument('--debug', action='store_true', help='Launch interactive console on exception or forced exit')
 parser.add_argument('--octet', type=int, action='store', default=256)
+parser.add_argument('--concurrent', type=int, action='store', default=500)
 
 arguments = parser.parse_args()
 
 try:
     ip_start, ip_end = arguments.range
     octet_range = arguments.octet
+    concurrent = arguments.concurrent
     print "IP Range: %i - %i" % (ip_start, ip_end)
     print "Octet Range: %i" % octet_range
+    print "Concurrent: %i" % concurrent
     ip_end += 1
 except Exception as e:
     print >> stderr, e
@@ -25,8 +28,6 @@ except Exception as e:
 
 default = dns.resolver.get_default_resolver()
 ns = default.nameservers[0]
-
-concurrent = 500
 
 if arguments.threading:
     print 'Using Threading'
