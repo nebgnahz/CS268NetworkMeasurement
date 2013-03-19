@@ -1,5 +1,4 @@
-import argparse, dns.query, dns.resolver, psycopg2
-from dns.exception import DNSException
+import argparse, psycopg2
 from time import time
 from sys import stderr
 
@@ -30,13 +29,11 @@ except Exception as e:
     print >> stderr, e
     exit(1)
 
-'''
 conn = psycopg2.connect('dbname=dns password=test')
 c = conn.cursor()
 c.execute('DROP TABLE dns;')
 c.execute('CREATE TABLE dns (name TEXT, ip BIGINT);')
 conn.commit()
-'''
 
 if arguments.threading:
     print 'Using Threading'
@@ -81,11 +78,9 @@ def doWork(arr, id):
         
             for ip in ips:
                 auth, add = yield lookup_sync(ip, level, arr, id)
-                print auth, add
                 if auth is None and add is None:
                     pass
                 else:
-                    # print ip, auth, add
                     processRecords(auth, add)
                     if level < 4:
                         q.put((ip2int(ip), level+1))
@@ -129,7 +124,6 @@ def processRecords(auth, add):
         return
     else:
         pass
-        #print addr, level, auth, add
     records = {}
     for A in add:
         if A.type is dns.A:
@@ -149,7 +143,7 @@ def insertDB(records):
             query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s' and ip IS NOT NULL);''' % (name, ip2int(ip), name)
         else:
             query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
-        #print name, ip
+        print name, ip
         c.execute(query)
     conn.commit()
 
