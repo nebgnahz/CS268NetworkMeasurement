@@ -3,22 +3,25 @@ from dns.exception import DNSException
 from time import time
 from sys import stderr
 
-octet_range = 256
-
 parser = argparse.ArgumentParser(description='Reverse DNS Scraper')
 parser.add_argument('range', metavar='octet', type=int, nargs='+',
                    help='Specify first octet range')
 parser.add_argument('--threading', action='store_true', help='Use threads instead of processes')
 parser.add_argument('--debug', action='store_true', help='Launch interactive console on exception or forced exit')
+parser.add_argument('--octet', type=int, action='store', default=256)
+
 arguments = parser.parse_args()
 
 try:
     ip_start, ip_end = arguments.range
+    octet_range = arguments.octet
     print "IP Range: %i - %i" % (ip_start, ip_end)
+    print "Octet Range: %i" % octet_range
     ip_end += 1
-except:
-    #print >> stderr, 'Invalid Range'
+except Exception as e:
+    print >> stderr, e
     exit(1)
+
 
 default = dns.resolver.get_default_resolver()
 ns = default.nameservers[0]
