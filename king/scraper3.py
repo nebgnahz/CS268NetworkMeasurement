@@ -31,7 +31,9 @@ try:
 except:
     print >> stderr, 'Could not connect to Redis'
 
-ns = ['128.32.44.21', '128.32.44.23', '128.32.136.9', '128.32.206.9', '128.32.206.12', '128.32.136.12']
+default = dns.resolver.get_default_resolver()
+default.lifetime = .5
+default_ns = default.nameservers[0]
 
 if arguments.threading:
     print 'Using Threading'
@@ -52,18 +54,18 @@ def main():
     else:
         arr = Array('d', concurrent, lock=False)
     for i in range(concurrent):
-        t=Split(target=doWork, args=(arr, i, ns[i % len(ns)]))
+        t=Split(target=doWork, args=(arr, i))
         t.daemon=True
         t.start()
-    q.put((None, 1))
+    q.put((None, 1, default_ns))
     q.join()
     end = max(arr)
     print "Total Time: %f seconds" % (end - start)
 
-def doWork(arr, id, ns):
+def doWork(arr, id):
     while True:
         try:
-            prefix, level = q.get(timeout=1)
+            prefix, level, ns = q.get(timeout=1)
         except:
             continue
 
@@ -74,16 +76,20 @@ def doWork(arr, id, ns):
             ips = ("%i" % octet for octet in range(ip_start,ip_end))
         
         for ip in ips:
-            addr, auth, add = lookup(ip, level, arr, id, ns)
+            addr, auth, add = lookup(ip, ns, level, arr, id)
             if not auth and not add:
                 pass
             else:
-                processRecords(auth, add)
-                if level < 4:
-                    q.put((ip2tuple(ip), level+1))
+                next_ns_name = processRecords(auth, add)
+                if level < 3:
+                    try:
+                        next_ns = default.query(next_ns_name).rrset[0].address
+                        q.put((ip2tuple(ip), level+1, next_ns))
+                    except Exception as e:
+                        print "Could not resolve NS", e
         q.task_done()
 
-def lookup(ip, level, arr, id, ns):
+def lookup(ip, ns, level, arr, id):
     addr = ip2reverse(ip)
     query = dns.message.make_query(addr, dns.rdatatype.PTR)
 
@@ -129,13 +135,15 @@ def ip2reverse(ip):
     return '%s.in-addr.arpa' % '.'.join(ip)
 
 def processRecords(auth, add):
-    if auth == add == []:
-        return
     records = {}
+    ret = None
     for rrset in auth:
         for rec in rrset:
             if rec.rdtype is dns.rdatatype.NS:
                 records[str(rec).lower()] = None
+            if rec.rdtype is dns.rdatatype.SOA:
+                ret = rec.mname
+                print ret
     for rrset in add:
         name = rrset.name.to_text().lower()
         for rec in rrset:
@@ -148,6 +156,8 @@ def processRecords(auth, add):
         except Exception as e:
             print "DB Error", e
             print records
+
+    return ret
 
 def insertDB(records):
     pipe = r_server.pipeline()
