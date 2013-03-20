@@ -1,4 +1,4 @@
-import argparse, dns.query, dns.resolver, dns.rdatatype, psycopg2
+import argparse, dns.query, dns.resolver, dns.rdatatype, psycopg2, socket, struct
 from dns.exception import DNSException
 from time import time
 from sys import stderr
@@ -72,7 +72,7 @@ def doWork(arr, id, ns):
             continue
 
         if prefix:
-            prefix = int2ip(prefix)
+            prefix = tuple2ip(prefix)
             ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
         else:
             ips = ("%i" % octet for octet in range(ip_start,ip_end))
@@ -84,7 +84,7 @@ def doWork(arr, id, ns):
             else:
                 processRecords(auth, add)
                 if level < 4:
-                    q.put((ip2int(ip), level+1))
+                    q.put((ip2tuple(ip), level+1))
         q.task_done()
 
 def lookup(ip, level, arr, id, ns):
@@ -106,17 +106,26 @@ def lookup(ip, level, arr, id, ns):
         except dns.query.BadResponse:
             continue
             #print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
+        except dns.query.UnexpectedSource:
+            continue
+            print >> stderr, 'Unexpected Source, Count: %i, Level: %i' % (i, level)
 
     return addr, None, None
 
 #############
 # Utilities #
 #############
-def ip2int(addr):
+def ip2tuple(addr):
     return tuple(addr.split('.'))
 
-def int2ip(addr):
+def tuple2ip(addr):
     return '.'.join(addr)
+
+def ip2int(addr):
+    return struct.unpack("!L", socket.inet_aton(addr))[0]
+
+def int2ip(addr):
+    return socket.inet_ntoa(struct.pack("!L", addr))
 
 def ip2reverse(ip):
     ip = ip.split('.')
@@ -135,18 +144,19 @@ def processRecords(auth, add):
         name = rrset.name.to_text().lower()
         for rec in rrset:
             if rec.rdtype is dns.rdatatype.A:
-                records[name] = rec.address
+                records[name] = ip2int(rec.to_text())
+                #assert int2ip(ip2int(rec.to_text())) == rec.to_text()
     try:
         insertDB(records)
     except Exception as e:
-        print "DB Error", e
+        print "DB Error", e, e.pgcode, e.pgerror
+        print records
 
 def insertDB(records):
     for name, ip in records.items():
         name = str(name).lower()
-        print name, ip
         if ip:
-            query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s' and ip IS NOT NULL);''' % (name, ip2int(ip), name)
+            query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s' and ip IS NOT NULL);''' % (name, ip, name)
         else:
             query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
         c.execute(query)
