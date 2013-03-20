@@ -149,11 +149,13 @@ def processRecords(auth, add):
         print records
 
 def insertDB(records):
+    pipe = r_server.pipeline()
     for name, ip in records.items():
         if ip:
-            r_server.set(ip, name)
+            pipe.sadd(ip, name)
         else:
-            r_server.set(name, '')
+            pipe.sadd(name, '')
+    pipe.execute()
 
 try:
     main()
