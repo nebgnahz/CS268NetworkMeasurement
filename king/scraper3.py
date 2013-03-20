@@ -142,11 +142,12 @@ def processRecords(auth, add):
             if rec.rdtype is dns.rdatatype.A:
                 records[name] = ip2int(rec.to_text())
                 #assert int2ip(ip2int(rec.to_text())) == rec.to_text()
-    try:
-        insertDB(records)
-    except Exception as e:
-        print "DB Error", e
-        print records
+    if records:
+        try:
+            insertDB(records)
+        except Exception as e:
+            print "DB Error", e
+            print records
 
 def insertDB(records):
     pipe = r_server.pipeline()
