@@ -25,9 +25,12 @@ except Exception as e:
     print >> stderr, e
     exit(1)
 
-conn = psycopg2.connect('dbname=dns host=localhost')
+try:
+    conn = psycopg2.connect('dbname=dns host=localhost')
+except:
+    conn = psycopg2.connect('dbname=dns password=test')
+
 conn.autocommit = True
-#conn = psycopg2.connect('dbname=dns password=test')
 c = conn.cursor()
 c.execute('DROP TABLE dns;')
 c.execute('CREATE TABLE dns (name TEXT, ip BIGINT);')
@@ -130,20 +133,15 @@ def processRecords(auth, add):
     if auth == add == []:
         return
     records = {}
-    for rrset in add:
+    for rrset in add+auth:
         for rec in rrset:
-            print rec
-#        if A.type is dns.A:
-#           records[A.name.name] = A.payload.dottedQuad()
-    for rrset in auth:
-        for rec in rrset:
-            if rec.rdtype is dns.rdatatype.SOA:
-                records[rec.rname] = None
+            print "Rec", rec.rdtype, rec
 #        if NS.type is dns.NS:
 #            if NS.payload.name.name not in records:
 #               records[NS.payload.name.name] = None
     try:
-        insertDB(records)
+        pass
+        #insertDB(records)
     except Exception as e:
         print "DB Error", e
 
@@ -156,6 +154,7 @@ def insertDB(records):
             query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
         print name, ip
         c.execute(query)
+        conn.commit()
 
 try:
     main()
