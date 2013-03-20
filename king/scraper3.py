@@ -32,7 +32,7 @@ except:
     print >> stderr, 'Could not connect to Redis'
 
 default = dns.resolver.get_default_resolver()
-default.lifetime = .5
+default.timeout = .5
 default_ns = default.nameservers[0]
 
 if arguments.threading:
@@ -82,17 +82,31 @@ def doWork(arr, id):
             else:
                 next_ns_name = processRecords(auth, add)
                 if level < 3:
-                    try:
-                        next_ns = default.query(next_ns_name).rrset[0].address
+                    next_ns = lookupHost(next_ns_name, level)
+                    if next_ns:
                         q.put((ip2tuple(ip), level+1, next_ns))
-                    except Exception as e:
-                        print "Could not resolve NS", e
         q.task_done()
+
+def lookupHost(host, level):
+    if host:
+        for i in range(5-level):
+            try:
+                return default.query(host).rrset[0].address
+            except dns.exception.Timeout:
+                print >> stderr, host, 'Timeout'
+            except dns.resolver.NXDOMAIN:
+                print >> stderr, host, 'NXDOMAIN'
+            except dns.resolver.NoAnswer:
+                print >> stderr, host, 'NoAnswer'
+            except dns.resolver.NoNameservers:
+                print >> stderr, host, 'NoNameservers'
+            except Exception:
+                print >> stderr, host, 'Unknown Error'
+    return None
 
 def lookup(ip, ns, level, arr, id):
     addr = ip2reverse(ip)
     query = dns.message.make_query(addr, dns.rdatatype.PTR)
-
     for i in range(5-level):
         try:
             response = dns.query.udp(query, ns, timeout=.5)
@@ -103,15 +117,13 @@ def lookup(ip, ns, level, arr, id):
             else:
                 return addr, None, None
         except dns.exception.Timeout:
-            continue
             print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
         except dns.query.BadResponse:
-            continue
-            #print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
+            print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
         except dns.query.UnexpectedSource:
-            continue
             print >> stderr, 'Unexpected Source, Count: %i, Level: %i' % (i, level)
-
+        except Exception:
+            print >> stderr, 'Unknown Error, Count: %i, Level: %i' % (i, level)
     return addr, None, None
 
 #############
