@@ -154,7 +154,7 @@ def insertDB(records):
         if ip:
             pipe.sadd(ip, name)
         else:
-            pipe.sadd(name, '')
+            pipe.sadd('', name)
     pipe.execute()
 
 try:
