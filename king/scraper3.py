@@ -155,7 +155,8 @@ def insertDB(records):
             pipe.sadd(ip, name)
         else:
             pipe.sadd('', name)
-    pipe.execute()
+    if not pipe.execute():
+        raise Exception
 
 try:
     main()
