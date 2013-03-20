@@ -143,7 +143,6 @@ def processRecords(auth, add):
                 records[str(rec).lower()] = None
             if rec.rdtype is dns.rdatatype.SOA:
                 ret = rec.mname
-                print ret
     for rrset in add:
         name = rrset.name.to_text().lower()
         for rec in rrset:
