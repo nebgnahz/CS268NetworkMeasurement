@@ -127,26 +127,28 @@ def processRecords(auth, add):
     if auth == add == []:
         return
     records = {}
-    for rrset in add:
-        for rec in rrset:
-            print "Rec", rec.rdtype, rec
     for rrset in auth:
         for rec in rrset:
-            print "Rec", rec.rdtype, rec
+            if rec.rdtype is dns.rdatatype.NS:
+                records[str(rec).lower()] = None
+    for rrset in add:
+        name = rrset.name.to_text().lower()
+        for rec in rrset:
+            if rec.rdtype is dns.rdatatype.A:
+                records[name] = rec.address
     try:
-        pass
-        #insertDB(records)
+        insertDB(records)
     except Exception as e:
         print "DB Error", e
 
 def insertDB(records):
     for name, ip in records.items():
         name = str(name).lower()
+        print name, ip
         if ip:
             query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s' and ip IS NOT NULL);''' % (name, ip2int(ip), name)
         else:
             query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
-        print name, ip
         c.execute(query)
         conn.commit()
 
