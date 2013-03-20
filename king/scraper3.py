@@ -1,4 +1,4 @@
-import argparse, dns.query, dns.resolver, dns.rdatatype, psycopg2, socket, struct
+import argparse, dns.query, dns.resolver, dns.rdatatype, redis, socket, struct
 from dns.exception import DNSException
 from time import time
 from sys import stderr
@@ -26,14 +26,10 @@ except Exception as e:
     exit(1)
 
 try:
-    conn = psycopg2.connect('dbname=dns host=localhost')
+    import redis
+    r_server = redis.Redis('localhost')
 except:
-    conn = psycopg2.connect('dbname=dns password=test')
-
-conn.autocommit = True
-c = conn.cursor()
-c.execute('DROP TABLE dns;')
-c.execute('CREATE TABLE dns (name TEXT, ip BIGINT);')
+    print >> stderr, 'Could not connect to Redis'
 
 ns = ['128.32.44.21', '128.32.44.23', '128.32.136.9', '128.32.206.9', '128.32.206.12', '128.32.136.12']
 
@@ -149,18 +145,15 @@ def processRecords(auth, add):
     try:
         insertDB(records)
     except Exception as e:
-        print "DB Error", e, e.pgcode, e.pgerror, type(e)
+        print "DB Error", e
         print records
 
 def insertDB(records):
     for name, ip in records.items():
-        name = str(name).lower()
         if ip:
-            query = '''INSERT INTO dns (name, ip) SELECT '%s', %i WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s' and ip IS NOT NULL);''' % (name, ip, name)
+            r_server.set(ip, name)
         else:
-            query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
-        c.execute(query)
-    conn.commit()
+            r_server.set(name, '')
 
 try:
     main()
