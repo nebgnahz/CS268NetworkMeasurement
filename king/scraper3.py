@@ -35,8 +35,7 @@ c = conn.cursor()
 c.execute('DROP TABLE dns;')
 c.execute('CREATE TABLE dns (name TEXT, ip BIGINT);')
 
-default = dns.resolver.get_default_resolver()
-ns = default.nameservers[0]
+ns = ['128.32.44.21', '128.32.44.23', '128.32.136.9', '128.32.206.9', '128.32.206.12', '128.32.136.12']
 
 if arguments.threading:
     print 'Using Threading'
@@ -57,7 +56,7 @@ def main():
     else:
         arr = Array('d', concurrent, lock=False)
     for i in range(concurrent):
-        t=Split(target=doWork, args=(arr, i))
+        t=Split(target=doWork, args=(arr, i, ns[i % len(ns)]))
         t.daemon=True
         t.start()
     q.put((None, 1))
@@ -65,7 +64,7 @@ def main():
     end = max(arr)
     print "Total Time: %f seconds" % (end - start)
 
-def doWork(arr, id):
+def doWork(arr, id, ns):
     while True:
         try:
             prefix, level = q.get(timeout=1)
@@ -79,21 +78,16 @@ def doWork(arr, id):
             ips = ("%i" % octet for octet in range(ip_start,ip_end))
         
         for ip in ips:
-            addr, auth, add = lookup(ip, level, arr, id)
+            addr, auth, add = lookup(ip, level, arr, id, ns)
             if not auth and not add:
                 pass
             else:
-                #print addr, auth, add,
-                #if auth:
-                #    print auth[0][0].rname
-                #else:
-                #    print
                 processRecords(auth, add)
                 if level < 4:
                     q.put((ip2int(ip), level+1))
         q.task_done()
 
-def lookup(ip, level, arr, id):
+def lookup(ip, level, arr, id, ns):
     addr = ip2reverse(ip)
     query = dns.message.make_query(addr, dns.rdatatype.PTR)
 
@@ -133,12 +127,12 @@ def processRecords(auth, add):
     if auth == add == []:
         return
     records = {}
-    for rrset in add+auth:
+    for rrset in add:
         for rec in rrset:
             print "Rec", rec.rdtype, rec
-#        if NS.type is dns.NS:
-#            if NS.payload.name.name not in records:
-#               records[NS.payload.name.name] = None
+    for rrset in auth:
+        for rec in rrset:
+            print "Rec", rec.rdtype, rec
     try:
         pass
         #insertDB(records)
