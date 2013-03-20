@@ -149,7 +149,7 @@ def processRecords(auth, add):
     try:
         insertDB(records)
     except Exception as e:
-        print "DB Error", e, e.pgcode, e.pgerror
+        print "DB Error", e, e.pgcode, e.pgerror, type(e)
         print records
 
 def insertDB(records):
@@ -160,7 +160,7 @@ def insertDB(records):
         else:
             query = '''INSERT INTO dns (name, ip) SELECT '%s', NULL WHERE NOT EXISTS (SELECT 1 FROM dns WHERE name = '%s');''' % (name, name)
         c.execute(query)
-        conn.commit()
+    conn.commit()
 
 try:
     main()
