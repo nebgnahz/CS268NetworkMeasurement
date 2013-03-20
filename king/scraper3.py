@@ -159,7 +159,7 @@ def processRecords(auth, add):
         name = rrset.name.to_text().lower()
         for rec in rrset:
             if rec.rdtype is dns.rdatatype.A:
-                records[name] = ip2int(rec.to_text())
+                records[name] = rec.to_text()
                 #assert int2ip(ip2int(rec.to_text())) == rec.to_text()
     if records:
         try:
