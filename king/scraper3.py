@@ -33,7 +33,7 @@ except:
     print >> stderr, 'Could not connect to Redis'
 
 default = dns.resolver.get_default_resolver()
-default.timeout = 1
+default.timeout = .5
 default_ns = default.nameservers[0]
 
 if arguments.threading:
@@ -109,7 +109,7 @@ def lookup(ip, ns, level, arr, id):
     query = dns.message.make_query(addr, dns.rdatatype.PTR)
     for i in range(5-level):
         try:
-            response = dns.query.udp(query, ns, timeout=1)
+            response = dns.query.udp(query, ns, timeout=.5)
             arr[id] = time()
             rcode = response.rcode()
             if rcode == dns.rcode.NOERROR:
