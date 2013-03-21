@@ -95,13 +95,16 @@ def doWork(arr, id):
 
 def ipIsDNS(ip):
     try:
+        print 'Query IP: ', ip,
         query = dns.message.make_query('a.root-servers.net', dns.rdatatype.A)
         response = dns.query.udp(query, ip, timeout=.5)
     except dns.exception.Timeout:
+        print 'Timeout'
         return None, None
     except dns.query.BadResponse:
         return ip, lookupHost(ip, 3)
     except dns.query.UnexpectedSource:
+        print 'Unexpected source'
         return None, None
     return ip, lookupHost(ip, 3)
 
