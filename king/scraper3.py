@@ -174,6 +174,7 @@ def processRecords(auth, add, level):
         for rec in rrset:
             if rec.rdtype is dns.rdatatype.NS:
                 records[str(rec).lower()] = None
+                next_ns = lookupHost(str(rec), level)
             if rec.rdtype is dns.rdatatype.SOA:
                 next_ns = lookupHost(rec.mname, level)
                 records[str(rec.mname).lower()] = next_ns
