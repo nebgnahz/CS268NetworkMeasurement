@@ -106,6 +106,8 @@ def ipIsDNS(ip):
     except dns.query.UnexpectedSource:
         #print 'Unexpected source'
         return None, None
+    except Exception:
+        return None, None
     return ip, lookupHost(ip, 3)
 
 def lookupHost(host, level):
