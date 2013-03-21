@@ -80,9 +80,8 @@ def doWork(arr, id):
             if not auth and not add:
                 pass
             else:
-                next_ns_name = processRecords(auth, add)
+                next_ns = processRecords(auth, add, level)
                 if level < 3:
-                    next_ns = lookupHost(next_ns_name, level)
                     if next_ns:
                         q.put((ip2tuple(ip), level+1, next_ns))
         q.task_done()
@@ -146,15 +145,16 @@ def ip2reverse(ip):
     ip.reverse()
     return '%s.in-addr.arpa' % '.'.join(ip)
 
-def processRecords(auth, add):
+def processRecords(auth, add, level):
     records = {}
-    ret = None
+    next_ns = None
     for rrset in auth:
         for rec in rrset:
             if rec.rdtype is dns.rdatatype.NS:
                 records[str(rec).lower()] = None
             if rec.rdtype is dns.rdatatype.SOA:
-                ret = rec.mname
+                next_ns = lookupHost(rec.mname, level)
+                records[str(rec.mname).lower()] = next_ns
     for rrset in add:
         name = rrset.name.to_text().lower()
         for rec in rrset:
@@ -168,7 +168,7 @@ def processRecords(auth, add):
             print "DB Error", e
             print records
 
-    return ret
+    return next_ns
 
 def insertDB(records):
     pipe = r_server.pipeline()
