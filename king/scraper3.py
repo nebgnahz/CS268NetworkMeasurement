@@ -75,17 +75,35 @@ def doWork(arr, id):
             ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
         else:
             ips = ("%i" % octet for octet in range(ip_start,ip_end))
-        
-        for ip in ips:
-            addr, auth, add = lookup(ip, ns, level, arr, id)
-            if not auth and not add:
-                pass
-            else:
-                next_ns = processRecords(auth, add, level)
-                if level < 3:
-                    if next_ns:
-                        q.put((ip2tuple(ip), level+1, next_ns))
+
+        if level is 4:
+            for ip in ips:
+                ip, host_name = ipIsDNS(ip)
+                if ip and host_name:
+                    print ip, host_name
+        else:
+            for ip in ips:
+                addr, auth, add = lookup(ip, ns, level, arr, id)
+                if not auth and not add:
+                    pass
+                else:
+                    next_ns = processRecords(auth, add, level)
+                    if level < 4:
+                        if next_ns:
+                            q.put((ip2tuple(ip), level+1, next_ns))
         q.task_done()
+
+def ipIsDNS(ip):
+    try:
+        query = dns.message.make_query('a.root-servers.net', dns.rdatatype.A)
+        response = dns.query.udp(query, ip, timeout=.5)
+    except dns.exception.Timeout:
+        return None, None
+    except dns.query.BadResponse:
+        return ip, lookupHost(ip, 3)
+    except dns.query.UnexpectedSource:
+        return None, None
+    return ip, lookupHost(ip, 3)
 
 def lookupHost(host, level):
     if host:
