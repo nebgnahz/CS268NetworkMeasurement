@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser(description='Reverse DNS Scraper')
 parser.add_argument('range', metavar='octet', type=int, nargs='+',
                    help='Specify first octet range')
 parser.add_argument('--threading', action='store_true', help='Use threads instead of processes')
-parser.add_argument('--debug', action='store_true', help='Launch interactive console on exception or forced exit')
+parser.add_argument('--debug', default=False, action='store_true', help='Print More Errors and Launch interactive console on exception or forced exit')
 parser.add_argument('--octet', type=int, action='store', default=256)
 parser.add_argument('--concurrent', type=int, action='store', default=500)
 
@@ -17,6 +17,7 @@ try:
     ip_start, ip_end = arguments.range
     octet_range = arguments.octet
     concurrent = arguments.concurrent
+    debug = arguments.debug
     print "IP Range: %i - %i" % (ip_start, ip_end)
     print "Octet Range: %i" % octet_range
     print "Concurrent: %i" % concurrent
@@ -92,13 +93,13 @@ def lookupHost(host, level):
             try:
                 return default.query(host).rrset[0].address
             except dns.exception.Timeout:
-                print >> stderr, host, 'Timeout'
+                if debug: print >> stderr, host, 'Timeout'
             except dns.resolver.NXDOMAIN:
-                print >> stderr, host, 'NXDOMAIN'
+                if debug: print >> stderr, host, 'NXDOMAIN'
             except dns.resolver.NoAnswer:
-                print >> stderr, host, 'NoAnswer'
+                if debug: print >> stderr, host, 'NoAnswer'
             except dns.resolver.NoNameservers:
-                print >> stderr, host, 'NoNameservers'
+                if debug: print >> stderr, host, 'NoNameservers'
             except Exception:
                 print >> stderr, host, 'Unknown Error'
     return None
@@ -116,11 +117,11 @@ def lookup(ip, ns, level, arr, id):
             else:
                 return addr, None, None
         except dns.exception.Timeout:
-            print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
+            if debug: print >> stderr, 'Timeout, Count: %i, Level: %i' % (i, level)
         except dns.query.BadResponse:
-            print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
+            if debug: print >> stderr, 'Bad Response, Count: %i, Level: %i' % (i, level)
         except dns.query.UnexpectedSource:
-            print >> stderr, 'Unexpected Source, Count: %i, Level: %i' % (i, level)
+            if debug: print >> stderr, 'Unexpected Source, Count: %i, Level: %i' % (i, level)
         except Exception:
             print >> stderr, 'Unknown Error, Count: %i, Level: %i' % (i, level)
     return addr, None, None
