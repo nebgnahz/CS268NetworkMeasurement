@@ -98,6 +98,7 @@ def ipIsDNS(ip):
         #print 'Query IP: ', ip,
         query = dns.message.make_query('a.root-servers.net', dns.rdatatype.A)
         response = dns.query.udp(query, ip, timeout=.5)
+        return ip, lookupHost(ip, 3)
     except dns.exception.Timeout:
         #print 'Timeout'
         return None, None
@@ -108,7 +109,6 @@ def ipIsDNS(ip):
         return None, None
     except Exception:
         return None, None
-    return ip, lookupHost(ip, 3)
 
 def lookupHost(host, level):
     if host:
