@@ -10,6 +10,7 @@ parser.add_argument('--threading', action='store_true', help='Use threads instea
 parser.add_argument('--debug', default=False, action='store_true', help='Print More Errors and Launch interactive console on exception or forced exit')
 parser.add_argument('--octet', type=int, action='store', default=256)
 parser.add_argument('--concurrent', type=int, action='store', default=500)
+parser.add_argument('--timeout', type=float, action='store', default=.5)
 
 arguments = parser.parse_args()
 
@@ -18,6 +19,7 @@ try:
     octet_range = arguments.octet
     concurrent = arguments.concurrent
     debug = arguments.debug
+    default_timeout = arguments.timeout
     print "IP Range: %i - %i" % (ip_start, ip_end)
     print "Octet Range: %i" % octet_range
     print "Concurrent: %i" % concurrent
@@ -33,7 +35,7 @@ except:
     print >> stderr, 'Could not connect to Redis'
 
 default = dns.resolver.get_default_resolver()
-default.timeout = .5
+default.timeout = default_timeout
 default_ns = default.nameservers[0]
 
 if arguments.threading:
@@ -66,7 +68,7 @@ def main():
 def doWork(arr, id):
     while True:
         try:
-            prefix, level, ns = q.get(timeout=1)
+            prefix, level, ns = q.get(timeout=default_timeout)
         except:
             continue
 
@@ -76,11 +78,6 @@ def doWork(arr, id):
         else:
             ips = ("%i" % octet for octet in range(ip_start,ip_end))
 
-        if level is 4:
-            for ip in ips:
-                ip, host_name = ipIsDNS(ip)
-                if ip and host_name:
-                    print 'Found', ip, host_name
         else:
             for ip in ips:
                 addr, auth, add = lookup(ip, ns, level, arr, id)
@@ -88,27 +85,10 @@ def doWork(arr, id):
                     pass
                 else:
                     next_ns = processRecords(auth, add, level)
-                    if level < 4:
+                    if level < 3:
                         if next_ns:
                             q.put((ip2tuple(ip), level+1, next_ns))
         q.task_done()
-
-def ipIsDNS(ip):
-    try:
-        #print 'Query IP: ', ip,
-        query = dns.message.make_query('a.root-servers.net', dns.rdatatype.A)
-        response = dns.query.udp(query, ip, timeout=.5)
-        return ip, lookupHost(ip, 3)
-    except dns.exception.Timeout:
-        #print 'Timeout'
-        return None, None
-    except dns.query.BadResponse:
-        return ip, lookupHost(ip, 3)
-    except dns.query.UnexpectedSource:
-        #print 'Unexpected source'
-        return None, None
-    except Exception:
-        return None, None
 
 def lookupHost(host, level):
     if host:
@@ -132,7 +112,7 @@ def lookup(ip, ns, level, arr, id):
     query = dns.message.make_query(addr, dns.rdatatype.PTR)
     for i in range(5-level):
         try:
-            response = dns.query.udp(query, ns, timeout=.5)
+            response = dns.query.udp(query, ns, timeout=default_timeout)
             arr[id] = time()
             rcode = response.rcode()
             if rcode == dns.rcode.NOERROR:
@@ -175,8 +155,8 @@ def processRecords(auth, add, level):
     for rrset in auth:
         for rec in rrset:
             if rec.rdtype is dns.rdatatype.NS:
-                records[str(rec).lower()] = None
                 next_ns = lookupHost(str(rec), level)
+                records[str(rec).lower()] = next_ns
             if rec.rdtype is dns.rdatatype.SOA:
                 next_ns = lookupHost(rec.mname, level)
                 records[str(rec.mname).lower()] = next_ns
@@ -199,9 +179,9 @@ def insertDB(records):
     pipe = r_server.pipeline()
     for name, ip in records.items():
         if ip:
-            pipe.sadd(ip, name)
+            pipe.sadd(name, ip)
         else:
-            pipe.sadd('', name)
+            pipe.sadd(name, '')
     if not pipe.execute():
         raise Exception
 
