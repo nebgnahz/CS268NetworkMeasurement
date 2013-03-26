@@ -23,6 +23,7 @@ try:
     print "IP Range: %i - %i" % (ip_start, ip_end)
     print "Octet Range: %i" % octet_range
     print "Concurrent: %i" % concurrent
+    print "Timeout: %f" % default_timeout
     ip_end += 1
 except Exception as e:
     print >> stderr, e
@@ -78,16 +79,15 @@ def doWork(arr, id):
         else:
             ips = ("%i" % octet for octet in range(ip_start,ip_end))
 
-        else:
-            for ip in ips:
-                addr, auth, add = lookup(ip, ns, level, arr, id)
-                if not auth and not add:
-                    pass
-                else:
-                    next_ns = processRecords(auth, add, level)
-                    if level < 3:
-                        if next_ns:
-                            q.put((ip2tuple(ip), level+1, next_ns))
+        for ip in ips:
+            addr, auth, add = lookup(ip, ns, level, arr, id)
+            if not auth and not add:
+                pass
+            else:
+                next_ns = processRecords(auth, add, level)
+                if level < 3:
+                    if next_ns:
+                        q.put((ip2tuple(ip), level+1, next_ns))
         q.task_done()
 
 def lookupHost(host, level):
