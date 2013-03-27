@@ -64,11 +64,8 @@ def main():
         t=Split(target=doWork, args=(arr, i, dictionary))
         t.daemon=True
         t.start()
-
-    for first_octet in range(ip_start,ip_end):
-        print first_octet
-        q.put(first_octet, 1, default_ns)
-        q.join()
+    q.put((None, 1, default_ns))
+    q.join()
     end = max(arr)
     print "Total Time: %f seconds" % (end - start)
 
@@ -79,11 +76,13 @@ def doWork(arr, id, dictionary):
         except:
             continue
 
-        if level is 1:
-            ips = tuple("%i" % prefix)
-        else:
+        if prefix:
+            if len(prefix) is 2:
+                print prefix
             prefix = tuple2ip(prefix)
             ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
+        else:
+            ips = ("%i" % octet for octet in range(ip_start,ip_end))
 
         for ip in ips:
             addr, auth, add = lookup(ip, ns, level, arr, id)
