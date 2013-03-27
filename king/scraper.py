@@ -82,6 +82,8 @@ def doWork(arr, id, dictionary):
         if level is 1:
             ips = tuple("%i" % prefix)
         else:
+            if level is 2:
+                print prefix
             prefix = tuple2ip(prefix)
             ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
 
