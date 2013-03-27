@@ -86,7 +86,7 @@ def doWork(arr, id, dictionary):
 
         threads = []
         for ip in ips:
-            t = Thread(target=processIP, args=(ip, ns, level, arr, id, dictionary))
+            t = Thread(target=processIP, args=(ip, ns, level, arr, id))
             threads.append(t)
             t.start()
         for t in threads:
@@ -94,7 +94,7 @@ def doWork(arr, id, dictionary):
 
         q.task_done()
 
-def processIP(ip, ns, level, arr, id, dictionary):
+def processIP(ip, ns, level, arr, id):
     addr, auth, add = lookup(ip, ns, level, arr, id)
     if not auth and not add:
         pass
