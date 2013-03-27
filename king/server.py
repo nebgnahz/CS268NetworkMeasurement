@@ -4,12 +4,18 @@ from twisted.names import dns, client, server
 class DNSServerFactory(server.DNSServerFactory):
     def handleQuery(self, message, protocol, address):
         query = message.queries[0]
+        target = query.name.name
+        origin = target.split('.')[0]
+        origin = origin.split('-')
 
-        print query.name.name
-        NS = dns.RRHeader(name=query.name.name, type=dns.NS, cls=dns.IN, ttl=0, auth=True,
-                         payload=dns.Record_NS(name='ns1.nbapuns.com', ttl=0))
-        A = dns.RRHeader(name='ns1.nbapuns.com', type=dns.A, cls=dns.IN, ttl=0,
-                        payload=dns.Record_A(address='127.0.0.1', ttl=None))
+        origin_ns = origin[-1]
+        origin_ns_name = "%s.nbappuns.com" % origin_ns
+        origin_ip = '.'.join(origin[:4])
+
+        NS = dns.RRHeader(name=target, type=dns.NS, cls=dns.IN, ttl=0, auth=True,
+                         payload=dns.Record_NS(name=origin_ns_name, ttl=0))
+        A = dns.RRHeader(name=origin_ns_name, type=dns.A, cls=dns.IN, ttl=0,
+                        payload=dns.Record_A(address=origin_ip, ttl=None))
 
         ans = []
         auth = [NS]
