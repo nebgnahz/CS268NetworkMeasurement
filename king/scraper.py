@@ -19,11 +19,10 @@ try:
     octet_range = arguments.octet
     concurrent = arguments.concurrent
     debug = arguments.debug
-    default_timeout = arguments.timeout
     print "IP Range: %i - %i" % (ip_start, ip_end)
     print "Octet Range: %i" % octet_range
     print "Concurrent: %i" % concurrent
-    print "Timeout: %f" % default_timeout
+    print "Timeout: %f" % arguments.timeout
     ip_end += 1
 except Exception as e:
     print >> stderr, e
@@ -36,7 +35,7 @@ except:
     print >> stderr, 'Could not connect to Redis'
 
 default = dns.resolver.get_default_resolver()
-default.timeout = default_timeout
+default.timeout = arguments.timeout
 default_ns = default.nameservers[0]
 
 if arguments.threading:
@@ -72,7 +71,7 @@ def main():
 def doWork(arr, id, dictionary):
     while True:
         try:
-            prefix, level, ns = q.get(timeout=default_timeout)
+            prefix, level, ns = q.get(timeout=arguments.timeout)
         except:
             continue
 
@@ -115,7 +114,7 @@ def lookup(ip, ns, level, arr, id):
     query = dns.message.make_query(addr, dns.rdatatype.PTR)
     for i in range(5-level):
         try:
-            response = dns.query.udp(query, ns, timeout=default_timeout)
+            response = dns.query.udp(query, ns, timeout=arguments.timeout)
             arr[id] = time()
             rcode = response.rcode()
             if rcode == dns.rcode.NOERROR:
