@@ -50,9 +50,9 @@ else:
     from multiprocessing import JoinableQueue as Queue
     from multiprocessing import Array
     from multiprocessing import Manager
-q = Queue()
 
 def main(first_octet):
+    q = Queue()
     start = time()
     if arguments.threading:
         arr = Array('d', (0,)*concurrent)
