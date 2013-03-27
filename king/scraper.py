@@ -71,7 +71,7 @@ def main():
 def doWork(arr, id, dictionary):
     while True:
         try:
-            prefix, level, ns = q.get(timeout=arguments.timeout)
+            prefix, level, ns = q.get(timeout=1)
         except:
             continue
 
