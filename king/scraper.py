@@ -73,17 +73,17 @@ def main():
 def doWork(arr, id, dictionary):
     while True:
         try:
-            ip, level, ns = q.get(timeout=1)
+            prefix, level, ns = q.get(timeout=1)
         except:
             continue
 
-        addr, auth, add = lookup(ip, ns, level, arr, id)
+        addr, auth, add = lookup(prefix, ns, level, arr, id)
         if not auth and not add:
             pass
         else:
             next_ns = processRecords(auth, add, level, dictionary)
             if level < 3 and next_ns:
-                ips = ("%s.%i" % (ip, octet) for octet in range(0,octet_range))
+                ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
                 for ip in ips:
                     q.put((ip, level+1, next_ns))
         q.task_done()
