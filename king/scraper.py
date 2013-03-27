@@ -52,7 +52,7 @@ else:
     from multiprocessing import Manager
 q = Queue()
 
-def main(first_octet):
+def main():
     start = time()
     if arguments.threading:
         arr = Array('d', (0,)*concurrent)
@@ -61,7 +61,7 @@ def main(first_octet):
         arr = Array('d', concurrent, lock=False)
         dictionary = Manager().dict()
     for i in range(concurrent):
-        t=Split(target=doWork, args=(arr, i, dictionary, first_octet))
+        t=Split(target=doWork, args=(arr, i, dictionary))
         t.daemon=True
         t.start()
     q.put((None, 1, default_ns))
@@ -69,7 +69,7 @@ def main(first_octet):
     end = max(arr)
     print "Total Time: %f seconds" % (end - start)
 
-def doWork(arr, id, dictionary, first_octet):
+def doWork(arr, id, dictionary):
     while True:
         try:
             prefix, level, ns = q.get(timeout=default_timeout)
@@ -77,12 +77,12 @@ def doWork(arr, id, dictionary, first_octet):
             continue
 
         if prefix:
+            if len(prefix) is 1:
+                print prefix
             prefix = tuple2ip(prefix)
             ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
         else:
-            print "Octet: %i" % first_octet
-            ips = tuple("%i" % first_octet)
-            #ips = ("%i" % octet for octet in range(ip_start,ip_end))
+            ips = ("%i" % octet for octet in range(ip_start,ip_end))
 
         for ip in ips:
             addr, auth, add = lookup(ip, ns, level, arr, id)
@@ -199,8 +199,7 @@ def insertDB(records):
         raise Exception
 
 try:
-    for first_octet in range(ip_start,ip_end):
-        main(first_octet)
+    main()
 except KeyboardInterrupt:
     if arguments.debug:
         from IPython import embed
