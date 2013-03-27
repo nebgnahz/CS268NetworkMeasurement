@@ -30,6 +30,6 @@ class DNSServerFactory(server.DNSServerFactory):
 factory = DNSServerFactory()
 protocol = dns.DNSDatagramProtocol(factory)
 
-reactor.listenUDP(53, protocol, interface='54.244.114.147')
-reactor.listenTCP(53, factory, interface='54.244.114.147')
+reactor.listenUDP(53, protocol)
+reactor.listenTCP(53, factory)
 reactor.run()
