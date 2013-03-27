@@ -49,16 +49,19 @@ else:
     from multiprocessing import Process as Split
     from multiprocessing import JoinableQueue as Queue
     from multiprocessing import Array
+    from multiprocessing import Manager
 q = Queue()
 
 def main():
     start = time()
     if arguments.threading:
         arr = Array('d', (0,)*concurrent)
+        dictionary = dict()
     else:
         arr = Array('d', concurrent, lock=False)
+        dictionary = Manager().dict()
     for i in range(concurrent):
-        t=Split(target=doWork, args=(arr, i))
+        t=Split(target=doWork, args=(arr, i, dictionary))
         t.daemon=True
         t.start()
     q.put((None, 1, default_ns))
@@ -66,7 +69,7 @@ def main():
     end = max(arr)
     print "Total Time: %f seconds" % (end - start)
 
-def doWork(arr, id):
+def doWork(arr, id, dictionary):
     while True:
         try:
             prefix, level, ns = q.get(timeout=default_timeout)
@@ -84,7 +87,7 @@ def doWork(arr, id):
             if not auth and not add:
                 pass
             else:
-                next_ns = processRecords(auth, add, level)
+                next_ns = processRecords(auth, add, level, dictionary)
                 if level < 3:
                     if next_ns:
                         q.put((ip2tuple(ip), level+1, next_ns))
@@ -149,23 +152,31 @@ def ip2reverse(ip):
     ip.reverse()
     return '%s.in-addr.arpa' % '.'.join(ip)
 
-def processRecords(auth, add, level):
+def processRecords(auth, add, level, dictionary):
     records = {}
     next_ns = None
     for rrset in auth:
         for rec in rrset:
             if rec.rdtype is dns.rdatatype.NS:
-                next_ns = lookupHost(str(rec), level)
-                records[str(rec).lower()] = next_ns
-            if rec.rdtype is dns.rdatatype.SOA:
-                next_ns = lookupHost(rec.mname, level)
-                records[str(rec.mname).lower()] = next_ns
+                host_name = str(rec).lower()
+            elif rec.rdtype is dns.rdatatype.SOA:
+                host_name = str(rec.mname).lower()
+            else:
+                continue
+
+            if host_name in dictionary:
+                next_ns = dictionary[host_name]
+            else:
+                next_ns = lookupHost(host_name, level)
+                dictionary[host_name] = next_ns
+                records[host_name] = next_ns
     for rrset in add:
-        name = rrset.name.to_text().lower()
+        host_name = rrset.name.to_text().lower()
         for rec in rrset:
             if rec.rdtype is dns.rdatatype.A:
-                records[name] = rec.to_text()
-                #assert int2ip(ip2int(rec.to_text())) == rec.to_text()
+                ip = rec.to_text()
+                dictionary[host_name] = ip
+                records[host_name] = ip
     if records:
         try:
             insertDB(records)
