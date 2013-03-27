@@ -83,7 +83,7 @@ def doWork(arr, id, dictionary):
         else:
             next_ns = processRecords(auth, add, level, dictionary)
             if level < 3 and next_ns:
-                ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
+                ips = ("%s.%i" % (ip, octet) for octet in range(0,octet_range))
                 for ip in ips:
                     q.put((ip, level+1, next_ns))
         q.task_done()
