@@ -1,10 +1,12 @@
-import exceptions
+import exceptions, sys
 from twisted.internet import reactor, defer
 from twisted.names import dns, client, server
 from datetime import datetime
+from random import randrange
 
+myAddr = '169-229-50-3-planet1.nbapuns.com'
 target1 = '8.8.8.8'
-target2 = 'google.com'
+target2 = 'ns1.google.com'
 
 start_time = None
 end_time = None
@@ -21,14 +23,17 @@ def queryResponse(args):
 
 class DNSServerFactory(server.DNSServerFactory):
     def handleQuery(self, message, protocol, address):
-        global start_time
+        global start_time, query_id
         try:
             start_time = datetime.now()
             query = message.queries[0]
             target = query.name.name
-            origin = target.split('.')[0]
-            origin = origin.split('-')
+            id, origin = target.split('.')[0:2]
 
+            if id != query_id:
+                raise Exception
+
+            origin = origin.split('-')
             origin_ns = origin[-1]
             origin_ns_name = "%s.nbappuns.com" % origin_ns
             origin_ip = '.'.join(origin[:4])
@@ -47,6 +52,8 @@ class DNSServerFactory(server.DNSServerFactory):
         except Exception:
             print "Bad Request"
 
+query_id = randrange(0, sys.maxint)
+
 ##########
 # Server #
 ##########
@@ -59,6 +66,7 @@ reactor.listenTCP(53, factory)
 # Client #
 ##########
 resolver = client.createResolver([(target1, 53)])
-resolver.lookupAddress(target2, timeout=[1,2,3]).addCallback(queryResponse)
+lookup = "%s.%i.%s" % ('dummy', query_id, myAddr)
+resolver.lookupAddress(lookup, timeout=[1,2,3]).addCallback(queryResponse)
 
 reactor.run()
