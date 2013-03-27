@@ -67,7 +67,7 @@ def main():
 
     for first_octet in range(ip_start,ip_end):
         print first_octet
-        q.put(first_octet, 1, default_ns)
+        q.put(ip2tuple(first_octet), 1, default_ns)
         q.join()
     end = max(arr)
     print "Total Time: %f seconds" % (end - start)
