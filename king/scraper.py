@@ -81,6 +81,8 @@ def doWork(arr, id, dictionary):
         else:
             ips = ("%i" % octet for octet in range(ip_start,ip_end))
 
+        print "\r                 ", "\r", prefix,
+
         for ip in ips:
             addr, auth, add = lookup(ip, ns, level, arr, id)
             if not auth and not add:
