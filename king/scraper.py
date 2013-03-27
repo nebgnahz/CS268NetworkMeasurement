@@ -63,7 +63,9 @@ def main():
         t=Split(target=doWork, args=(arr, i, dictionary))
         t.daemon=True
         t.start()
-    q.put((None, 1, default_ns))
+    ips = ("%i" % octet for octet in range(ip_start,ip_end))
+    for ip in ips:
+        q.put((ip, 1, default_ns))
     q.join()
     end = max(arr)
     print "Total Time: %f seconds" % (end - start)
@@ -71,27 +73,19 @@ def main():
 def doWork(arr, id, dictionary):
     while True:
         try:
-            prefix, level, ns = q.get(timeout=1)
+            ip, level, ns = q.get(timeout=1)
         except:
             continue
 
-        if prefix:
-            prefix = tuple2ip(prefix)
-            ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
+        addr, auth, add = lookup(ip, ns, level, arr, id)
+        if not auth and not add:
+            pass
         else:
-            ips = ("%i" % octet for octet in range(ip_start,ip_end))
-
-        print "\r                 ", "\r", prefix,
-
-        for ip in ips:
-            addr, auth, add = lookup(ip, ns, level, arr, id)
-            if not auth and not add:
-                pass
-            else:
-                next_ns = processRecords(auth, add, level, dictionary)
-                if level < 3:
-                    if next_ns:
-                        q.put((ip2tuple(ip), level+1, next_ns))
+            next_ns = processRecords(auth, add, level, dictionary)
+            if level < 3 and next_ns:
+                ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
+                for ip in ips:
+                    q.put((ip, level+1, next_ns))
         q.task_done()
 
 def lookupHost(host, level):
@@ -136,12 +130,6 @@ def lookup(ip, ns, level, arr, id):
 #############
 # Utilities #
 #############
-def ip2tuple(addr):
-    return tuple(addr.split('.'))
-
-def tuple2ip(addr):
-    return '.'.join(addr)
-
 def ip2int(addr):
     return struct.unpack("!L", socket.inet_aton(addr))[0]
 
