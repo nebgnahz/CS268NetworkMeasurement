@@ -2,11 +2,6 @@ import argparse, dns.query, dns.resolver, dns.rdatatype, redis, socket, struct
 from dns.exception import DNSException
 from time import time
 from sys import stderr
-from multiprocessing import Process as Split
-from multiprocessing import JoinableQueue as Queue
-from multiprocessing import Array
-from multiprocessing import Manager
-from threading import Thread
 
 parser = argparse.ArgumentParser(description='Reverse DNS Scraper')
 parser.add_argument('range', metavar='octet', type=int, nargs='+',
@@ -42,6 +37,19 @@ except:
 default = dns.resolver.get_default_resolver()
 default.timeout = arguments.timeout
 default_ns = default.nameservers[0]
+
+if arguments.threading:
+    print 'Using Threading'
+    from threading import Thread as Split
+    from Queue import Queue
+    from array import array as Array
+else:
+    print 'Using Multiprocessing'
+    from multiprocessing import Process as Split
+    from multiprocessing import JoinableQueue as Queue
+    from multiprocessing import Array
+    from multiprocessing import Manager
+    from threading import Thread
 q = Queue()
 
 def main():
@@ -78,31 +86,23 @@ def doWork(arr, id, dictionary):
 
         threads = []
         for ip in ips:
-            t = ProcessIp(args=(ip, ns, level, arr, id))
+            t = Thread(target=processIP, args=(ip, ns, level, arr, id, dictionary))
             threads.append(t)
             t.start()
         for t in threads:
             t.join()
-            if not t.auth and not t.add:
-                pass
-            else:
-                next_ns = processRecords(t.auth, t.add, level, dictionary)
-                if level < 3:
-                    if next_ns:
-                        q.put((ip2tuple(ip), level+1, next_ns))
+
         q.task_done()
 
-class ProcessIp(Thread):
-    def __init__(self, args):
-        self.args = args
-        self.addr = None
-        self.auth = None
-        self.add = None
-        super(ProcessIp, self).__init__()
-
-    def run(self):
-        ip, ns, level, arr, id = self.args
-        self.addr, self.auth, self.add = lookup(ip, ns, level, arr, id)
+def processIP(ip, ns, level, arr, id, dictionary):
+    addr, auth, add = lookup(ip, ns, level, arr, id)
+    if not auth and not add:
+        pass
+    else:
+        next_ns = processRecords(auth, add, level, dictionary)
+        if level < 3:
+            if next_ns:
+                q.put((ip2tuple(ip), level+1, next_ns))
 
 def lookupHost(host, level):
     if host:
