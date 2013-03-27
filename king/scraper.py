@@ -107,11 +107,7 @@ def lookupHost(host, level):
 
 def lookup(ip, ns, level, arr, id):
     addr = ip2reverse(ip)
-    try:
-        query = dns.message.make_query(addr, dns.rdatatype.PTR)
-    except Exception:
-        print addr
-        exit()
+    query = dns.message.make_query(addr, dns.rdatatype.PTR)
     for i in range(5-level):
         try:
             response = dns.query.udp(query, ns, timeout=arguments.timeout)
