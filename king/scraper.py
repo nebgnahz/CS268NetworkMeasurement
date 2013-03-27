@@ -96,6 +96,8 @@ def doWork(arr, id, dictionary):
                 if level < 3:
                     if next_ns:
                         q.put((ip2tuple(ip), level+1, next_ns))
+        if level is 1:
+            print "Task Done", ips
         q.task_done()
 
 def lookupHost(host, level):
