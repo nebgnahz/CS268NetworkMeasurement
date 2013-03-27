@@ -1,3 +1,4 @@
+import exceptions
 from twisted.internet import reactor, defer
 from twisted.names import dns, client, server
 from datetime import datetime
@@ -5,15 +6,24 @@ from datetime import datetime
 target1 = '8.8.8.8'
 target2 = 'google.com'
 
+start_time = None
+end_time = None
+
 def queryResponse(args):
-    end_time = datetime.now()
-    answer, authority, additional = args
-    print end_time - start_time
+    try:
+        global end_time
+        end_time = datetime.now()
+        answer, authority, additional = args
+        print end_time - start_time
+    except exceptions.TypeError:
+        print "Sever Thread Never Recieved Query"
     reactor.stop()
 
 class DNSServerFactory(server.DNSServerFactory):
     def handleQuery(self, message, protocol, address):
+        global start_time
         try:
+            start_time = datetime.now()
             query = message.queries[0]
             target = query.name.name
             origin = target.split('.')[0]
@@ -50,6 +60,5 @@ reactor.listenTCP(53, factory)
 ##########
 resolver = client.createResolver([(target1, 53)])
 resolver.lookupAddress(target2, timeout=[1,2,3]).addCallback(queryResponse)
-start_time = datetime.now()
 
 reactor.run()
