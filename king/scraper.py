@@ -77,7 +77,7 @@ def doWork(arr, id, dictionary):
             continue
 
         if prefix:
-            if len(prefix) is 1:
+            if len(prefix) is 2:
                 print prefix
             prefix = tuple2ip(prefix)
             ips = ("%s.%i" % (prefix, octet) for octet in range(0,octet_range))
