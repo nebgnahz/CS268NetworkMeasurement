@@ -49,6 +49,7 @@ else:
     from multiprocessing import JoinableQueue as Queue
     from multiprocessing import Array
     from multiprocessing import Manager
+    from threading import Thread
 q = Queue()
 
 def main():
@@ -83,16 +84,25 @@ def doWork(arr, id, dictionary):
 
         print "\r                 ", "\r", prefix,
 
+        threads = []
         for ip in ips:
-            addr, auth, add = lookup(ip, ns, level, arr, id)
-            if not auth and not add:
-                pass
-            else:
-                next_ns = processRecords(auth, add, level, dictionary)
-                if level < 3:
-                    if next_ns:
-                        q.put((ip2tuple(ip), level+1, next_ns))
+            t = Thread(target=processIP, args=(ip, ns, level, arr, id))
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
+
         q.task_done()
+
+def processIP(ip, ns, level, arr, id):
+    addr, auth, add = lookup(ip, ns, level, arr, id)
+    if not auth and not add:
+        pass
+    else:
+        next_ns = processRecords(auth, add, level, dictionary)
+        if level < 3:
+            if next_ns:
+                q.put((ip2tuple(ip), level+1, next_ns))
 
 def lookupHost(host, level):
     if host:
