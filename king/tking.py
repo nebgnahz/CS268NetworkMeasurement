@@ -1,13 +1,14 @@
-import time
 from twisted.internet import reactor, defer
 from twisted.names import dns, client, server
+from datetime import datetime
 
 target1 = '8.8.8.8'
 target2 = 'google.com'
 
 def queryResponse(args):
-    end_time = time.time()
+    end_time = datetime.now()
     answer, authority, additional = args
+    print end_time - start_time
     reactor.stop()
 
 class DNSServerFactory(server.DNSServerFactory):
@@ -47,8 +48,8 @@ reactor.listenTCP(53, factory)
 ##########
 # Client #
 ##########
-resolver = client.createResolver([target1, 53])
-resolver.lookupAddress(target2, timeout=[1,2,3]).addCallback(queryResponse, args)
-start_time = time.time()
+resolver = client.createResolver([(target1, 53)])
+resolver.lookupAddress(target2, timeout=[1,2,3]).addCallback(queryResponse)
+start_time = datetime.now()
 
 reactor.run()
