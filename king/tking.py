@@ -40,7 +40,7 @@ class DNSServerFactory(server.DNSServerFactory):
             print target
             id, origin = target.split('.')[0:2]
 
-            if id != query_id:
+            if int(id) != query_id:
                 raise Exception
 
             origin = origin.split('-')
