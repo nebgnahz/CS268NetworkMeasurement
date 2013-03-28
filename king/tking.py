@@ -76,7 +76,8 @@ class DNSClient(Thread):
             print response
         except dns.exception.Timeout, e:
             print e
-        reactor.callFromThread(reactor.stop)        
+        reactor.callFromThread(reactor.stop)
+        print "Stopped Reactor"
 
 
 ##############
