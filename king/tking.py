@@ -68,7 +68,10 @@ def client():
     response = dns.query.udp(query, target1, timeout=5)
     end_time = datetime.now()
     print "Recieved Response:"
-    print "Time: ", end_time - start_time
+    try:
+        print "Time: ", end_time - start_time
+    except:
+        print 'Never Recieved Server Query'
     print response
     #reactor.callFromThread(reactor.stop)
 

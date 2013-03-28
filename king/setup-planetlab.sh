@@ -1,4 +1,8 @@
-yum -y install git
+yum -y install git python-setuptools python-setuptools-devel python-twisted
+easy_install pip
+pip install --insecure dnspython
+
+mkdir .ssh
 echo "-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA6J47jGKWt0NZ9vNndoDSPLv5rBLj8Jn22HhiyRvpC4Tx7GHP
 ioTWyTQhRha3R5B0M4UW88WTqQPA5lUayuJxm2kC4TMY/j8CN8DlI6bHBf1mm5Oa
