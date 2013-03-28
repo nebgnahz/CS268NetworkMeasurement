@@ -2,6 +2,16 @@ yum -y install git python-setuptools python-setuptools-devel python-twisted
 easy_install pip
 pip install --insecure dnspython
 
+sudo yum -y install make gcc gcc-c++ kernel-devel m4 ncurses-devel openssl-devel
+mkdir -p erlang
+cd erlang
+wget http://www.erlang.org/download/otp_src_R13B04.tar.gz
+tar xfvz otp_src_R13B04.tar.gz
+cd otp_src_R13B04/
+./configure
+sudo make install
+cd ../../
+
 mkdir -p .ssh
 echo "-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA6J47jGKWt0NZ9vNndoDSPLv5rBLj8Jn22HhiyRvpC4Tx7GHP
