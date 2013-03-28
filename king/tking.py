@@ -1,6 +1,6 @@
 import exceptions, sys
 from twisted.internet import reactor, defer
-from twisted.names import twisted_dns as twisted_twisted_dns
+from twisted.names import dns as twisted_dns
 from twisted.names import server
 from datetime import datetime
 from random import randrange
@@ -78,6 +78,7 @@ def client():
     query = dns.message.make_query(addr, dns.rdatatype.A)
     response = dns.query.udp(query, target1, timeout=5)
     print response
+    reactor.stop()
 
 t=Thread(target=client)
 t.start()
