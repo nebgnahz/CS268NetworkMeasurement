@@ -12,6 +12,7 @@ import dns.query, dns.rdatatype
 myAddr = '219-243-208-60-planet3.nbapuns.com'
 target1 = '8.8.8.8'
 target2 = 'ns1.google.com'
+target2_ip = '216.239.32.10'
 
 start_time = None
 
@@ -35,12 +36,12 @@ class DNSServerFactory(server.DNSServerFactory):
 
             NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
                              payload=twisted_dns.Record_NS(name=target2, ttl=0))
-#            A = twisted_dns.RRHeader(name=origin_ns_name, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
-#                            payload=twisted_dns.Record_A(address=origin_ip, ttl=None))
+            A = twisted_dns.RRHeader(name=target2, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
+                            payload=twisted_dns.Record_A(address=target2_ip, ttl=None))
 
             ans = []
             auth = [NS]
-            add = []
+            add = [A]
             args = (self, (ans, auth, add), protocol, message, address)
 
             return server.DNSServerFactory.gotResolverResponse(*args)
