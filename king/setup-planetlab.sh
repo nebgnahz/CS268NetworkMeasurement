@@ -1,17 +1,18 @@
+# Setup Python
 yum -y install git python-setuptools python-setuptools-devel python-twisted
 easy_install pip
 pip install --insecure dnspython
 
-sudo yum -y install make gcc gcc-c++ kernel-devel m4 ncurses-devel openssl-devel
-mkdir -p erlang
-cd erlang
-wget http://www.erlang.org/download/otp_src_R13B04.tar.gz
-tar xfvz otp_src_R13B04.tar.gz
-cd otp_src_R13B04/
-./configure
+# Install Redis
+yum -y install make gcc gcc-c++ kernel-devel m4 ncurses-devel openssl-devel
+wget http://redis.googlecode.com/files/redis-2.4.18.tar.gz
+tar -zxvf redis-2.4.18.tar.gz
+cd redis-2.4.18
+make
 sudo make install
-cd ../../
+cd ~
 
+# SSH and Git
 mkdir -p .ssh
 echo "-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA6J47jGKWt0NZ9vNndoDSPLv5rBLj8Jn22HhiyRvpC4Tx7GHP
