@@ -47,7 +47,7 @@ class TurboKingService(rpyc.Service):
         t.start()
 
         # Start DNS Server
-        reactor.run()
+        reactor.run(installSignalHandlers=0)
 
         if factory.start_time:
             return t.end_time - factory.start_time
