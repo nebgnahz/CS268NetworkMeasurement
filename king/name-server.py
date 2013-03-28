@@ -10,7 +10,7 @@ class DNSServerFactory(server.DNSServerFactory):
             origin = origin.split('-')
 
             origin_ns = origin[-1]
-            origin_ns_name = "%s.nbappuns.com" % origin_ns
+            origin_ns_name = "pl1.6test.edu.cn"
             origin_ip = '.'.join(origin[:4])
 
             print target, origin_ns, origin_ns_name, origin_ip
