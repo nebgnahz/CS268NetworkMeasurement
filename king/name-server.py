@@ -6,12 +6,14 @@ class DNSServerFactory(server.DNSServerFactory):
         try:
             query = message.queries[0]
             target = query.name.name
+            print 'Target:', target
+
             origin = target.split('.')[1]
             origin = origin.split('-')
-
             origin_ns = origin[-1]
             origin_ns_name = "pl1.6test.edu.cn"
             origin_ip = '.'.join(origin[:4])
+            target = '.'.join(target.split('.')[2:])
 
             print target, origin_ns, origin_ns_name, origin_ip
 
