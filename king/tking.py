@@ -30,6 +30,7 @@ def error(args):
 
 class DNSServerFactory(server.DNSServerFactory):
     def handleQuery(self, message, protocol, address):
+        print "recieved query"
         global start_time, query_id
         try:
             start_time = datetime.now()
