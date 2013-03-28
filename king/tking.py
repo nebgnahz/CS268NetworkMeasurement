@@ -8,8 +8,12 @@ from threading import Thread
 from time import sleep
 from datetime import datetime
 import dns.query, dns.rdatatype
+import socket
 
-myAddr = '219-243-208-60-planet3.nbapuns.com'
+myHostName = socket.gethostname().replace('.', '-')
+myIP = socket.gethostbyname(socket.gethostname()).replace('.', '-')
+myAddr = '%s-%s.nbapuns.com' % (myIP, myHostName)
+
 target1 = '8.8.8.8'
 target2 = 'ns1.google.com'
 target2_ip = '216.239.32.10'
@@ -63,7 +67,7 @@ reactor.listenTCP(53, factory)
 ##########
 def client():
     sleep(1)
-    addr = "target.%i.%s" % (query_id, myAddr)
+    addr = "final.%i.%s" % (query_id, myAddr)
     query = dns.message.make_query(addr, dns.rdatatype.A)
     response = dns.query.udp(query, target1, timeout=5)
     end_time = datetime.now()

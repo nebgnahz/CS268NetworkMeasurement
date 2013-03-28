@@ -8,14 +8,12 @@ class DNSServerFactory(server.DNSServerFactory):
             target = query.name.name
             print 'Target:', target
 
-            origin = target.split('.')[1]
-            origin = origin.split('-')
-            origin_ns = origin[-1]
-            origin_ns_name = "pl1.6test.edu.cn"
+            origin = target.split('.')[2].split('-')
+            origin_ns_name = '.'.join(origin[4:])
             origin_ip = '.'.join(origin[:4])
             target = '.'.join(target.split('.')[2:])
 
-            print target, origin_ns, origin_ns_name, origin_ip
+            print target, origin_ip, origin_ns_name
 
             NS = dns.RRHeader(name=target, type=dns.NS, cls=dns.IN, ttl=0, auth=True,
                              payload=dns.Record_NS(name=origin_ns_name, ttl=0))
