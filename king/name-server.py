@@ -13,6 +13,8 @@ class DNSServerFactory(server.DNSServerFactory):
             origin_ns_name = "%s.nbappuns.com" % origin_ns
             origin_ip = '.'.join(origin[:4])
 
+            print target, origin_ns, origin_ns_name, origin_ip
+
             NS = dns.RRHeader(name=target, type=dns.NS, cls=dns.IN, ttl=0, auth=True,
                              payload=dns.Record_NS(name=origin_ns_name, ttl=0))
             A = dns.RRHeader(name=origin_ns_name, type=dns.A, cls=dns.IN, ttl=0,
