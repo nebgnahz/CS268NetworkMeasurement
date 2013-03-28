@@ -36,6 +36,7 @@ class DNSServerFactory(server.DNSServerFactory):
             start_time = datetime.now()
             query = message.queries[0]
             target = query.name.name
+            print target
             id, origin = target.split('.')[0:2]
 
             if id != query_id:
