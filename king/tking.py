@@ -71,7 +71,7 @@ class DNSClient(Thread):
         query = dns.message.make_query(addr, dns.rdatatype.A)
         try:
             response = dns.query.udp(query, self.target1_ip, timeout=5)
-            end_time = datetime.now()
+            self.end_time = datetime.now()
             print "Recieved Response:"
             print response
         except dns.exception.Timeout, e:
