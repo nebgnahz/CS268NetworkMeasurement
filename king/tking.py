@@ -4,7 +4,7 @@ from twisted.names import dns, client, server
 from datetime import datetime
 from random import randrange
 
-myAddr = '169-229-50-3-planet1.nbapuns.com'
+myAddr = '219-243-208-60-planet3.nbapuns.com'
 target1 = '8.8.8.8'
 target2 = 'ns1.google.com'
 
