@@ -35,18 +35,26 @@ class DNSServerFactory(server.DNSServerFactory):
         global start_time, query_id
         try:
             start_time = datetime.now()
+            print "start time"
             query = message.queries[0]
+            print "query"
             target = query.name.name
+            print "target"
             print target
             id, origin = target.split('.')[0:2]
+            print "split"
 
             if int(id) != query_id:
+                print "Query ID Doesn't Match"
                 raise Exception
 
             origin = origin.split('-')
+            print "split origin"
             origin_ns = origin[-1]
+            print "origin ns"
             origin_ns_name = "%s.nbappuns.com" % origin_ns
             origin_ip = '.'.join(origin[:4])
+            print "ip"
 
             NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
                              payload=twisted_dns.Record_NS(name=origin_ns_name, ttl=0))
@@ -59,8 +67,8 @@ class DNSServerFactory(server.DNSServerFactory):
             args = (self, (ans, auth, add), protocol, message, address)
 
             return server.DNSServerFactory.gotResolverResponse(*args)
-        except Exception:
-            print "Bad Request"
+        except Exception, e:
+            print "Bad Request", e
 
 query_id = randrange(0, sys.maxint)
 
