@@ -28,7 +28,7 @@ class DNSServerFactory(server.DNSServerFactory):
             query = message.queries[0]
             target = query.name.name
             print target
-            target, id, origin = target.split('.')[0:3]
+            dummy, id, origin = target.split('.')[0:3]
 
             if int(id) != query_id:
                 print "Query ID Doesn't Match"
