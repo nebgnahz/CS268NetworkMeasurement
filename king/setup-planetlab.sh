@@ -2,6 +2,7 @@
 yum -y install git python-setuptools python-setuptools-devel python-twisted
 easy_install pip
 pip install --insecure dnspython
+pip install --insecure celery
 
 # Install Redis
 yum -y install make gcc gcc-c++ kernel-devel m4 ncurses-devel openssl-devel
