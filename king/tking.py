@@ -15,19 +15,6 @@ target2 = 'ns1.google.com'
 
 start_time = None
 
-def queryResponse(args):
-    try:
-        end_time = datetime.now()
-        print "Recieved Response:"
-        print "Time: ", end_time - start_time
-        print args
-    except exceptions.TypeError:
-        print "Sever Thread Never Recieved Query"
-    reactor.stop()
-
-def error(args):
-    print args
-
 class DNSServerFactory(server.DNSServerFactory):
     def handleQuery(self, message, protocol, address):
         print "Recieved Query"
@@ -83,6 +70,9 @@ def client():
     addr = "%i.%s" % (query_id, myAddr)
     query = dns.message.make_query(addr, dns.rdatatype.A)
     response = dns.query.udp(query, target1, timeout=5)
+    end_time = datetime.now()
+    print "Recieved Response:"
+    print "Time: ", end_time - start_time
     print response
     reactor.stop()
 
