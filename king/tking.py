@@ -43,7 +43,7 @@ class TurboKingService(rpyc.Service):
         reactor.listenTCP(53, factory)
 
         # Start DNS Client
-        t=DNSClient(query_id, t1)
+        t=DNSClient(query_id, t1, ip1)
         t.start()
 
         # Start DNS Server
@@ -58,10 +58,11 @@ class TurboKingService(rpyc.Service):
 # Client #
 ##########
 class DNSClient(Thread):
-    def __init__(self, query_id, target1):
+    def __init__(self, query_id, target1, target1_ip):
         Thread.__init__(self)
         self.query_id = query_id
         self.target1 = target1
+        self.target1_ip = target1_ip
         self.end_time = None
 
     def run(self):
@@ -69,7 +70,7 @@ class DNSClient(Thread):
         addr = "final.%i.%s" % (self.query_id, myAddr)
         query = dns.message.make_query(addr, dns.rdatatype.A)
         try:
-            response = dns.query.udp(query, self.target1, timeout=5)
+            response = dns.query.udp(query, self.target1_ip, timeout=5)
             end_time = datetime.now()
             print "Recieved Response:"
             print response
