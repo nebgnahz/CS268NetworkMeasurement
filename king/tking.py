@@ -14,10 +14,10 @@ myHostName = socket.gethostname().replace('.', '-')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '-')
 myAddr = '%s-%s.nbapuns.com' % (myIP, myHostName)
 
-target1 = '8.8.8.8'
-target2 = 'ns1.google.com'
-target2_ip = '216.239.32.10'
 
+# target1 = '8.8.8.8'
+# target2 = 'ns1.google.com'
+# target2_ip = '216.239.32.10'
 
 ###############
 # RPC Service #
@@ -33,13 +33,13 @@ class TurboKingService(rpyc.Service):
         query_id = randrange(0, sys.maxint)
         
         # Setup DNS Server
-        factory = DNSServerFactory(query_id)
+        factory = DNSServerFactory(query_id, t2, ip2)
         protocol = twisted_dns.DNSDatagramProtocol(factory)
         reactor.listenUDP(53, protocol)
         reactor.listenTCP(53, factory)
 
         # Start DNS Client
-        t=Thread(target=DnsClient)
+        t=DNSClient(query_id, t1)
         t.start()
 
         # Start DNS Server
@@ -75,9 +75,11 @@ class DNSClient(Thread):
 # DNS Server #
 ##############
 class DNSServerFactory(server.DNSServerFactory):
-    def __init__(self, query_id, authorities=None, caches=None, clients=None, verbose=0):
+    def __init__(self, query_id, t2, ip2, authorities=None, caches=None, clients=None, verbose=0):
         server.DNSServerFactory.__init__(self,authorities,caches,clients,verbose)
         self.query_id = query_id
+        self.target2 = t2
+        self.target2_ip = ip2
         self.start_time = None
 
     #TODO: Stop Handling of Queries after seeing a valid one
@@ -100,9 +102,9 @@ class DNSServerFactory(server.DNSServerFactory):
                 self.start_time = datetime.now()
 
             NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
-                             payload=twisted_dns.Record_NS(name=target2, ttl=0))
-            A = twisted_dns.RRHeader(name=target2, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
-                            payload=twisted_dns.Record_A(address=target2_ip, ttl=None))
+                             payload=twisted_dns.Record_NS(name=self.target2, ttl=0))
+            A = twisted_dns.RRHeader(name=self.target2, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
+                            payload=twisted_dns.Record_A(address=self.target2_ip, ttl=None))
 
             ans = []
             auth = [NS]
