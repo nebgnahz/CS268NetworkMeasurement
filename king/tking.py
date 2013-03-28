@@ -114,3 +114,8 @@ class DNSServerFactory(server.DNSServerFactory):
             return server.DNSServerFactory.gotResolverResponse(*args)
         except Exception, e:
             print "Bad Request", e
+
+if __name__ == "__main__":
+    from rpyc.utils.server import ThreadedServer
+    t = ThreadedServer(MyService, port = 18861)
+    t.start()
