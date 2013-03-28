@@ -5,6 +5,7 @@ from twisted.names import server
 from datetime import datetime
 from random import randrange
 from threading import Thread
+from time import sleep
 import datetime
 import dns.query, dns.rdatatype
 
