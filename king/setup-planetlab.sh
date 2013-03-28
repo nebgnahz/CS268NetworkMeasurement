@@ -1,16 +1,7 @@
 yum -y install git python-setuptools python-setuptools-devel python-twisted
 yum -y install make gcc gcc-c++ kernel-devel m4 ncurses-devel openssl-devel
 easy_install pip
-pip install --insecure dnspython
-pip install --insecure celery
-pip install -U --insecure celery-with-redis
-
-wget http://redis.googlecode.com/files/redis-2.4.18.tar.gz
-tar -zxvf redis-2.4.18.tar.gz
-cd redis-2.4.18
-make
-sudo make install
-cd ~
+pip install --insecure dnspython rpyc
 
 mkdir -p .ssh
 echo "-----BEGIN RSA PRIVATE KEY-----
