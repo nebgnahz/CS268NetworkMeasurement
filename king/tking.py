@@ -1,4 +1,5 @@
 import exceptions, sys
+from twisted.internet import reactor
 from twisted.names import dns as twisted_dns
 from twisted.names import server
 from datetime import datetime
@@ -34,7 +35,6 @@ class TurboKingService(rpyc.Service):
 
     # TODO: Figure out if old reactors are using memory
     def exposed_get_latency(self, t1, ip1, t2, ip2):
-        from twisted.internet import reactor
         query_id = randrange(0, sys.maxint)
         
         # Setup DNS Server
