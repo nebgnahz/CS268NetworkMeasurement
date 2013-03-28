@@ -26,7 +26,7 @@ class DNSServerFactory(server.DNSServerFactory):
             args = (self, (ans, auth, add), protocol, message, address)
 
             return server.DNSServerFactory.gotResolverResponse(*args)
-        except Exception as e:
+        except Exception, e:
             print "Bad Request", e
 
 factory = DNSServerFactory()
