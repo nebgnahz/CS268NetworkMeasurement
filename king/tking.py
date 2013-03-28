@@ -1,8 +1,11 @@
 import exceptions, sys
 from twisted.internet import reactor, defer
-from twisted.names import dns, client, server
+from twisted.names import dns, server
 from datetime import datetime
 from random import randrange
+from threading import Thread
+from time import sleep
+import dns as pydns
 
 myAddr = '219-243-208-60-planet3.nbapuns.com'
 target1 = '8.8.8.8'
@@ -68,8 +71,14 @@ reactor.listenTCP(53, factory)
 ##########
 # Client #
 ##########
-resolver = client.createResolver([(target1, 53)])
-lookup = "%s.%i.%s" % ('dummy', query_id, myAddr)
-resolver.lookupAddress(lookup, timeout=[5,5,5]).addCallback(queryResponse).addErrback(error)
+def client():
+    sleep(1)
+    addr = "%s.%i.%s" % ('dummy', query_id, myAddr)
+    query = dns.message.make_query(addr, dns.rdatatype.A)
+    response = dns.query.udp(query, target1, timeout=5)
+    print response
+
+t=Thread(target=client)
+t.start()
 
 reactor.run()
