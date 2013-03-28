@@ -1,11 +1,12 @@
 import exceptions, sys
 from twisted.internet import reactor, defer
-from twisted.names import dns, server
+from twisted.names import twisted_dns as twisted_twisted_dns
+from twisted.names import server
 from datetime import datetime
 from random import randrange
 from threading import Thread
 from time import sleep
-import dns as pydns
+import dns.query, dns.rdatatype
 
 myAddr = '219-243-208-60-planet3.nbapuns.com'
 target1 = '8.8.8.8'
@@ -44,10 +45,10 @@ class DNSServerFactory(server.DNSServerFactory):
             origin_ns_name = "%s.nbappuns.com" % origin_ns
             origin_ip = '.'.join(origin[:4])
 
-            NS = dns.RRHeader(name=target, type=dns.NS, cls=dns.IN, ttl=0, auth=True,
-                             payload=dns.Record_NS(name=origin_ns_name, ttl=0))
-            A = dns.RRHeader(name=origin_ns_name, type=dns.A, cls=dns.IN, ttl=0,
-                            payload=dns.Record_A(address=origin_ip, ttl=None))
+            NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
+                             payload=twisted_dns.Record_NS(name=origin_ns_name, ttl=0))
+            A = twisted_dns.RRHeader(name=origin_ns_name, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
+                            payload=twisted_dns.Record_A(address=origin_ip, ttl=None))
 
             ans = []
             auth = [NS]
@@ -64,7 +65,7 @@ query_id = randrange(0, sys.maxint)
 # Server #
 ##########
 factory = DNSServerFactory()
-protocol = dns.DNSDatagramProtocol(factory)
+protocol = twisted_dns.DNSDatagramProtocol(factory)
 reactor.listenUDP(53, protocol)
 reactor.listenTCP(53, factory)
 
@@ -74,8 +75,8 @@ reactor.listenTCP(53, factory)
 def client():
     sleep(1)
     addr = "%s.%i.%s" % ('dummy', query_id, myAddr)
-    query = pydns.message.make_query(addr, dns.rdatatype.A)
-    response = pydns.query.udp(query, target1, timeout=5)
+    query = dns.message.make_query(addr, dns.rdatatype.A)
+    response = dns.query.udp(query, target1, timeout=5)
     print response
 
 t=Thread(target=client)
