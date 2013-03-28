@@ -74,7 +74,7 @@ def client():
     print "Recieved Response:"
     print "Time: ", end_time - start_time
     print response
-    reactor.stop()
+    reactor.callFromThread(reactor.stop)
 
 t=Thread(target=client)
 t.start()
