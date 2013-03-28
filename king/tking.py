@@ -14,14 +14,13 @@ target1 = '8.8.8.8'
 target2 = 'ns1.google.com'
 
 start_time = None
-end_time = None
 
 def queryResponse(args):
     try:
-        global end_time
         end_time = datetime.now()
-        answer, authority, additional = args
-        print end_time - start_time
+        print "Recieved Response:"
+        print "Time: ", end_time - start_time
+        print args
     except exceptions.TypeError:
         print "Sever Thread Never Recieved Query"
     reactor.stop()
@@ -31,30 +30,26 @@ def error(args):
 
 class DNSServerFactory(server.DNSServerFactory):
     def handleQuery(self, message, protocol, address):
-        print "recieved query"
+        print "Recieved Query"
+        print address
+        print message
+
         global start_time, query_id
         try:
             start_time = datetime.now()
-            print "start time"
             query = message.queries[0]
-            print "query"
             target = query.name.name
-            print "target"
             print target
             id, origin = target.split('.')[0:2]
-            print "split"
 
             if int(id) != query_id:
                 print "Query ID Doesn't Match"
                 raise Exception
 
             origin = origin.split('-')
-            print "split origin"
             origin_ns = origin[-1]
-            print "origin ns"
             origin_ns_name = "%s.nbappuns.com" % origin_ns
             origin_ip = '.'.join(origin[:4])
-            print "ip"
 
             NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
                              payload=twisted_dns.Record_NS(name=origin_ns_name, ttl=0))
