@@ -9,6 +9,7 @@ from time import sleep
 from datetime import datetime
 import dns.query, dns.rdatatype
 import socket
+import rpyc
 
 myHostName = socket.gethostname().replace('.', '-')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '-')
@@ -28,6 +29,9 @@ class TurboKingService(rpyc.Service):
 
     def on_disconnect(self):
         pass
+
+    def exposed_test(self):
+        return 1
 
     def exposed_get_latency(self, t1, ip1, t2, ip2):
         query_id = randrange(0, sys.maxint)
@@ -117,5 +121,5 @@ class DNSServerFactory(server.DNSServerFactory):
 
 if __name__ == "__main__":
     from rpyc.utils.server import ThreadedServer
-    t = ThreadedServer(MyService, port = 18861)
+    t = ThreadedServer(TurboKingService, port = 18861)
     t.start()
