@@ -76,7 +76,7 @@ reactor.listenTCP(53, factory)
 ##########
 def client():
     sleep(1)
-    addr = "%s.%i.%s" % ('dummy', query_id, myAddr)
+    addr = "%i.%s" % (query_id, myAddr)
     query = dns.message.make_query(addr, dns.rdatatype.A)
     response = dns.query.udp(query, target1, timeout=5)
     print response
