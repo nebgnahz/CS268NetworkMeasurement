@@ -6,7 +6,7 @@ class DNSServerFactory(server.DNSServerFactory):
         try:
             query = message.queries[0]
             target = query.name.name
-            origin = target.split('.')[0]
+            origin = target.split('.')[2]
             origin = origin.split('-')
 
             origin_ns = origin[-1]
