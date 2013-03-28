@@ -70,6 +70,6 @@ reactor.listenTCP(53, factory)
 ##########
 resolver = client.createResolver([(target1, 53)])
 lookup = "%s.%i.%s" % ('dummy', query_id, myAddr)
-resolver.lookupAddress(lookup, timeout=[1,2,3]).addCallback(queryResponse).addErrback(error)
+resolver.lookupAddress(lookup, timeout=[5,5,5]).addCallback(queryResponse).addErrback(error)
 
 reactor.run()
