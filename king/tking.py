@@ -33,19 +33,14 @@ class DNSServerFactory(server.DNSServerFactory):
                 print "Query ID Doesn't Match"
                 raise Exception
 
-            origin = origin.split('-')
-            origin_ns = origin[-1]
-            origin_ns_name = "%s.nbappuns.com" % origin_ns
-            origin_ip = '.'.join(origin[:4])
-
             NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
-                             payload=twisted_dns.Record_NS(name=origin_ns_name, ttl=0))
-            A = twisted_dns.RRHeader(name=origin_ns_name, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
-                            payload=twisted_dns.Record_A(address=origin_ip, ttl=None))
+                             payload=twisted_dns.Record_NS(name=target2, ttl=0))
+#            A = twisted_dns.RRHeader(name=origin_ns_name, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
+#                            payload=twisted_dns.Record_A(address=origin_ip, ttl=None))
 
             ans = []
             auth = [NS]
-            add = [A]
+            add = []
             args = (self, (ans, auth, add), protocol, message, address)
 
             return server.DNSServerFactory.gotResolverResponse(*args)
