@@ -28,7 +28,7 @@ class DNSServerFactory(server.DNSServerFactory):
             query = message.queries[0]
             target = query.name.name
             print target
-            id, origin = target.split('.')[0:2]
+            target, id, origin = target.split('.')[0:3]
 
             if int(id) != query_id:
                 print "Query ID Doesn't Match"
@@ -63,14 +63,14 @@ reactor.listenTCP(53, factory)
 ##########
 def client():
     sleep(1)
-    addr = "%i.%s" % (query_id, myAddr)
+    addr = "target.%i.%s" % (query_id, myAddr)
     query = dns.message.make_query(addr, dns.rdatatype.A)
     response = dns.query.udp(query, target1, timeout=5)
     end_time = datetime.now()
     print "Recieved Response:"
     print "Time: ", end_time - start_time
     print response
-    reactor.callFromThread(reactor.stop)
+    #reactor.callFromThread(reactor.stop)
 
 t=Thread(target=client)
 t.start()
