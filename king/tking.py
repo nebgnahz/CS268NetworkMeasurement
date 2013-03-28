@@ -21,6 +21,9 @@ def queryResponse(args):
         print "Sever Thread Never Recieved Query"
     reactor.stop()
 
+def error(args):
+    print args
+
 class DNSServerFactory(server.DNSServerFactory):
     def handleQuery(self, message, protocol, address):
         global start_time, query_id
@@ -67,6 +70,6 @@ reactor.listenTCP(53, factory)
 ##########
 resolver = client.createResolver([(target1, 53)])
 lookup = "%s.%i.%s" % ('dummy', query_id, myAddr)
-resolver.lookupAddress(lookup, timeout=[1,2,3]).addCallback(queryResponse)
+resolver.lookupAddress(lookup, timeout=[1,2,3]).addCallback(queryResponse).addErrback(error)
 
 reactor.run()
