@@ -7,7 +7,7 @@ from random import randrange
 from threading import Thread
 from time import sleep
 from datetime import datetime
-import dns.query, dns.rdatatype
+import dns.query, dns.rdatatype, dns.exception
 import socket
 import rpyc
 
@@ -68,11 +68,14 @@ class DNSClient(Thread):
         sleep(1) # Wait for DNS Server to Start
         addr = "final.%i.%s" % (self.query_id, myAddr)
         query = dns.message.make_query(addr, dns.rdatatype.A)
-        response = dns.query.udp(query, self.target1, timeout=5)
-        end_time = datetime.now()
+        try:
+            response = dns.query.udp(query, self.target1, timeout=5)
+            end_time = datetime.now()
+            print "Recieved Response:"
+            print response
+        except dns.exception.Timeout, e:
+            print e
         reactor.callFromThread(reactor.stop)        
-        print "Recieved Response:"
-        print response
 
 
 ##############
