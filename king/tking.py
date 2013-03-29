@@ -39,31 +39,17 @@ class TurboKingService(rpyc.Service):
     def exposed_get_latency(self, t1, ip1, t2, ip2):
         query_id = randrange(0, sys.maxint)
 
-        def startDnsServer():
-            # Setup DNS Server
-            factory = DNSServerFactory(query_id, t2, ip2)
-            protocol = twisted_dns.DNSDatagramProtocol(factory)
-            udp = reactor.listenUDP(53, protocol)
-            tcp = reactor.listenTCP(53, factory)
-            # Start DNS Server
-            reactor.run()
-            udp.stopListening()
-            tcp.stopListening()
-            print "Reactor Stopped"
-
-        # Start DNS Server
-        dnsServer=Process(target=startDnsServer)
-        dnsServer.start()
-        sleep(1)
-
         # Start DNS Client
         t=DNSClient(query_id, t1, ip1)
         t.run()
 
-        tmpfile = open(str(query_id), "rb")
-        start_time = pickle.load(tmpfile)
-        tmpfile.close()
-        os.remove(tmpfile.name)
+        start_time = None
+        try:
+            tmpfile = open(str(query_id), "rb")
+            start_time = pickle.load(tmpfile)
+            tmpfile.close()
+            os.remove(tmpfile.name)
+        except:
 
         if start_time:
             return t.end_time - start_time
@@ -97,10 +83,10 @@ class DNSClient(Thread):
 # DNS Server #
 ##############
 class DNSServerFactory(server.DNSServerFactory):
-    def __init__(self, query_id, t2, ip2, authorities=None, caches=None, clients=None, verbose=0):
+    def __init__(self, t2, ip2, authorities=None, caches=None, clients=None, verbose=0):
         server.DNSServerFactory.__init__(self,authorities,caches,clients,verbose)
-        self.query_id = query_id
         self.target2 = t2
+        self.query_id = None
         self.target2_ip = ip2
         self.start_time = None
 
@@ -117,13 +103,11 @@ class DNSServerFactory(server.DNSServerFactory):
             print target
             dummy, id, origin = target.split('.')[0:3]
 
-            if int(id) != self.query_id:
-                print "Query ID Doesn't Match"
-                raise Exception
-            else:
-                tmpfile = open(str(self.query_id), "wb")
-                pickle.dump(datetime.now(), tmpfile)
-                tmpfile.close()
+            self.query_id = str(id)
+
+            tmpfile = open(str(self.query_id), "wb")
+            pickle.dump(datetime.now(), tmpfile)
+            tmpfile.close()
 
             NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
                              payload=twisted_dns.Record_NS(name=self.target2, ttl=0))
@@ -142,10 +126,28 @@ class DNSServerFactory(server.DNSServerFactory):
             tmpfile.close()
             print "Bad Request", e
 
-        reactor.callFromThread(reactor.stop)
+
+def startDnsServer():
+    # Setup DNS Server
+    factory = DNSServerFactory(t2, ip2)
+    protocol = twisted_dns.DNSDatagramProtocol(factory)
+    udp = reactor.listenUDP(53, protocol)
+    tcp = reactor.listenTCP(53, factory)
+    # Start DNS Server
+    reactor.run()
+    udp.stopListening()
+    tcp.stopListening()
+    print "Reactor Stopped"
 
 
 if __name__ == "__main__":
+    # Start DNS Server
+    dnsServer=Process(target=startDnsServer)
+    dnsServer.daemon = True
+    dnsServer.start()
+    sleep(1)
+
+    # Start RPYC
     from rpyc.utils.server import ThreadedServer
     t = ThreadedServer(TurboKingService, port = 18861)
     t.start()
