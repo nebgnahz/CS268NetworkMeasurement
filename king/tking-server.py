@@ -152,6 +152,7 @@ class TkingServerDaemon(Daemon):
         # Start RPYC
         t = ThreadedServer(TurboKingService, hostname='localhost', port = 18861)
         dnsClient = Thread(target=t.start)
+        dnsClient.daemon = True
         dnsClient.start()
 
         startDnsServer()
