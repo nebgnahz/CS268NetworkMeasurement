@@ -2,6 +2,7 @@ from rpyc.utils.factory import ssh_connect
 from plumbum import SshMachine
 from termcolor import colored
 import string
+from time import sleep
 
 hosts = map(string.strip,open('pl-host-list').readlines())
 
@@ -22,8 +23,15 @@ for host in hosts:
         except Exception, e:
             print colored('Service is not Running', 'red')
             print 'Attempting to Start Service...'
-            print rem['ls']()
+            from plumbum import BG
+            #from plumbum.cmd import sudo
+            sudo = rem['sudo']
+            nohup = rem['nohup']
+            python = rem['python']
+            command = '/home/ucb_268_measure/CS268NetworkMeasurement/king/tking-server.py'
+            print (sudo[nohup[python[command]]]) & BG
             try:
+                sleep(4)
                 conn = ssh_connect(rem, 18861)
                 conn.root.test()
             except:
