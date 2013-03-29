@@ -57,6 +57,8 @@ class TurboKingService(rpyc.Service):
             start_time = pickle.load(tmpfile)
             tmpfile.close()
             os.remove(tmpfile.name)
+            if type(start_time) is tuple:
+                return 'Never Recieved DNS Query. Check if Remote NS is Active'
         except Exception, e:
             print e
             return None
