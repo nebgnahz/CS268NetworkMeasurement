@@ -10,7 +10,6 @@ from datetime import datetime
 import dns.query, dns.rdatatype, dns.exception
 import socket
 import rpyc
-from multiprocessing import Process
 import pickle
 
 myHostName = socket.gethostname().replace('.', '---')
@@ -152,7 +151,7 @@ def startDnsServer():
 
 if __name__ == "__main__":
     # Start DNS Server
-    dnsServer=Process(target=startDnsServer)
+    dnsServer=Thread(target=startDnsServer)
     dnsServer.daemon = True
     dnsServer.start()
     sleep(1)

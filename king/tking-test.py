@@ -19,7 +19,7 @@ for host in hosts:
         print colored('SSH Connected', 'green')
         try:
             conn = ssh_connect(rem, 18861)
-            conn.root.test()
+            print conn.root.test()
         except Exception, e:
             print colored('Service is not Running', 'red')
             print 'Attempting to Start Service...'
@@ -29,7 +29,7 @@ for host in hosts:
             try:
                 sleep(4)
                 conn = ssh_connect(rem, 18861)
-                conn.root.test()
+                print conn.root.test()
             except:
                 print colored('Could not start service', 'red')
                 continue
@@ -44,6 +44,6 @@ for host in hosts:
         elif a and b and c:
             print colored('Recieved Latencies','green'), a, b, c
         else:
-            print ('Other Issue with latencies', 'red'), a, b, c
+            print colored ('Other Issue with latencies', 'red'), a, b, c
     except Exception, e:
         print colored('Could not connect', 'red')
