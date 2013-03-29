@@ -10,7 +10,7 @@ from datetime import datetime
 import dns.query, dns.rdatatype, dns.exception
 import socket
 import rpyc
-from multiprocessing import Process
+from multiprocessing import Process, Queue
 
 myHostName = socket.gethostname().replace('.', '-')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '-')
@@ -38,6 +38,7 @@ class TurboKingService(rpyc.Service):
     def exposed_get_latency(self, t1, ip1, t2, ip2):
         query_id = randrange(0, sys.maxint)
 
+        mpQueue = Queue()
         def startDnsServer():
             # Setup DNS Server
             factory = DNSServerFactory(query_id, t2, ip2)
@@ -47,17 +48,19 @@ class TurboKingService(rpyc.Service):
             # Start DNS Server
             reactor.run()
 
-        dnsServer=Split(target=startDnsServer)
+        # Start DNS Server
+        dnsServer=Process(target=startDnsServer)
         dnsServer.start()
+        sleep(1)
 
         # Start DNS Client
         t=DNSClient(query_id, t1, ip1)
         t.run()
 
-        dnsServer.shutdown()
+        start_time = mpQueue.get()
 
-        if factory.start_time:
-            return t.end_time - factory.start_time
+        if start_time:
+            return t.end_time - start_time
         else:
             return None
 
@@ -82,8 +85,6 @@ class DNSClient(Thread):
             print response
         except dns.exception.Timeout, e:
             print e
-        reactor.callFromThread(reactor.stop)
-        print "Stopped Reactor"
 
 
 ##############
@@ -112,9 +113,11 @@ class DNSServerFactory(server.DNSServerFactory):
 
             if int(id) != self.query_id:
                 print "Query ID Doesn't Match"
+                mpQueue.put(None)
                 raise Exception
             else:
                 self.start_time = datetime.now()
+                mpQueue.put(self.start_time)
 
             NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
                              payload=twisted_dns.Record_NS(name=self.target2, ttl=0))
@@ -127,8 +130,10 @@ class DNSServerFactory(server.DNSServerFactory):
             args = (self, (ans, auth, add), protocol, message, address)
 
             return server.DNSServerFactory.gotResolverResponse(*args)
+            reactor.stop()
         except Exception, e:
             print "Bad Request", e
+            reactor.stop()
 
 if __name__ == "__main__":
     from rpyc.utils.server import ThreadedServer
