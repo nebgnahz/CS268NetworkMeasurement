@@ -23,13 +23,9 @@ for host in hosts:
         except Exception, e:
             print colored('Service is not Running', 'red')
             print 'Attempting to Start Service...'
-            from plumbum import BG
-            #from plumbum.cmd import sudo
-            sudo = rem['sudo']
-            nohup = rem['nohup']
-            python = rem['python']
-            command = '/home/ucb_268_measure/CS268NetworkMeasurement/king/tking-server.py'
-            print (sudo[nohup[python[command]]]) & BG
+            start = rem['start-server.sh']
+            print start()
+            print rem['ps']['aux']()
             try:
                 sleep(4)
                 conn = ssh_connect(rem, 18861)
