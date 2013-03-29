@@ -1,10 +1,12 @@
 from rpyc.utils.factory import ssh_connect
 from plumbum import SshMachine
 from termcolor import colored
+import string
 
 hosts = map(string.strip,open('pl-host-list').readlines())
 
 for host in hosts:
+    print host
     try:
         try:
             conn = rpyc.connect(host, 18861)
@@ -25,3 +27,4 @@ for host in hosts:
             print ('Issue with latencies', 'red'), a, b, c
     except Exception, e:
         print colored('Could not connect', 'red')
+    print
