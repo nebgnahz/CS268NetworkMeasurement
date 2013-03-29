@@ -15,7 +15,7 @@ import pickle
 
 myHostName = socket.gethostname().replace('.', '---')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
-myAddr = '%s-%s.nbapuns.com' % (myIP, myHostName)
+myAddr = '%s---%s.nbapuns.com' % (myIP, myHostName)
 
 
 # target1 = '8.8.8.8'
