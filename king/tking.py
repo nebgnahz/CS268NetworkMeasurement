@@ -1,4 +1,4 @@
-import exceptions, sys
+import exceptions, sys, os
 from twisted.internet import reactor
 from twisted.names import dns as twisted_dns
 from twisted.names import server
@@ -10,7 +10,8 @@ from datetime import datetime
 import dns.query, dns.rdatatype, dns.exception
 import socket
 import rpyc
-from multiprocessing import Process, Queue
+from multiprocessing import Process
+import pickle
 
 myHostName = socket.gethostname().replace('.', '-')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '-')
@@ -38,7 +39,6 @@ class TurboKingService(rpyc.Service):
     def exposed_get_latency(self, t1, ip1, t2, ip2):
         query_id = randrange(0, sys.maxint)
 
-        mpQueue = Queue()
         def startDnsServer():
             # Setup DNS Server
             factory = DNSServerFactory(query_id, t2, ip2)
@@ -57,7 +57,9 @@ class TurboKingService(rpyc.Service):
         t=DNSClient(query_id, t1, ip1)
         t.run()
 
-        start_time = mpQueue.get()
+        tmpfile = open(str(query_id), "rb")
+        start_time = pickle.load(tmpfile)
+        os.remove(tmpfile.name)
 
         if start_time:
             return t.end_time - start_time
@@ -113,11 +115,9 @@ class DNSServerFactory(server.DNSServerFactory):
 
             if int(id) != self.query_id:
                 print "Query ID Doesn't Match"
-                mpQueue.put(None)
                 raise Exception
             else:
-                self.start_time = datetime.now()
-                mpQueue.put(self.start_time)
+                pickle.dump(datetime.now(), open(str(self.query_id), "wb"))
 
             NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
                              payload=twisted_dns.Record_NS(name=self.target2, ttl=0))
@@ -132,6 +132,7 @@ class DNSServerFactory(server.DNSServerFactory):
             return server.DNSServerFactory.gotResolverResponse(*args)
             reactor.stop()
         except Exception, e:
+            pickle.dump(None, open(str(self.query_id), "wb" ))
             print "Bad Request", e
             reactor.stop()
 
