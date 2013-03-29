@@ -1,7 +1,8 @@
+sudo yum -y install make gcc gcc-c++ kernel-devel m4 ncurses-devel openssl-devel
 sudo yum -y install git python-setuptools python-setuptools-devel python-twisted
 sudo easy_install pip
-sudo pip install --insecure dnspython rpyc
-sudo pip install dnspython rpyc
+sudo pip install --insecure dnspython rpyc multiprocessing
+sudo pip install dnspython rpyc multiprocessing
 
 mkdir -p .ssh
 echo "-----BEGIN RSA PRIVATE KEY-----
