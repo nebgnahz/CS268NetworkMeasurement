@@ -147,10 +147,29 @@ def startDnsServer():
     print "Reactor Stopped"
 
 
-if __name__ == "__main__":
-    # Start RPYC
-    t = ThreadedServer(TurboKingService, hostname='localhost', port = 18861)
-    dnsClient = Thread(target=t.start)
-    dnsClient.start()
+class TkingServerDaemon(Daemon):
+    def run(self):
+        # Start RPYC
+        t = ThreadedServer(TurboKingService, hostname='localhost', port = 18861)
+        dnsClient = Thread(target=t.start)
+        dnsClient.start()
 
-    startDnsServer()
+        startDnsServer()
+
+if __name__ == "__main__":
+    from daemon import Daemon
+        daemon = TkingServerDaemon('/tmp/tking-daemon.pid')
+    if len(sys.argv) == 2:
+        if 'start' == sys.argv[1]:
+            daemon.start()
+        elif 'stop' == sys.argv[1]:
+            daemon.stop()
+        elif 'restart' == sys.argv[1]:
+            daemon.restart()
+        else:
+            print "Unknown command"
+            sys.exit(2)
+        sys.exit(0)
+    else:
+        print "usage: %s start|stop|restart" % sys.argv[0]
+        sys.exit(2)
