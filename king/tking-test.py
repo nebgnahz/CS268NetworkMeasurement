@@ -6,7 +6,7 @@ import string
 hosts = map(string.strip,open('pl-host-list').readlines())
 
 for host in hosts:
-    print host
+    print '\n,' host
     try:
         try:
             conn = rpyc.connect(host, 18861)
@@ -15,8 +15,14 @@ for host in hosts:
             print colored("Service Not Exposed Exterally",'green')
 
         rem = SshMachine(host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
-        conn = ssh_connect(rem, 18861)
-        conn.root.test()
+        print colored('SSH Connected', 'green')
+        try:
+            conn = ssh_connect(rem, 18861)
+            conn.root.test()
+        except Exception, e:
+            print colored('Service is not Running', 'red')
+            continue
+
         a = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
         b = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
         c = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
@@ -30,4 +36,3 @@ for host in hosts:
             print ('Other Issue with latencies', 'red'), a, b, c
     except Exception, e:
         print colored('Could not connect', 'red')
-    print
