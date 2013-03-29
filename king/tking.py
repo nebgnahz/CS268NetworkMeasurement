@@ -10,6 +10,7 @@ from datetime import datetime
 import dns.query, dns.rdatatype, dns.exception
 import socket
 import rpyc
+from multiprocessing import Process
 
 myHostName = socket.gethostname().replace('.', '-')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '-')
@@ -36,19 +37,24 @@ class TurboKingService(rpyc.Service):
     # TODO: Figure out if old reactors are using memory
     def exposed_get_latency(self, t1, ip1, t2, ip2):
         query_id = randrange(0, sys.maxint)
-        
-        # Setup DNS Server
-        factory = DNSServerFactory(query_id, t2, ip2)
-        protocol = twisted_dns.DNSDatagramProtocol(factory)
-        reactor.listenUDP(53, protocol)
-        reactor.listenTCP(53, factory)
+
+        def startDnsServer():
+            # Setup DNS Server
+            factory = DNSServerFactory(query_id, t2, ip2)
+            protocol = twisted_dns.DNSDatagramProtocol(factory)
+            reactor.listenUDP(53, protocol)
+            reactor.listenTCP(53, factory)
+            # Start DNS Server
+            reactor.run()
+
+        dnsServer=Split(target=startDnsServer)
+        dnsServer.start()
 
         # Start DNS Client
         t=DNSClient(query_id, t1, ip1)
-        t.start()
+        t.run()
 
-        # Start DNS Server
-        reactor.run(installSignalHandlers=0)
+        dnsServer.shutdown()
 
         if factory.start_time:
             return t.end_time - factory.start_time
@@ -67,7 +73,6 @@ class DNSClient(Thread):
         self.end_time = None
 
     def run(self):
-        sleep(1) # Wait for DNS Server to Start
         addr = "final.%i.%s" % (self.query_id, myAddr)
         query = dns.message.make_query(addr, dns.rdatatype.A)
         try:
