@@ -43,10 +43,13 @@ class TurboKingService(rpyc.Service):
             # Setup DNS Server
             factory = DNSServerFactory(query_id, t2, ip2)
             protocol = twisted_dns.DNSDatagramProtocol(factory)
-            reactor.listenUDP(53, protocol)
-            reactor.listenTCP(53, factory)
+            udp = reactor.listenUDP(53, protocol)
+            tcp = reactor.listenTCP(53, factory)
             # Start DNS Server
             reactor.run()
+            udp.stopListening()
+            tcp.stopListening()
+            print "Reactor Stopped"
 
         # Start DNS Server
         dnsServer=Process(target=startDnsServer)
@@ -59,6 +62,7 @@ class TurboKingService(rpyc.Service):
 
         tmpfile = open(str(query_id), "rb")
         start_time = pickle.load(tmpfile)
+        tmpfile.close()
         os.remove(tmpfile.name)
 
         if start_time:
@@ -117,7 +121,9 @@ class DNSServerFactory(server.DNSServerFactory):
                 print "Query ID Doesn't Match"
                 raise Exception
             else:
-                pickle.dump(datetime.now(), open(str(self.query_id), "wb"))
+                tmpfile = open(str(self.query_id), "wb")
+                pickle.dump(datetime.now(), tmpfile)
+                tmpfile.close()
 
             NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
                              payload=twisted_dns.Record_NS(name=self.target2, ttl=0))
@@ -131,7 +137,9 @@ class DNSServerFactory(server.DNSServerFactory):
 
             return server.DNSServerFactory.gotResolverResponse(*args)
         except Exception, e:
-            pickle.dump(None, open(str(self.query_id), "wb" ))
+            tmpfile = open(str(self.query_id), "wb")
+            pickle.dump(None, open(tmpfile, "wb" ))
+            tmpfile.close()
             print "Bad Request", e
 
         reactor.callFromThread(reactor.stop)
