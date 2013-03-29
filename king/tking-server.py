@@ -129,9 +129,6 @@ class DNSServerFactory(server.DNSServerFactory):
 
             return server.DNSServerFactory.gotResolverResponse(*args)
         except Exception, e:
-            tmpfile = open(str(self.query_id), "wb")
-            pickle.dump(None, open(tmpfile, "wb" ))
-            tmpfile.close()
             print "Bad Request", e
 
 

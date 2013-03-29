@@ -1,6 +1,7 @@
 sudo yum -y install git python-setuptools python-setuptools-devel python-twisted
 sudo easy_install pip
 sudo pip install --insecure dnspython rpyc
+sudo pip install dnspython rpyc
 
 mkdir -p .ssh
 echo "-----BEGIN RSA PRIVATE KEY-----
