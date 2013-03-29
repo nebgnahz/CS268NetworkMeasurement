@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import exceptions, sys, os, socket, rpyc, pickle
 from twisted.internet import reactor
 from twisted.names import dns as twisted_dns
@@ -159,7 +160,7 @@ class TkingServerDaemon(Daemon):
 
 if __name__ == "__main__":
     from daemon import Daemon
-        daemon = TkingServerDaemon('/tmp/tking-daemon.pid')
+    daemon = TkingServerDaemon('/tmp/tking-daemon.pid')
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
             daemon.start()
