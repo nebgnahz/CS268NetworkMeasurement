@@ -13,8 +13,8 @@ import rpyc
 from multiprocessing import Process
 import pickle
 
-myHostName = socket.gethostname().replace('.', '-')
-myIP = socket.gethostbyname(socket.gethostname()).replace('.', '-')
+myHostName = socket.gethostname().replace('.', '---')
+myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
 myAddr = '%s-%s.nbapuns.com' % (myIP, myHostName)
 
 

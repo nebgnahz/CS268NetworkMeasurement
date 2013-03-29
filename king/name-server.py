@@ -8,7 +8,7 @@ class DNSServerFactory(server.DNSServerFactory):
             target = query.name.name
             print 'Target:', target
 
-            origin = target.split('.')[2].split('-')
+            origin = target.split('.')[2].split('---')
             origin_ns_name = '.'.join(origin[4:])
             origin_ip = '.'.join(origin[:4])
             target = '.'.join(target.split('.')[2:])
