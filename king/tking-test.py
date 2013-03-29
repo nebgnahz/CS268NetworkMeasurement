@@ -23,8 +23,11 @@ for host in hosts:
 
         if a and b and c:
             print colored('Recieved Latencies','green'), a, b, c
+        elif type(a) == type('') or type(b) == type('') or type(c) == type(''):
+            print colored('Amazon NS maybe inactive, or Node DNS server cannot bind', 'red')
+            print a, b, c
         else:
-            print ('Issue with latencies', 'red'), a, b, c
+            print ('Other Issue with latencies', 'red'), a, b, c
     except Exception, e:
         print colored('Could not connect', 'red')
     print
