@@ -1,4 +1,4 @@
-import exceptions, sys, os
+import exceptions, sys, os, socket, rpyc, pickle
 from twisted.internet import reactor
 from twisted.names import dns as twisted_dns
 from twisted.names import server
@@ -8,9 +8,7 @@ from threading import Thread
 from time import sleep
 from datetime import datetime
 import dns.query, dns.rdatatype, dns.exception
-import socket
-import rpyc
-import pickle
+from rpyc.utils.server import ThreadedServer
 
 myHostName = socket.gethostname().replace('.', '---')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
@@ -150,13 +148,9 @@ def startDnsServer():
 
 
 if __name__ == "__main__":
-    # Start DNS Server
-    dnsServer=Thread(target=startDnsServer)
-    dnsServer.daemon = True
-    dnsServer.start()
-    sleep(1)
-
     # Start RPYC
-    from rpyc.utils.server import ThreadedServer
     t = ThreadedServer(TurboKingService, hostname='localhost', port = 18861)
-    t.start()
+    dnsClient = Thread(target=t.start)
+    dnsClient.start()
+
+    startDnsServer()
