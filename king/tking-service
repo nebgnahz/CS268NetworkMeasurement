@@ -1,6 +1,0 @@
-#!/bin/bash
-# chkconfig: 2345 95 20
-# description: Some description
-# What your script does (not sure if this is necessary though)
-# processname: myscript
-sudo python /home/ucb_268_measure/CS268NetworkMeasurement/king/tking-server.py

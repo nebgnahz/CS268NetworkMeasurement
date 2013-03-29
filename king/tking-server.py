@@ -1,4 +1,6 @@
-import exceptions, sys, os
+#!/usr/bin/python
+import exceptions, sys, os, daemon, pickle, socket, rpyc
+import dns.query, dns.rdatatype, dns.exception
 from twisted.internet import reactor
 from twisted.names import dns as twisted_dns
 from twisted.names import server
@@ -7,16 +9,11 @@ from random import randrange
 from threading import Thread
 from time import sleep
 from datetime import datetime
-import dns.query, dns.rdatatype, dns.exception
-import socket
-import rpyc
 from multiprocessing import Process
-import pickle
 
 myHostName = socket.gethostname().replace('.', '---')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
 myAddr = '%s---%s.nbapuns.com' % (myIP, myHostName)
-
 
 # target1 = '8.8.8.8'
 # target2 = 'ns1.google.com'
@@ -150,7 +147,7 @@ def startDnsServer():
     print "Reactor Stopped"
 
 
-if __name__ == "__main__":
+def main():
     # Start DNS Server
     dnsServer=Process(target=startDnsServer)
     dnsServer.daemon = True
@@ -161,3 +158,6 @@ if __name__ == "__main__":
     from rpyc.utils.server import ThreadedServer
     t = ThreadedServer(TurboKingService, hostname='localhost', port = 18861)
     t.start()
+
+with daemon.DaemonContext():
+    main()
