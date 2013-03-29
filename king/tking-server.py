@@ -157,5 +157,5 @@ if __name__ == "__main__":
 
     # Start RPYC
     from rpyc.utils.server import ThreadedServer
-    t = ThreadedServer(TurboKingService, port = 18861)
+    t = ThreadedServer(TurboKingService, hostname='localhost', port = 18861)
     t.start()
