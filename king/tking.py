@@ -130,11 +130,12 @@ class DNSServerFactory(server.DNSServerFactory):
             args = (self, (ans, auth, add), protocol, message, address)
 
             return server.DNSServerFactory.gotResolverResponse(*args)
-            reactor.stop()
         except Exception, e:
             pickle.dump(None, open(str(self.query_id), "wb" ))
             print "Bad Request", e
-            reactor.stop()
+
+        reactor.callFromThread(reactor.stop)
+
 
 if __name__ == "__main__":
     from rpyc.utils.server import ThreadedServer
