@@ -40,10 +40,11 @@ class TurboKingService(rpyc.Service):
         query_id = randrange(0, sys.maxint)
 
         try:
-            tmpfile = open(str(query_id), "rb")
+            tmpfile = open(str(query_id), "wb")
             pickle.dump((t2, ip2), tmpfile)
             tmpfile.close()
-        except:
+        except Exception, e:
+            print e
             return None
 
         # Start DNS Client
@@ -56,7 +57,8 @@ class TurboKingService(rpyc.Service):
             start_time = pickle.load(tmpfile)
             tmpfile.close()
             os.remove(tmpfile.name)
-        except:
+        except Exception, e:
+            print e
             return None
 
         if start_time:
@@ -135,7 +137,7 @@ class DNSServerFactory(server.DNSServerFactory):
 
 def startDnsServer():
     # Setup DNS Server
-    factory = DNSServerFactory(t2, ip2)
+    factory = DNSServerFactory()
     protocol = twisted_dns.DNSDatagramProtocol(factory)
     udp = reactor.listenUDP(53, protocol)
     tcp = reactor.listenTCP(53, factory)
