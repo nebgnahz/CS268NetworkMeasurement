@@ -35,6 +35,9 @@ class TurboKingService(rpyc.Service):
     def exposed_test(self):
         return 1
 
+    def exposed_exit(self):
+        exit(0)
+
     # TODO: Figure out if old reactors are using memory
     def exposed_get_latency(self, t1, ip1, t2, ip2):
         query_id = randrange(0, sys.maxint)
