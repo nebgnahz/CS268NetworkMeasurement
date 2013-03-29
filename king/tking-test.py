@@ -6,7 +6,7 @@ import string
 hosts = map(string.strip,open('pl-host-list').readlines())
 
 for host in hosts:
-    print '\n,' host
+    print '\n', host
     try:
         try:
             conn = rpyc.connect(host, 18861)
@@ -21,7 +21,14 @@ for host in hosts:
             conn.root.test()
         except Exception, e:
             print colored('Service is not Running', 'red')
-            continue
+            print 'Attempting to Start Service...'
+            print rem['ls']()
+            try:
+                conn = ssh_connect(rem, 18861)
+                conn.root.test()
+            except:
+                print colored('Could not start service', 'red')
+                continue
 
         a = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
         b = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
