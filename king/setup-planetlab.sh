@@ -1,7 +1,6 @@
-yum -y install git python-setuptools python-setuptools-devel python-twisted
-yum -y install make gcc gcc-c++ kernel-devel m4 ncurses-devel openssl-devel
-easy_install pip
-pip install --insecure dnspython rpyc
+sudo yum -y install git python-setuptools python-setuptools-devel python-twisted
+sudo easy_install pip
+sudo pip install --insecure dnspython rpyc
 
 mkdir -p .ssh
 echo "-----BEGIN RSA PRIVATE KEY-----
