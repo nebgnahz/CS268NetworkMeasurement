@@ -42,7 +42,6 @@ class TurboKingService(rpyc.Service):
         protocol = twisted_dns.DNSDatagramProtocol(factory)
         udp = reactor.listenUDP(53, protocol)
         tcp = reactor.listenTCP(53, factory)
-        sleep(1) # Wait for DNS Server to Start
 
         # Start DNS Client
         t=DNSClient(query_id, t1, ip1)
@@ -69,6 +68,7 @@ class DNSClient(Thread):
         self.end_time = None
 
     def run(self):
+        sleep(1) # Wait for DNS Server to Start
         addr = "final.%i.%s" % (self.query_id, myAddr)
         query = dns.message.make_query(addr, dns.rdatatype.A)
         try:
@@ -90,7 +90,6 @@ class DNSServerFactory(server.DNSServerFactory):
         self.target2 = t2
         self.target2_ip = ip2
         self.start_time = None
-        print "Binding DNS Server"
 
     #TODO: Stop Handling of Queries after seeing a valid one
     def handleQuery(self, message, protocol, address):
