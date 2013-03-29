@@ -37,18 +37,19 @@ class TurboKingService(rpyc.Service):
     def exposed_get_latency(self, t1, ip1, t2, ip2):
         query_id = randrange(0, sys.maxint)
         
-        # Setup DNS Server
+        # Setup DNS Server Instance
         factory = DNSServerFactory(query_id, t2, ip2)
         protocol = twisted_dns.DNSDatagramProtocol(factory)
-        reactor.listenUDP(53, protocol)
-        reactor.listenTCP(53, factory)
+        udp = reactor.listenUDP(53, protocol)
+        tcp = reactor.listenTCP(53, factory)
 
         # Start DNS Client
         t=DNSClient(query_id, t1, ip1)
-        t.start()
+        t.run()
 
-        # Start DNS Server
-        reactor.run(installSignalHandlers=0)
+        # Tear Down DNS Server Instance
+        udp.stopListening()
+        tcp.stopListening()
 
         if factory.start_time:
             return t.end_time - factory.start_time
@@ -77,8 +78,6 @@ class DNSClient(Thread):
             print response
         except dns.exception.Timeout, e:
             print e
-        reactor.callFromThread(reactor.stop)
-        print "Stopped Reactor"
 
 
 ##############
@@ -128,4 +127,7 @@ class DNSServerFactory(server.DNSServerFactory):
 if __name__ == "__main__":
     from rpyc.utils.server import ThreadedServer
     t = ThreadedServer(TurboKingService, port = 18861)
-    t.start()
+    reactor.callInThread(t.start)
+    # Start DNS Server
+    print "Starting Reactor"
+    reactor.run()
