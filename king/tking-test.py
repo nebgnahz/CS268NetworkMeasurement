@@ -21,11 +21,11 @@ for host in hosts:
         b = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
         c = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
 
-        if a and b and c:
-            print colored('Recieved Latencies','green'), a, b, c
-        elif type(a) == type('') or type(b) == type('') or type(c) == type(''):
+        if type(a) == type('') and type(b) == type('') and type(c) == type(''):
             print colored('Amazon NS maybe inactive, or Node DNS server cannot bind', 'red')
             print a, b, c
+        elif a and b and c:
+            print colored('Recieved Latencies','green'), a, b, c
         else:
             print ('Other Issue with latencies', 'red'), a, b, c
     except Exception, e:
