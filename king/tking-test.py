@@ -13,13 +13,14 @@ def testHost(host, buff):
             conn = rpyc.connect(host, 18861)
             print >> buff, colored('Service Is Exposed Externally', 'red')
         except:
-            print >> buff, colored("Service Not Exposed Exterally",'green')
+            pass
+            #print >> buff, colored("Service Not Exposed Exterally",'green')
 
         rem = SshMachine(host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
-        print >> buff, colored('SSH Connected', 'green')
+        #print >> buff, colored('SSH Connected', 'green')
         try:
             conn = ssh_connect(rem, 18861)
-            print >> buff, conn.root.test()
+            #print >> buff, conn.root.test()
         except Exception, e:
             print >> buff, colored('Service is not Running', 'red')
             print >> buff, 'Attempting to Start Service...'
@@ -28,9 +29,9 @@ def testHost(host, buff):
             try:
                 sleep(4)
                 conn = ssh_connect(rem, 18861)
-                print >> buff, conn.root.test()
+                #print >> buff, conn.root.test()
             except:
-                print >> buff, colored('Could not start service', 'red')
+                #print >> buff, colored('Could not start service', 'red')
                 return
 
         a = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
@@ -45,7 +46,8 @@ def testHost(host, buff):
         else:
             print >> buff, colored ('Other Issue with latencies', 'red'), a, b, c
     except Exception, e:
-        print >> buff, colored('Could not connect', 'red')
+        pass
+        #print >> buff, colored('Could not connect', 'red')
 
 threads = []
 for host in hosts:
@@ -58,6 +60,6 @@ for host, t, buff in threads:
     t.join()
 
 for host, t, buff in threads:
+    print '-----------------'
     print host
-    print buff.getvalue()
-    print
+    print buff.getvalue(),
