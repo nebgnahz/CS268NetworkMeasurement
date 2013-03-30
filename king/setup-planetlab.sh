@@ -39,3 +39,4 @@ chmod 600 ~/.ssh/id_rsa*
 
 git clone git@github.com:nebgnahz/CS268NetworkMeasurement.git
 
+sudo ln -s /home/ucb_268_measure/CS268NetworkMeasurement/king/tking-server.py /bin/tking-server
