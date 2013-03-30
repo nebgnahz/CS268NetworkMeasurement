@@ -8,7 +8,6 @@ from threading import Thread
 hosts = map(string.strip,open('pl-host-list').readlines())
 
 def testHost(host, buff):
-    print >> buff, '\n', host
     try:
         try:
             conn = rpyc.connect(host, 18861)
@@ -53,10 +52,12 @@ for host in hosts:
     buff = StringIO.StringIO()
     t = Thread(target=testHost, args=(host,buff))
     t.start()
-    threads.append((t,buff))
+    threads.append((host, t, buff))
 
-for t, buff in threads:
+for host, t, buff in threads:
     t.join()
 
-for t, buff in threads:
+for host, t, buff in threads:
+    print host
     print buff.getvalue()
+    print
