@@ -23,9 +23,9 @@ for host in hosts:
         except Exception, e:
             print colored('Service is not Running', 'red')
             print 'Attempting to Start Service...'
-            start = rem['start-server.sh']
-            print start()
-            print rem['ps']['aux']()
+            sudo = rem['sudo']
+            server = sudo[rem['tking-server']]
+            print server['start']()
             try:
                 sleep(4)
                 conn = ssh_connect(rem, 18861)
