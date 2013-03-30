@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import exceptions, sys, os, socket, rpyc, pickle
+import dns.query, dns.rdatatype, dns.exception
 from twisted.internet import reactor
 from twisted.names import dns as twisted_dns
 from twisted.names import server
@@ -8,8 +9,8 @@ from random import randrange
 from threading import Thread
 from time import sleep
 from datetime import datetime
-import dns.query, dns.rdatatype, dns.exception
 from rpyc.utils.server import ThreadedServer
+from daemon import Daemon
 
 myHostName = socket.gethostname().replace('.', '---')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
@@ -159,7 +160,6 @@ class TkingServerDaemon(Daemon):
         startDnsServer()
 
 if __name__ == "__main__":
-    from daemon import Daemon
     daemon = TkingServerDaemon('/tmp/tking-daemon.pid')
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
