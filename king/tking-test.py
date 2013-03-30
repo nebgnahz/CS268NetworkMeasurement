@@ -1,7 +1,7 @@
 from rpyc.utils.factory import ssh_connect
 from plumbum import SshMachine
 from termcolor import colored
-import string
+import string, subprocess
 from time import sleep
 
 hosts = map(string.strip,open('pl-host-list').readlines())
@@ -23,9 +23,8 @@ for host in hosts:
         except Exception, e:
             print colored('Service is not Running', 'red')
             print 'Attempting to Start Service...'
-            sudo = rem['sudo']
-            server = sudo[rem['tking-server']]
-            print server['start']()
+            subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "ucb_268_measure@%s" % host, "sudo tking-server stop"])
+            subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "ucb_268_measure@%s" % host, "sudo tking-server start"])
             try:
                 sleep(4)
                 conn = ssh_connect(rem, 18861)
