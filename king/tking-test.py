@@ -59,7 +59,7 @@ for host in hosts:
     threads.append((host, t, buff))
 
 for host, t, buff in threads:
-    t.join()
+    t.join(timeout=60.0)
 
 for host, t, buff in threads:
     print '-----------------'
