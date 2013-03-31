@@ -67,7 +67,16 @@ class TurboKingService(rpyc.Service):
             return None, None, None
 
         if start_time:
-            return t.end_time, start_time, ping(ip1)
+			try:
+				ping_response = ping(ip1)
+				avg_ping_rtt = ping_response.avg_rtt
+				mil, mic = avg_ping_rtt.split('.')
+				mil = int(mil)
+				mic = int(mic)
+				ping_time = timedelta(milliseconds = mil, microseconds=mic)
+			except Exception, e:
+				ping_time = None
+            return t.end_time, start_time, ping_time
         else:
             return None, None, None
 
