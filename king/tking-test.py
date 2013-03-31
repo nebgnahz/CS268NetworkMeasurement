@@ -46,20 +46,19 @@ def testHost(host, buff):
                 end_time, start_time, ping_time, address = response
 
                 latency = end_time - start_time - ping_time
-                responses.append(latency)
-                print address
+                responses.append((latency, address))
             except:
                 response.append(None)
 
-        a = responses[0][0]
-        b = responses[1][0]
-        c = responses[2][0]
+        a = responses[0]
+        b = responses[1]
+        c = responses[2]
 
-        if type(a) == type('') and type(b) == type('') and type(c) == type(''):
+        if type(a[0]) == type('') and type(b[0]) == type('') and type(c[0]) == type(''):
             print >> buff, colored('Amazon NS maybe inactive, or Node DNS server cannot bind', 'red')
-            print >> buff, a, b, c
+            print >> buff, a, '\n', b, '\n', c
         elif a and b and c:
-            print >> buff, colored('Recieved Latencies','green'), a, b, c
+            print >> buff, colored('Recieved Latencies','green'), '\n', a, '\n', b, '\n', c
         else:
             print >> buff, colored ('Other Issue with latencies', 'red'), a, b, c
     except Exception, e:
