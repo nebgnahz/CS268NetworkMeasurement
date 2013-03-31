@@ -21,6 +21,7 @@ def testHost(host, buff):
         try:
             conn = ssh_connect(rem, 18861)
             #print >> buff, conn.root.test()
+            conn.root.test()
         except Exception, e:
             print >> buff, colored('Service is not Running', 'red')
             print >> buff, 'Attempting to Start Service...'
@@ -30,6 +31,7 @@ def testHost(host, buff):
                 sleep(4)
                 conn = ssh_connect(rem, 18861)
                 #print >> buff, conn.root.test()
+                conn.root.test()
             except:
                 #print >> buff, colored('Could not start service', 'red')
                 return
