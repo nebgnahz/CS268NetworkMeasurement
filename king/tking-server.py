@@ -11,6 +11,7 @@ from time import sleep
 from datetime import datetime
 from rpyc.utils.server import ThreadedServer
 from daemon import Daemon
+from pyping import ping
 
 myHostName = socket.gethostname().replace('.', '---')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
@@ -47,7 +48,7 @@ class TurboKingService(rpyc.Service):
             tmpfile.close()
         except Exception, e:
             print e
-            return None
+            return None, None, None
 
         # Start DNS Client
         t=DNSClient(query_id, t1, ip1)
@@ -63,12 +64,12 @@ class TurboKingService(rpyc.Service):
                 return 'Never Recieved DNS Query. Check if Remote NS is Active'
         except Exception, e:
             print e
-            return None
+            return None, None, None
 
         if start_time:
-            return t.end_time - start_time
+            return t.end_time, start_time, ping(ip1)
         else:
-            return None
+            return None, None, None
 
 ##########
 # Client #
