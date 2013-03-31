@@ -4,7 +4,7 @@ import dns.query, dns.rdatatype, dns.exception
 from twisted.internet import reactor
 from twisted.names import dns as twisted_dns
 from twisted.names import server
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import randrange
 from threading import Thread
 from time import sleep
