@@ -48,7 +48,7 @@ class TurboKingService(rpyc.Service):
             tmpfile.close()
         except Exception, e:
             print e
-            return None, None, None
+            return None, None, None, None
 
         # Start DNS Client
         t=DNSClient(query_id, t1, ip1)
@@ -57,14 +57,14 @@ class TurboKingService(rpyc.Service):
         start_time = None
         try:
             tmpfile = open(str(query_id), "rb")
-            start_time = pickle.load(tmpfile)
+            start_time, address = pickle.load(tmpfile)
             tmpfile.close()
             os.remove(tmpfile.name)
             if type(start_time) is tuple:
                 return 'Never Recieved DNS Query. Check if Remote NS is Active'
         except Exception, e:
             print e
-            return None, None, None
+            return None, None, None, None
 
         if start_time:
             try:
@@ -76,9 +76,9 @@ class TurboKingService(rpyc.Service):
                 ping_time = timedelta(milliseconds = mil, microseconds=mic)
             except Exception, e:
                 ping_time = None
-            return t.end_time, start_time, ping_time
+            return t.end_time, start_time, ping_time, address
         else:
-            return None, None, None
+            return None, None, None, None
 
 ##########
 # Client #
@@ -128,7 +128,7 @@ class DNSServerFactory(server.DNSServerFactory):
             os.remove(tmpfile.name)
 
             tmpfile = open(str(self.query_id), "wb")
-            pickle.dump(datetime.now(), tmpfile)
+            pickle.dump((datetime.now(), address), tmpfile)
             tmpfile.close()
 
             NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,

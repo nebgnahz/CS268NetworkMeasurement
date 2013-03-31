@@ -36,23 +36,24 @@ def testHost(host, buff):
                 #print >> buff, colored('Could not start service', 'red')
                 return
 
-	responses = []
-	for i in range(3):
-		try:
-			response = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
-			if type(response) == type(''):
-				responses.append(response)
+        responses = []
+        for i in range(3):
+            try:
+                response = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
+                if type(response) == type(''):
+                    responses.append(response)
 
-			end_time, start_time, ping_time = response
+                end_time, start_time, ping_time, address = response
 
-			latency = end_time - start_time - ping_time
-			responses.append(latency)
-		except:
-			response.append(None)
+                latency = end_time - start_time - ping_time
+                responses.append(latency)
+                print address
+            except:
+                response.append(None)
 
-		a = responses[0]
-		b = responses[1]
-		c = responses[2]
+        a = responses[0][0]
+        b = responses[1][0]
+        c = responses[2][0]
 
         if type(a) == type('') and type(b) == type('') and type(c) == type(''):
             print >> buff, colored('Amazon NS maybe inactive, or Node DNS server cannot bind', 'red')
