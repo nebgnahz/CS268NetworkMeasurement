@@ -137,7 +137,7 @@ class Ping(object):
 			self.dest_ip = to_ip(self.destination)
 			if quiet_output:
 				self.response.destination_ip = self.dest_ip
-		except socket.gaierror as e:
+		except socket.gaierror , e:
 			self.print_unknown_host(e)
 		else:
 			self.print_start()
@@ -361,7 +361,7 @@ class Ping(object):
 
 		try:
 			current_socket.sendto(packet, (self.destination, 1)) # Port number is irrelevant for ICMP
-		except socket.error as e:
+		except socket.error , e:
 			self.response.output.append("General failure (%s)" % (e.args[1]))
 			current_socket.close()
 			return
