@@ -1,6 +1,9 @@
-import time, urlparse, socket, threading, subprocess
+import time, urlparse, socket, threading, subprocess, argparse
 from urlparse import urlparse
 from time import gmtime, strftime
+
+parser = argparse.ArgumentParser(description='Traceroute Logging')
+parser.add_argument('-m', action='store', dest='message', default="", help='add comments to the log')
 
 class Command(object):
 	def __init__(self, cmd, timeout):
@@ -32,16 +35,29 @@ class Command(object):
 			thread.join()
 
 		# timeout sees -15, normal sees 0x
-		print self.process.returncode
+		if (self.process.returncode == 0):
+			print "succeeded"
+		elif (self.process.returncode == -15):
+			print "timeout"
+		else:
+			print "check this traceroute manually:", self.cmd
+			
+		
+arguments = parser.parse_args()
 
 f = open('urllist.txt', 'r')
-logFile = open(str(strftime("%Y-%m-%d %H:%M:%S", gmtime())), 'w')
+logFile = open(str(strftime("./logs/%Y-%m-%d %H:%M:%S")), 'w')
+logFile.write( '# %s\n\n' % (arguments.message) )
+count = 0
 
 for line in f:
 	if line[0] == '#' or line[0] == '\n' or len(line) == 0:
 		continue
+
+	count += 1
 	url = urlparse(line.partition(" ")[0])
-	command = Command(['traceroute', '-aS', '-q 5', url.netloc], 30)
+	print "[%i] traceroute to %s" % (count, url.netloc)
+	command = Command(['traceroute', '-a', '-q 5', url.netloc], 30)
 	command.run()
 
 logFile.close()
