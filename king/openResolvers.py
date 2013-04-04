@@ -13,15 +13,14 @@
 import argparse
 from sys import stderr
 import argparse, dns.query, dns.resolver, dns.rdatatype, redis, socket, struct
+import Queue, threading
 
-# print 'Using Threading'
-from threading import Thread as Split
-from Queue import Queue
-from array import array as Array
 
 parser = argparse.ArgumentParser(description='Open DNS Resolvers')
 parser.add_argument('--debug', default=False, action='store_true', help='Print More Errors and Launch interactive console on exception or forced exit')
-parser.add_argument('--concurrent', type=int, action='store', default=500)
+parser.add_argument('--start', type=int, action='store', default=500)
+
+parser.add_argument('--concurrent', type=int, action='store', default=10)
 parser.add_argument('--timeout', type=float, action='store', default=1)
 
 arguments = parser.parse_args()
@@ -36,7 +35,7 @@ try:
 except:
 	print >> stderr, 'Could not connect to Redis'
 
-q = Queue()
+q = Queue.Queue(concurrent * 2)
 
 default = dns.resolver.get_default_resolver()
 default.timeout = arguments.timeout
@@ -45,20 +44,34 @@ default_ns = default.nameservers[0]
 def main():
 	count = 0
 	all_keys = db_dns.keys()
+
+	for i in range(concurrent):
+		t = threading.Thread(target=threadQuery)
+		t.daemon = True
+		t.start()
+	index = 0
 	for key in all_keys:
+		index += 1
+		q.put((index, key))
+		
+
+	q.join()
+
+def threadQuery():
+	while True:
+		index, key = q.get()
 		ip_set = db_dns.smembers(key)
 		if ip_set == set():
 			# empty set, we need to look it up
 			# ip = socket.gethostbyname(key)
 			print key
-			
-		if len(ip_set) > 1:
-			# print "multiple IPs", key, ip_set
+		else:
 			for ip in ip_set:
 				if ip is not '':
-					count += 1
-					print "[%i] %s, %s, %s" % (count, key, ip, ip2openResolvers(ip))
+					print "[%i] %s, %s, %s" % (index, key, ip, ip2openResolvers(ip))
 					query(key, ip)
+
+		q.task_done()
 
 
 def query(key, ip):
