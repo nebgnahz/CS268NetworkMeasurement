@@ -13,14 +13,15 @@
 # all keys are from [0:236733]
 
 import argparse
+import dns.query, dns.resolver, dns.rdatatype, redis, socket, struct
 from sys import stderr
-import argparse, dns.query, dns.resolver, dns.rdatatype, redis, socket, struct
 
 parser = argparse.ArgumentParser(description='Open DNS Resolvers')
 parser.add_argument('range', metavar='octet', type=int, nargs='+',
-                   help='Specify the range of keys in redis')
+                   help='Specify the range of keys in redis [0:236733]')
 parser.add_argument('--debug', default=False, action='store_true', help='Print More Errors and Launch interactive console on exception or forced exit')
 parser.add_argument('--concurrent', type=int, action='store', default=10)
+parser.add_argument('--db', type=bool, action='store', default=False)
 parser.add_argument('--timeout', type=float, action='store', default=3)
 
 arguments = parser.parse_args()
@@ -28,6 +29,9 @@ arguments = parser.parse_args()
 try:
 	concurrent = arguments.concurrent
 	debug = arguments.debug
+	db = arguments.db
+	if db:
+		print "writing to redis db"		
 	key_start, key_end = arguments.range
 except Exception as e:
 	print >> stderr, e
@@ -35,9 +39,10 @@ except Exception as e:
 
 try:
 	dns_servers = redis.ConnectionPool(host='localhost', port=6379, db=0)
-	open_resolvers = redis.ConnectionPool(host='localhost', port=6379, db=1)
 	db_dns = redis.Redis(connection_pool=dns_servers)
-	db_open = redis.Redis(connection_pool=open_resolvers)
+	if db:
+		open_resolvers = redis.ConnectionPool(host='localhost', port=6379, db=1)
+		db_open = redis.Redis(connection_pool=open_resolvers)
 except:
 	print >> stderr, 'Could not connect to Redis'
 
@@ -82,10 +87,11 @@ def query(key, ip):
 		if rcode == dns.rcode.NOERROR:
 			# insert into another database
 			print "\tTrue"
-			try:
-				db_open.sadd(key, ip)
-			except Exception as e:
-				print "\tDB Error", e
+			if db:
+				try:
+					db_open.sadd(key, ip)
+				except Exception as e:
+					print "\tDB Error", e
 
 		elif rcode == dns.rcode.NXDOMAIN:
 			print "\tFalse"
