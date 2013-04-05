@@ -4,28 +4,34 @@
 # select 0 will come with the DB that is a copy of 236.db
 # select 1 will come with the DB of open resolvers
 
-
-
 # question: Do I need multi-threading?
 # answer: tentatively, no!
 
+# test the consistency of each time's query [Done]
+# just run and print the results of keys, 'diff' gives no output
+
+# all keys are from [0:236733]
 
 import argparse
 from sys import stderr
 import argparse, dns.query, dns.resolver, dns.rdatatype, redis, socket, struct
-import Queue, threading
-
 
 parser = argparse.ArgumentParser(description='Open DNS Resolvers')
+parser.add_argument('range', metavar='octet', type=int, nargs='+',
+                   help='Specify the range of keys in redis')
 parser.add_argument('--debug', default=False, action='store_true', help='Print More Errors and Launch interactive console on exception or forced exit')
-parser.add_argument('--start', type=int, action='store', default=500)
-
 parser.add_argument('--concurrent', type=int, action='store', default=10)
-parser.add_argument('--timeout', type=float, action='store', default=1)
+parser.add_argument('--timeout', type=float, action='store', default=3)
 
 arguments = parser.parse_args()
-concurrent = arguments.concurrent
-debug = arguments.debug
+
+try:
+	concurrent = arguments.concurrent
+	debug = arguments.debug
+	key_start, key_end = arguments.range
+except Exception as e:
+	print >> stderr, e
+	exit(1)
 
 try:
 	dns_servers = redis.ConnectionPool(host='localhost', port=6379, db=0)
@@ -35,31 +41,24 @@ try:
 except:
 	print >> stderr, 'Could not connect to Redis'
 
-q = Queue.Queue(concurrent * 2)
-
 default = dns.resolver.get_default_resolver()
 default.timeout = arguments.timeout
 default_ns = default.nameservers[0]
 
-def main():
+def main(key_start, key_end):
 	count = 0
 	all_keys = db_dns.keys()
-
-	for i in range(concurrent):
-		t = threading.Thread(target=threadQuery)
-		t.daemon = True
-		t.start()
+	if key_start < 0:
+		key_start = 0
+	if key_end > len(all_keys) - 1:
+		key_end = len(all_keys) - 1
+	
+	keys = all_keys[key_start:key_end]
+	batchQuery(keys)
+	
+def batchQuery(all_keys):
 	index = 0
 	for key in all_keys:
-		index += 1
-		q.put((index, key))
-		
-
-	q.join()
-
-def threadQuery():
-	while True:
-		index, key = q.get()
 		ip_set = db_dns.smembers(key)
 		if ip_set == set():
 			# empty set, we need to look it up
@@ -68,10 +67,9 @@ def threadQuery():
 		else:
 			for ip in ip_set:
 				if ip is not '':
+					index += 1
 					print "[%i] %s, %s, %s" % (index, key, ip, ip2openResolvers(ip))
 					query(key, ip)
-
-		q.task_done()
 
 
 def query(key, ip):
@@ -94,12 +92,16 @@ def query(key, ip):
 			return False
 
 	except dns.exception.Timeout:
+		print "Timeout"
 		if debug: print >> stderr, '\tTimeout, ip: %s' % (ip)
 	except dns.query.BadResponse:
+		print "Bad Response"
 		if debug: print >> stderr, '\tBad Response, ip: %s' % (ip)
 	except dns.query.UnexpectedSource:
+		print "Unexpected Source"
 		if debug: print >> stderr, '\tUnexpected Source, ip: %s' % (ip)
 	except Exception:
+		print "Unknown Error"
 		print >> stderr, '\tUnknown Error, ip: %s' % (ip)
 
 def ip2openResolvers(ip):
@@ -109,7 +111,7 @@ def ip2openResolvers(ip):
 
 
 try:
-	main()
+	main(key_start, key_end)
 	count = 0
 	
 except KeyboardInterrupt:
