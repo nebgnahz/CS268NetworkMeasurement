@@ -10,9 +10,13 @@
 # test the consistency of each time's query [Done]
 # just run and print the results of keys, 'diff' gives no output
 
+# HIGHLIGHT:
+#   FIRST!!!
+#   run python redisKeyDump.py > redis-backups/236keys.txt
 # all keys are from [0:236733]
 
-import argparse
+
+import argparse, time
 import dns.query, dns.resolver, dns.rdatatype, redis, socket, struct
 from sys import stderr
 
@@ -25,6 +29,11 @@ parser.add_argument('--db', type=bool, action='store', default=False)
 parser.add_argument('--timeout', type=float, action='store', default=3)
 
 arguments = parser.parse_args()
+
+timeout_count = 0
+count_threshold = 2
+
+filename = "./redis-backups/236keys.txt"
 
 try:
 	concurrent = arguments.concurrent
@@ -51,30 +60,27 @@ default.timeout = arguments.timeout
 default_ns = default.nameservers[0]
 
 def main(key_start, key_end):
-	all_keys = db_dns.keys()
+	key_file = open(filename, 'r')
 	if key_start < 0:
 		key_start = 0
-	if key_end > len(all_keys) - 1:
-		key_end = len(all_keys) - 1
-	
-	keys = all_keys[key_start:key_end]
-	batchQuery(key_start, keys)
-	
-def batchQuery(key_start, all_keys):
-	index = key_start
-	for key in all_keys:
+	if key_end > 236733 - 1:
+		key_end = 236733 - 1
+	print "range:", key_start, key_end
+	for i, line in enumerate(key_file):
+		if i < key_start  or i > key_end:
+			continue
+		key = line.rstrip('\n')
 		ip_set = db_dns.smembers(key)
 		if ip_set == set():
 			# empty set, we need to look it up
 			# ip = socket.gethostbyname(key)
+			# didn't handle those without ip for now
 			print key
 		else:
 			for ip in ip_set:
 				if ip is not '':
-					index += 1
-					print "[%i] %s, %s, %s" % (index, key, ip, ip2openResolvers(ip))
+					print "[%i] %s, %s, %s" % (i, key, ip, ip2openResolvers(ip))
 					query(key, ip)
-
 
 def query(key, ip):
 	addr = ip2openResolvers(ip)
@@ -98,6 +104,12 @@ def query(key, ip):
 
 	except dns.exception.Timeout:
 		print "Timeout"
+		global timeout_count, count_threshold
+		timeout_count += 1
+		if timeout_count > count_threshold:
+			print "# sleep for 10 seconds", timeout_count
+			timeout_count = 0
+			time.sleep(10)
 		if debug: print >> stderr, '\tTimeout, ip: %s' % (ip)
 	except dns.query.BadResponse:
 		print "Bad Response"
