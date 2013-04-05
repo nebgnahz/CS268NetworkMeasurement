@@ -51,7 +51,6 @@ default.timeout = arguments.timeout
 default_ns = default.nameservers[0]
 
 def main(key_start, key_end):
-	count = 0
 	all_keys = db_dns.keys()
 	if key_start < 0:
 		key_start = 0
@@ -59,10 +58,10 @@ def main(key_start, key_end):
 		key_end = len(all_keys) - 1
 	
 	keys = all_keys[key_start:key_end]
-	batchQuery(keys)
+	batchQuery(key_start, keys)
 	
-def batchQuery(all_keys):
-	index = 0
+def batchQuery(key_start, all_keys):
+	index = key_start
 	for key in all_keys:
 		ip_set = db_dns.smembers(key)
 		if ip_set == set():
@@ -118,7 +117,6 @@ def ip2openResolvers(ip):
 
 try:
 	main(key_start, key_end)
-	count = 0
 	
 except KeyboardInterrupt:
 	if arguments.debug:
