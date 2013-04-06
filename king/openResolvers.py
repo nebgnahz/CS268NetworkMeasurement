@@ -60,11 +60,16 @@ default.timeout = arguments.timeout
 default_ns = default.nameservers[0]
 
 def main(key_start, key_end):
-	key_file = open(filename, 'r')
+	try:
+		key_file = open(filename, 'r')
+	except:
+		print "[ERROR]: key file not found. \n  run python redisKeyDump.py > redis-backups/236keys.txt"
+		return
+	
 	if key_start < 0:
 		key_start = 0
-	if key_end > 236733 - 1:
-		key_end = 236733 - 1
+	if key_end > 236733-1:
+		key_end = 236733-1
 	print "range:", key_start, key_end
 	for i, line in enumerate(key_file):
 		if i < key_start  or i > key_end:
