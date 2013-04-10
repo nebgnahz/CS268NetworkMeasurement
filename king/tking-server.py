@@ -16,11 +16,8 @@ from pyping import ping
 myHostName = socket.gethostname().replace('.', '---')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
 myAddr = '%s---%s.nbapuns.com' % (myIP, myHostName)
-
-
-# target1 = '8.8.8.8'
-# target2 = 'ns1.google.com'
-# target2_ip = '216.239.32.10'
+outstandingQueries = {}
+returnedQueries = {}
 
 ###############
 # RPC Service #
@@ -38,113 +35,94 @@ class TurboKingService(rpyc.Service):
     def exposed_exit(self):
         exit(0)
 
-    # TODO: Figure out if old reactors are using memory
-    def exposed_get_latency(self, t1, ip1, t2, ip2):
+    def generate_query_id(self):
+        query_id = randrange(0, sys.maxint)
+        while query_id in outstandingQueries or query_id in returnedQueries:
+            query_id = randrange(0, sys.maxint)
+        return query_id
+
+    def exposed_get_k(self, t1, ip1):
         query_id = randrange(0, sys.maxint)
 
-        try:
-            tmpfile = open(str(query_id), "wb")
-            pickle.dump((t2, ip2), tmpfile)
-            tmpfile.close()
-        except Exception, e:
-            print e
-            return None, None, None, None
+    def exposed_get_ping(self, ip1):
+        ping_response = ping(ip1)
+        avg_ping_rtt = ping_response.avg_rtt
+        mil, mic = avg_ping_rtt.split('.')
+        mil = int(mil)
+        mic = int(mic)
+        ping_time = timedelta(milliseconds = mil, microseconds=mic)
+        return ping_time
+
+    def exposed_get_latency(self, t1, ip1, t2, ip2):
+        query_id = generate_query_id()
+        outstandingQueries[query_id] = (t2, ip2)
 
         # Start DNS Client
-        t=DNSClient(query_id, t1, ip1)
-        t.run()
+        end_time = dnsClient(query_id, t1, ip1)
 
-        start_time = None
         try:
-            tmpfile = open(str(query_id), "rb")
-            start_time, address = pickle.load(tmpfile)
-            tmpfile.close()
-            os.remove(tmpfile.name)
-            if type(start_time) is tuple:
-                return 'Never Recieved DNS Query. Check if Remote NS is Active'
+            start_time, address = returnedQueries[query_id]
+            del returnedQueries[query_id]
+            ping_time = exposed_get_ping(ip1)
+            return end_time, start_time, ping_time, address
         except Exception, e:
             print e
             return None, None, None, None
 
-        if start_time:
-            try:
-                ping_response = ping(ip1)
-                avg_ping_rtt = ping_response.avg_rtt
-                mil, mic = avg_ping_rtt.split('.')
-                mil = int(mil)
-                mic = int(mic)
-                ping_time = timedelta(milliseconds = mil, microseconds=mic)
-            except Exception, e:
-                ping_time = None
-            return t.end_time, start_time, ping_time, address
-        else:
-            return None, None, None, None
 
 ##########
 # Client #
 ##########
-class DNSClient(Thread):
-    def __init__(self, query_id, target1, target1_ip):
-        Thread.__init__(self)
-        self.query_id = query_id
-        self.target1 = target1
-        self.target1_ip = target1_ip
-        self.end_time = None
-
-    def run(self):
-        addr = "final.%i.%s" % (self.query_id, myAddr)
-        query = dns.message.make_query(addr, dns.rdatatype.A)
-        try:
-            response = dns.query.udp(query, self.target1_ip, timeout=5)
-            self.end_time = datetime.now()
-            print "Recieved Response:"
-            print response
-        except dns.exception.Timeout, e:
-            print e
+def dnsClient(query_id, target1_ip):
+    addr = "final.%i.%s" % (query_id, myAddr)
+    query = dns.message.make_query(addr, dns.rdatatype.A)
+    try:
+        response = dns.query.udp(query, target1_ip, timeout=5)
+        end_time = datetime.now()
+        print "Recieved Response:", response
+    except dns.exception.Timeout, e:
+        end_time = None
+        print "Error:", e
+    return end_time
 
 
 ##############
 # DNS Server #
 ##############
 class DNSServerFactory(server.DNSServerFactory):
-    #TODO: Stop Handling of Queries after seeing a valid one
     def handleQuery(self, message, protocol, address):
-        print "Recieved Query"
-        print address
-        print message
-
-        global start_time, query_id
+        query_time = datetime.now()
+        print "Recieved Query", address, message
         try:
-            query = message.queries[0]
-            target = query.name.name
-            print target
-            dummy, id, origin = target.split('.')[0:3]
+            encoded_url, query_id, origin = processMessage(message)
+            print encoded_url
 
-            self.query_id = str(id)
+            returnedQueries[query_id] = (query_time, address)
+            target2, target2_ip = outstandingQueries[query_id]
+            del outstandingQueries[query_id]
 
-            tmpfile = open(str(self.query_id), "rb")
-            target2, target2_ip = pickle.load(tmpfile)
-            tmpfile.close()
-            os.remove(tmpfile.name)
-
-            tmpfile = open(str(self.query_id), "wb")
-            pickle.dump((datetime.now(), address), tmpfile)
-            tmpfile.close()
-
-            NS = twisted_dns.RRHeader(name=target, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
-                             payload=twisted_dns.Record_NS(name=target2, ttl=0))
-            A = twisted_dns.RRHeader(name=target2, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
-                            payload=twisted_dns.Record_A(address=target2_ip, ttl=None))
-
-            ans = []
-            auth = [NS]
-            add = [A]
-            args = (self, (ans, auth, add), protocol, message, address)
-
-            return server.DNSServerFactory.gotResolverResponse(*args)
+            response = createReferral(encoded_url, target2, target2_ip)
+            return server.DNSServerFactory.gotResolverResponse(*response)
         except Exception, e:
             print "Bad Request", e
+            return None
 
+    def processMessage(message):
+        query = message.queries[0]
+        encoded_url = query.name.name
+        dummy, query_id, origin = encoded_url.split('.')[0:3]
+        return encoded_url, query_id, origin
+
+    def createReferral(encoded_url, target2, target2_ip):
+        NS = twisted_dns.RRHeader(name=encoded_url, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
+                         payload=twisted_dns.Record_NS(name=target2, ttl=0))
+        A = twisted_dns.RRHeader(name=target2, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
+                        payload=twisted_dns.Record_A(address=target2_ip, ttl=None))
+
+        ans = []
+        auth = [NS]
+        add = [A]
+        return (self, (ans, auth, add), protocol, message, address)
 
 def startDnsServer():
     # Setup DNS Server
@@ -168,6 +146,7 @@ class TkingServerDaemon(Daemon):
         dnsClient.start()
 
         startDnsServer()
+
 
 if __name__ == "__main__":
     daemon = TkingServerDaemon('/tmp/tking-daemon.pid')
