@@ -63,7 +63,7 @@ class TurboKingService(rpyc.Service):
             ping_time = self.exposed_get_ping(ip1)
             return end_time, start_time, ping_time, address
         except Exception, e:
-            print e
+            print "End error:", e
             return None, None, None, None
 
     def exposed_get_k(self, t1, ip1):
