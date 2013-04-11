@@ -108,6 +108,7 @@ class DNSServerFactory(server.DNSServerFactory):
         print "Recieved Query", address, message
         try:
             encoded_url, query_id, origin, query_type = self.processMessage(message)
+            query_id = int(query_id)
             print encoded_url
 
             if query_type is 'kvalue':
