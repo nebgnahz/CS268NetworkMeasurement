@@ -54,7 +54,9 @@ def testHost(host, buff):
         b = responses[1]
         c = responses[2]
         k = conn.root.exposed_get_k('google.com', '8.8.8.8')
+        full = conn.root.exposed_full_test('ns.nwt.cz','217.197.152.132', 'ns2.internetlatencymeasurementstudy.org', '54.244.114.167')
 
+        print >> buff, "Full:", full
         print >> buff, "K:", k
 
         if type(a[0]) == type('') and type(b[0]) == type('') and type(c[0]) == type(''):
