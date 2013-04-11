@@ -55,7 +55,7 @@ def testHost(host, buff):
         c = responses[2]
         k = conn.root.exposed_get_k('google.com', '8.8.8.8')
 
-        print "K:", k
+        print >> buff, "K:", k
 
         if type(a[0]) == type('') and type(b[0]) == type('') and type(c[0]) == type(''):
             print >> buff, colored('Amazon NS maybe inactive, or Node DNS server cannot bind', 'red')
@@ -73,6 +73,7 @@ for host in hosts:
     buff = StringIO.StringIO()
     t = Thread(target=testHost, args=(host,buff))
     t.start()
+    t.daemon = True
     threads.append((host, t, buff))
 
 for host, t, buff in threads:
