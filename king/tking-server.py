@@ -170,10 +170,14 @@ def startDnsServer():
     # Setup DNS Server
     factory = DNSServerFactory()
     protocol = twisted_dns.DNSDatagramProtocol(factory)
-    udp = reactor.listenUDP(53, protocol)
-    tcp = reactor.listenTCP(53, factory)
-    # Start DNS Server
-    reactor.run()
+    try:
+        udp = reactor.listenUDP(53, protocol)
+        tcp = reactor.listenTCP(53, factory)
+        # Start DNS Server
+        reactor.run()
+    except:
+        print 'Could Not Bind/Start Reactor'
+        exit(1)
     udp.stopListening()
     tcp.stopListening()
     print "Reactor Stopped"
