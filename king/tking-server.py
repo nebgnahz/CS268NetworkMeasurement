@@ -83,11 +83,29 @@ class TurboKingService(rpyc.Service):
             print e
             return None
 
+    def exposed_full_response(self, query_id, msg):
+        returnedQueries[query_id] = msg
+
+    def exposed_full_test(self, t1, ip1, t2, ip2):
+        query_id = self.generate_query_id()
+        outstandingQueries[query_id] = (t2, ip2)
+        dnsClientQuery(query_id, ip1, query_type="full")
+        # Wait 10 seconds to get a response from the remote server
+        sleep(10)
+        try:
+            return returnedQueries[query_id]
+        except Exception, e:
+            print "Did Not Recieve RPC from Last Hop"
+            return "Did Not Recieve RPC from Last Hop"
+
 ##########
 # Client #
 ##########
 def dnsClientQuery(query_id, target1_ip, query_type="latency", timeout=5):
-    addr = "%s.%i.%s" % (query_type, query_id, myAddr)
+    if query_type == 'full':
+        addr = "%s.%s.%i.%s" % (query_type, myIP, query_id, myAddr)
+    else:
+        addr = "%s.%i.%s" % (query_type, query_id, myAddr)
     print addr
     query = dns.message.make_query(addr, dns.rdatatype.A)
     try:
@@ -121,11 +139,14 @@ class DNSServerFactory(server.DNSServerFactory):
                 else:
                     returnedQueries[query_id] += 1
             elif query_type == 'latency':
-                print "QUERY ID:", query_id
                 returnedQueries[query_id] = (query_time, address)
                 target2, target2_ip = outstandingQueries[query_id]
                 del outstandingQueries[query_id]
-
+                response = self.createReferral(encoded_url, target2, target2_ip, protocol, message, address)
+                return server.DNSServerFactory.gotResolverResponse(*response)
+            elif query_type == 'full':
+                target2, target2_ip = outstandingQueries[query_id]
+                del outstandingQueries[query_id]
                 response = self.createReferral(encoded_url, target2, target2_ip, protocol, message, address)
                 return server.DNSServerFactory.gotResolverResponse(*response)
         except Exception, e:
