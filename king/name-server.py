@@ -36,7 +36,7 @@ class DNSServerFactory(server.DNSServerFactory):
                 print query_type, origin_ip, origin_ns_name
 
                 if query_type == 'full' and arguments.full:
-                    rem = SshMachine(host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
+                    rem = SshMachine(origin_ip, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
                     conn = ssh_connect(rem, 18861)
                     conn.root.exposed_full_response(query_id, 'End Point Reached')
 
