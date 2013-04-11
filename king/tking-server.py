@@ -11,7 +11,7 @@ from time import sleep
 from datetime import datetime
 from rpyc.utils.server import ThreadedServer
 from daemon import Daemon
-from pyping import ping
+from sysping import ping
 
 myHostName = socket.gethostname().replace('.', '---')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
@@ -43,13 +43,16 @@ class TurboKingService(rpyc.Service):
         return query_id
 
     def exposed_get_ping(self, ip1):
-        ping_response = ping(ip1)
-        avg_ping_rtt = ping_response.avg_rtt
-        mil, mic = avg_ping_rtt.split('.')
-        mil = int(mil)
-        mic = int(mic)
-        ping_time = timedelta(milliseconds = mil, microseconds=mic)
-        return ping_time
+        code, pingTimes = ping(ip1)
+        if len(pingTimes) > 0:
+            avg_ping_rtt = str(sum(pingTimes)/len(pingTimes))
+            mil, mic = avg_ping_rtt.split('.')
+            mil = int(mil)
+            mic = int(mic)
+            ping_time = timedelta(milliseconds = mil, microseconds=mic)
+            return ping_time, (10 - len(pingTimes)) # number of dropped pings
+        else:
+            return None, 10 # 10 dropped pings
 
     def exposed_get_latency(self, t1, ip1, t2, ip2):
         query_id = self.generate_query_id()
