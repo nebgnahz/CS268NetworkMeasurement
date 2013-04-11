@@ -55,7 +55,7 @@ class TurboKingService(rpyc.Service):
         outstandingQueries[query_id] = (t2, ip2)
 
         # Start DNS Client
-        end_time = dnsClient(query_id, t1, ip1)
+        end_time = dnsClient(query_id, ip1)
 
         try:
             start_time, address = returnedQueries[query_id]
