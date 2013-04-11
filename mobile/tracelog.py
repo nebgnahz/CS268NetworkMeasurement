@@ -2,7 +2,7 @@ import time, urlparse, socket, threading, subprocess, argparse
 from urlparse import urlparse
 from time import gmtime, strftime
 
-parser = argparse.ArgumentParser(description='Traceroute Logging')
+parser = argparse.ArgumentParser(description='Traceroute Logging; logFile is under logs, named by time')
 parser.add_argument('-m', action='store', dest='message', default="", help='add comments to the log')
 
 class Command(object):
