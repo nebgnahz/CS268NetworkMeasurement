@@ -111,12 +111,12 @@ class DNSServerFactory(server.DNSServerFactory):
             query_id = int(query_id)
             print encoded_url
 
-            if query_type is 'kvalue':
+            if query_type == 'kvalue':
                 if query_id not in returnedQueries:
                     returnedQueries[query_id] = 1
                 else:
                     returnedQueries[query_id] += 1
-            elif query_type is 'latency':
+            elif query_type == 'latency':
                 print "QUERY ID:", query_id
                 returnedQueries[query_id] = (query_time, address)
                 target2, target2_ip = outstandingQueries[query_id]
