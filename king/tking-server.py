@@ -103,7 +103,7 @@ class DNSServerFactory(server.DNSServerFactory):
         query_time = datetime.now()
         print "Recieved Query", address, message
         try:
-            encoded_url, query_id, origin, query_type = processMessage(message)
+            encoded_url, query_id, origin, query_type = self.processMessage(message)
             print encoded_url
 
             if query_type is 'kvalue':
@@ -116,7 +116,7 @@ class DNSServerFactory(server.DNSServerFactory):
                 target2, target2_ip = outstandingQueries[query_id]
                 del outstandingQueries[query_id]
 
-                response = createReferral(encoded_url, target2, target2_ip)
+                response = self.createReferral(encoded_url, target2, target2_ip)
                 return server.DNSServerFactory.gotResolverResponse(*response)
         except Exception, e:
             print "Bad Request", e
