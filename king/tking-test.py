@@ -72,8 +72,8 @@ threads = []
 for host in hosts:
     buff = StringIO.StringIO()
     t = Thread(target=testHost, args=(host,buff))
-    t.start()
     t.daemon = True
+    t.start()
     threads.append((host, t, buff))
 
 for host, t, buff in threads:
