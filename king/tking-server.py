@@ -18,6 +18,7 @@ myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
 myAddr = '%s---%s.nbapuns.com' % (myIP, myHostName)
 outstandingQueries = {}
 returnedQueries = {}
+fullQueries = {}
 
 ###############
 # RPC Service #
@@ -84,7 +85,7 @@ class TurboKingService(rpyc.Service):
             return None
 
     def exposed_full_response(self, query_id, msg):
-        returnedQueries[query_id] = msg
+        fullQueries[query_id] = msg
 
     def exposed_full_test(self, t1, ip1, t2, ip2):
         query_id = self.generate_query_id()
@@ -93,7 +94,7 @@ class TurboKingService(rpyc.Service):
         # Wait 10 seconds to get a response from the remote server
         sleep(10)
         try:
-            return returnedQueries[query_id]
+            return fullQueries[query_id]
         except Exception, e:
             print "Did Not Recieve RPC from Last Hop"
             return "Did Not Recieve RPC from Last Hop"

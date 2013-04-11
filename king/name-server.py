@@ -2,6 +2,7 @@ from twisted.internet import reactor
 from twisted.names import dns, client, server
 from rpyc.utils.factory import ssh_connect
 from plumbum import SshMachine
+from threading import Thread
 import argparse
 
 parser = argparse.ArgumentParser(description='Central Name Server')
@@ -36,9 +37,7 @@ class DNSServerFactory(server.DNSServerFactory):
                 print query_type, origin_ip, origin_ns_name
 
                 if query_type == 'full' and arguments.full:
-                    rem = SshMachine(origin_ip, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
-                    conn = ssh_connect(rem, 18861)
-                    conn.root.exposed_full_response(query_id, 'End Point Reached')
+                    Thread(target=full_rpc, args=(origin_ip, query_id))
 
                 NS = dns.RRHeader(name=target, type=dns.NS, cls=dns.IN, ttl=0, auth=True,
                                  payload=dns.Record_NS(name=origin_ns_name, ttl=0))
@@ -53,6 +52,11 @@ class DNSServerFactory(server.DNSServerFactory):
                 return server.DNSServerFactory.gotResolverResponse(*args)
         except Exception, e:
             print "Bad Request", e
+
+def full_rpc(origin_ip, query_id):
+    rem = SshMachine(origin_ip, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
+    conn = ssh_connect(rem, 18861)
+    conn.root.exposed_full_response(query_id, 'End Point Reached')
 
 factory = DNSServerFactory()
 protocol = dns.DNSDatagramProtocol(factory)
