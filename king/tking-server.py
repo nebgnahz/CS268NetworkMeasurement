@@ -84,6 +84,7 @@ class TurboKingService(rpyc.Service):
 ##########
 def dnsClient(query_id, target1_ip, query_type="latency", timeout=5):
     addr = "%s.%i.%s" % (query_type, query_id, myAddr)
+    print addr
     query = dns.message.make_query(addr, dns.rdatatype.A)
     try:
         response = dns.query.udp(query, target1_ip, timeout=timeout)
