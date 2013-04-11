@@ -46,7 +46,7 @@ class Command(object):
 arguments = parser.parse_args()
 
 f = open('urllist.txt', 'r')
-logFile = open(str(strftime("./logs/%Y_%m_%d_%H:%M:%S.txt")), 'w')
+logFile = open(str(strftime("./logs/%Y_%m_%d_%H_%M_%S.txt")), 'w')
 logFile.write( '# %s\n\n' % (arguments.message) )
 count = 0
 
