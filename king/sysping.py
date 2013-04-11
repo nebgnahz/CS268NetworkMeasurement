@@ -26,7 +26,7 @@ class Command(object):
 		thread.start()
 
 		thread.join(self.timeout)
-		if thread.is_alive():
+		if thread.isAlive():
 			print "terminating process"
 			self.process.terminate()
 			thread.join()
