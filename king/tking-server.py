@@ -103,6 +103,10 @@ def dnsClientQuery(query_id, target1_ip, query_type="latency", timeout=5):
 # DNS Server #
 ##############
 class DNSServerFactory(server.DNSServerFactory):
+    def __init__(self, authorities=None, caches=None, clients=None, verbose=0):
+        print 'Starting Server'
+        server.DNSServerFactory.__init__(self)
+
     def handleQuery(self, message, protocol, address):
         query_time = datetime.now()
         print "Recieved Query", address, message
