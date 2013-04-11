@@ -53,6 +53,9 @@ def testHost(host, buff):
         a = responses[0]
         b = responses[1]
         c = responses[2]
+        k = conn.root.exposed_get_k('google.com', '8.8.8.8')
+
+        print "K:", k
 
         if type(a[0]) == type('') and type(b[0]) == type('') and type(c[0]) == type(''):
             print >> buff, colored('Amazon NS maybe inactive, or Node DNS server cannot bind', 'red')

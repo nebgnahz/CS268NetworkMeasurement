@@ -171,6 +171,8 @@ if __name__ == "__main__":
             daemon.stop()
         elif 'restart' == sys.argv[1]:
             daemon.restart()
+        elif 'normal' == sys.argv[1]:
+            daemon.run()
         else:
             print "Unknown command"
             sys.exit(2)
