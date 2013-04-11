@@ -41,9 +41,6 @@ class TurboKingService(rpyc.Service):
             query_id = randrange(0, sys.maxint)
         return query_id
 
-    def exposed_get_k(self, t1, ip1):
-        query_id = randrange(0, sys.maxint)
-
     def exposed_get_ping(self, ip1):
         ping_response = ping(ip1)
         avg_ping_rtt = ping_response.avg_rtt
@@ -54,7 +51,7 @@ class TurboKingService(rpyc.Service):
         return ping_time
 
     def exposed_get_latency(self, t1, ip1, t2, ip2):
-        query_id = generate_query_id()
+        query_id = self.generate_query_id()
         outstandingQueries[query_id] = (t2, ip2)
 
         # Start DNS Client
@@ -63,28 +60,39 @@ class TurboKingService(rpyc.Service):
         try:
             start_time, address = returnedQueries[query_id]
             del returnedQueries[query_id]
-            ping_time = exposed_get_ping(ip1)
+            ping_time = self.exposed_get_ping(ip1)
             return end_time, start_time, ping_time, address
         except Exception, e:
             print e
             return None, None, None, None
 
+    def exposed_get_k(self, t1, ip1):
+        query_id = self.generate_query_id()
+        outstandingQueries[query_id] = (t1, ip1)
+
+        dnsClient(query_id, ip1, query_type="kvalue", timeout=20)
+        try:
+            k = returnedQueries[query_id]
+            del returnedQueries[query_id]
+            return k
+        except Exception, e:
+            print e
+            return None
 
 ##########
 # Client #
 ##########
-def dnsClient(query_id, target1_ip):
-    addr = "final.%i.%s" % (query_id, myAddr)
+def dnsClient(query_id, target1_ip, query_type="latency", timeout=5):
+    addr = "%s.%i.%s" % (query_type, query_id, myAddr)
     query = dns.message.make_query(addr, dns.rdatatype.A)
     try:
-        response = dns.query.udp(query, target1_ip, timeout=5)
+        response = dns.query.udp(query, target1_ip, timeout=timeout)
         end_time = datetime.now()
         print "Recieved Response:", response
     except dns.exception.Timeout, e:
         end_time = None
         print "Error:", e
     return end_time
-
 
 ##############
 # DNS Server #
@@ -94,26 +102,32 @@ class DNSServerFactory(server.DNSServerFactory):
         query_time = datetime.now()
         print "Recieved Query", address, message
         try:
-            encoded_url, query_id, origin = processMessage(message)
+            encoded_url, query_id, origin, query_type = processMessage(message)
             print encoded_url
 
-            returnedQueries[query_id] = (query_time, address)
-            target2, target2_ip = outstandingQueries[query_id]
-            del outstandingQueries[query_id]
+            if query_type is 'kvalue':
+                if query_id not in returnedQueries:
+                    returnedQueries[query_id] = 1
+                else:
+                    returnedQueries[query_id] += 1
+            elif query_type is 'latency':
+                returnedQueries[query_id] = (query_time, address)
+                target2, target2_ip = outstandingQueries[query_id]
+                del outstandingQueries[query_id]
 
-            response = createReferral(encoded_url, target2, target2_ip)
-            return server.DNSServerFactory.gotResolverResponse(*response)
+                response = createReferral(encoded_url, target2, target2_ip)
+                return server.DNSServerFactory.gotResolverResponse(*response)
         except Exception, e:
             print "Bad Request", e
             return None
 
-    def processMessage(message):
+    def processMessage(self, message):
         query = message.queries[0]
         encoded_url = query.name.name
-        dummy, query_id, origin = encoded_url.split('.')[0:3]
-        return encoded_url, query_id, origin
+        query_type, query_id, origin = encoded_url.split('.')[0:3]
+        return encoded_url, query_id, origin, query_type
 
-    def createReferral(encoded_url, target2, target2_ip):
+    def createReferral(self, encoded_url, target2, target2_ip):
         NS = twisted_dns.RRHeader(name=encoded_url, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
                          payload=twisted_dns.Record_NS(name=target2, ttl=0))
         A = twisted_dns.RRHeader(name=target2, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
@@ -144,7 +158,6 @@ class TkingServerDaemon(Daemon):
         dnsClient = Thread(target=t.start)
         dnsClient.daemon = True
         dnsClient.start()
-
         startDnsServer()
 
 
