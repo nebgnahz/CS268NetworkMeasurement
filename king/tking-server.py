@@ -102,10 +102,7 @@ class TurboKingService(rpyc.Service):
 # Client #
 ##########
 def dnsClientQuery(query_id, target1_ip, query_type="latency", timeout=5):
-    if query_type == 'full':
-        addr = "%s.%s.%i.%s" % (query_type, myIP, query_id, myAddr)
-    else:
-        addr = "%s.%i.%s" % (query_type, query_id, myAddr)
+    addr = "%s.%i.%s" % (query_type, query_id, myAddr)
     print addr
     query = dns.message.make_query(addr, dns.rdatatype.A)
     try:
@@ -138,13 +135,8 @@ class DNSServerFactory(server.DNSServerFactory):
                     returnedQueries[query_id] = 1
                 else:
                     returnedQueries[query_id] += 1
-            elif query_type == 'latency':
+            elif query_type == 'latency' or query_type == 'full':
                 returnedQueries[query_id] = (query_time, address)
-                target2, target2_ip = outstandingQueries[query_id]
-                del outstandingQueries[query_id]
-                response = self.createReferral(encoded_url, target2, target2_ip, protocol, message, address)
-                return server.DNSServerFactory.gotResolverResponse(*response)
-            elif query_type == 'full':
                 target2, target2_ip = outstandingQueries[query_id]
                 del outstandingQueries[query_id]
                 response = self.createReferral(encoded_url, target2, target2_ip, protocol, message, address)

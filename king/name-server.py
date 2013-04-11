@@ -27,24 +27,18 @@ class DNSServerFactory(server.DNSServerFactory):
                                 payload=dns.Record_A(address='54.244.114.167', ttl=None))
                 args = (self, ([A], [], []), protocol, message, address)
                 return server.DNSServerFactory.gotResolverResponse(*args)
-            elif query_type == 'full':
-                query_id = int(target.split('.')[2])
-                origin = target.split('.')[3].split('---')
-                origin_ns_name = '.'.join(origin[4:])
-                origin_ip = '.'.join(origin[:4])
-                target = '.'.join(target.split('.')[3:])
-                node_ip = '.'.join(target.split('.')[1].split('---'))
-                print 'Full', query_type, origin_ip, origin_ns_name, node_ip
-                if arguments.full:
-                    rem = SshMachine(host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
-                    conn = ssh_connect(rem, 18861)
-                    conn.root.exposed_full_response(query_id, 'End Point Reached')
             else:
+                query_id = int(target.split('.')[1])
                 origin = target.split('.')[2].split('---')
                 origin_ns_name = '.'.join(origin[4:])
                 origin_ip = '.'.join(origin[:4])
                 target = '.'.join(target.split('.')[2:])
                 print query_type, origin_ip, origin_ns_name
+
+                if query_type == 'full' and arguments.full:
+                    rem = SshMachine(host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
+                    conn = ssh_connect(rem, 18861)
+                    conn.root.exposed_full_response(query_id, 'End Point Reached')
 
                 NS = dns.RRHeader(name=target, type=dns.NS, cls=dns.IN, ttl=0, auth=True,
                                  payload=dns.Record_NS(name=origin_ns_name, ttl=0))

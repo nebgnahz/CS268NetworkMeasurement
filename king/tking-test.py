@@ -54,7 +54,7 @@ def testHost(host, buff):
         b = responses[1]
         c = responses[2]
         k = conn.root.exposed_get_k('google.com', '8.8.8.8')
-        full = conn.root.exposed_full_test('ns.nwt.cz','217.197.152.132', 'ns2.internetlatencymeasurementstudy.org', '54.244.114.167')
+        full = conn.root.exposed_full_test('ns.nwt.cz','217.197.152.132', 'ns1.internetlatencymeasurementstudy.org', '54.214.0.110')
 
         print >> buff, "Full:", full
         print >> buff, "K:", k
