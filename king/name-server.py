@@ -2,6 +2,12 @@ from twisted.internet import reactor
 from twisted.names import dns, client, server
 from rpyc.utils.factory import ssh_connect
 from plumbum import SshMachine
+import argparse
+
+parser = argparse.ArgumentParser(description='Central Name Server')
+parser.add_argument('--full', default=False, action='store_true', help='This instance will act as the endpoint for integration testing')
+
+arguments = parser.parse_args()
 
 class DNSServerFactory(server.DNSServerFactory):
     def handleQuery(self, message, protocol, address):
@@ -22,12 +28,17 @@ class DNSServerFactory(server.DNSServerFactory):
                 args = (self, ([A], [], []), protocol, message, address)
                 return server.DNSServerFactory.gotResolverResponse(*args)
             elif query_type == 'full':
+                query_id = int(target.split('.')[2])
                 origin = target.split('.')[3].split('---')
                 origin_ns_name = '.'.join(origin[4:])
                 origin_ip = '.'.join(origin[:4])
                 target = '.'.join(target.split('.')[3:])
                 node_ip = '.'.join(target.split('.')[1].split('---'))
                 print 'Full', query_type, origin_ip, origin_ns_name, node_ip
+                if arguments.full:
+                    rem = SshMachine(host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
+                    conn = ssh_connect(rem, 18861)
+                    conn.root.exposed_full_response(query_id, 'End Point Reached')
             else:
                 origin = target.split('.')[2].split('---')
                 origin_ns_name = '.'.join(origin[4:])
