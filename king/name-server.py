@@ -9,24 +9,35 @@ class DNSServerFactory(server.DNSServerFactory):
             print 'Target:', target
 
             query_type = target.split('.')[0]
-            origin = target.split('.')[2].split('---')
-            origin_ns_name = '.'.join(origin[4:])
-            origin_ip = '.'.join(origin[:4])
-            target = '.'.join(target.split('.')[2:])
+            if query_type is 'ns1':
+                A = dns.RRHeader(name=target, type=dns.A, cls=dns.IN, ttl=0,
+                                payload=dns.Record_A(address='54.244.114.147', ttl=None))
+                args = (self, ([A], [], []), protocol, message, address)
+                return server.DNSServerFactory.gotResolverResponse(*args)
+            elif query_type is 'ns2':
+                A = dns.RRHeader(name=target, type=dns.A, cls=dns.IN, ttl=0,
+                                payload=dns.Record_A(address='54.244.114.167', ttl=None))
+                args = (self, ([A], [], []), protocol, message, address)
+                return server.DNSServerFactory.gotResolverResponse(*args)
+            else:
+                origin = target.split('.')[2].split('---')
+                origin_ns_name = '.'.join(origin[4:])
+                origin_ip = '.'.join(origin[:4])
+                target = '.'.join(target.split('.')[2:])
 
-            print query_type, origin_ip, origin_ns_name
+                print query_type, origin_ip, origin_ns_name
 
-            NS = dns.RRHeader(name=target, type=dns.NS, cls=dns.IN, ttl=0, auth=True,
-                             payload=dns.Record_NS(name=origin_ns_name, ttl=0))
-            A = dns.RRHeader(name=origin_ns_name, type=dns.A, cls=dns.IN, ttl=0,
-                            payload=dns.Record_A(address=origin_ip, ttl=None))
+                NS = dns.RRHeader(name=target, type=dns.NS, cls=dns.IN, ttl=0, auth=True,
+                                 payload=dns.Record_NS(name=origin_ns_name, ttl=0))
+                A = dns.RRHeader(name=origin_ns_name, type=dns.A, cls=dns.IN, ttl=0,
+                                payload=dns.Record_A(address=origin_ip, ttl=None))
 
-            ans = []
-            auth = [NS]
-            add = [A]
-            args = (self, (ans, auth, add), protocol, message, address)
+                ans = []
+                auth = [NS]
+                add = [A]
+                args = (self, (ans, auth, add), protocol, message, address)
 
-            return server.DNSServerFactory.gotResolverResponse(*args)
+                return server.DNSServerFactory.gotResolverResponse(*args)
         except Exception, e:
             print "Bad Request", e
 

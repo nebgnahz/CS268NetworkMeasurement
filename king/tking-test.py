@@ -39,7 +39,7 @@ def testHost(host, buff):
         responses = []
         for i in range(3):
             try:
-                response = conn.root.get_latency('google.com','8.8.8.8','ns1.google.com','216.239.32.10')
+                response = conn.root.get_latency('ns.nwt.cz','217.197.152.132','ns1.google.com','216.239.32.10')
                 if type(response) == type(''):
                     responses.append(response)
 
