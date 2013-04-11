@@ -126,7 +126,7 @@ class DNSServerFactory(server.DNSServerFactory):
                 target2, target2_ip = outstandingQueries[query_id]
                 del outstandingQueries[query_id]
 
-                response = self.createReferral(encoded_url, target2, target2_ip)
+                response = self.createReferral(encoded_url, target2, target2_ip, protocol, message, address)
                 return server.DNSServerFactory.gotResolverResponse(*response)
         except Exception, e:
             print "Bad Request", e
@@ -138,7 +138,7 @@ class DNSServerFactory(server.DNSServerFactory):
         query_type, query_id, origin = encoded_url.split('.')[0:3]
         return encoded_url, query_id, origin, query_type
 
-    def createReferral(self, encoded_url, target2, target2_ip):
+    def createReferral(self, encoded_url, target2, target2_ip, protocol, message, address):
         NS = twisted_dns.RRHeader(name=encoded_url, type=twisted_dns.NS, cls=twisted_dns.IN, ttl=0, auth=True,
                          payload=twisted_dns.Record_NS(name=target2, ttl=0))
         A = twisted_dns.RRHeader(name=target2, type=twisted_dns.A, cls=twisted_dns.IN, ttl=0,
