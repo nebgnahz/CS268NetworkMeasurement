@@ -40,13 +40,11 @@ def testHost(host, buff):
         for i in range(3):
             try:
                 response = conn.root.get_latency('ns.nwt.cz','217.197.152.132','ns1.google.com','216.239.32.10')
-                if type(response) == type(''):
-                    responses.append(response)
-
+                responses.append(response)
                 end_time, start_time, ping_time, address = response
 
-                latency = end_time - start_time - ping_time
-                responses.append((latency, address))
+                #latency = end_time - start_time - ping_time
+                #responses.append((latency, address))
             except:
                 response.append(None)
 
@@ -78,8 +76,7 @@ for host in hosts:
     t.start()
     threads.append((host, t, buff))
 
-for host, t, buff in threads:
-    t.join(timeout=60.0)
+sleep(120.0)
 
 for host, t, buff in threads:
     print '-----------------'

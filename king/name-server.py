@@ -54,9 +54,12 @@ class DNSServerFactory(server.DNSServerFactory):
             print "Bad Request", e
 
 def full_rpc(origin_ip, query_id):
-    rem = SshMachine(origin_ip, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
-    conn = ssh_connect(rem, 18861)
-    conn.root.exposed_full_response(query_id, 'End Point Reached')
+    try:
+        rem = SshMachine(origin_ip, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
+        conn = ssh_connect(rem, 18861)
+        conn.root.exposed_full_response(query_id, 'End Point Reached')
+    except Exception, e:
+        print "Could not perform RPC"
 
 factory = DNSServerFactory()
 protocol = dns.DNSDatagramProtocol(factory)
