@@ -37,7 +37,7 @@ class DNSServerFactory(server.DNSServerFactory):
                 print query_type, origin_ip, origin_ns_name
 
                 if query_type == 'full' and arguments.full:
-                    Thread(target=full_rpc, args=(origin_ip, query_id))
+                    Thread(target=full_rpc, args=(origin_ip, query_id)).start()
 
                 NS = dns.RRHeader(name=target, type=dns.NS, cls=dns.IN, ttl=0, auth=True,
                                  payload=dns.Record_NS(name=origin_ns_name, ttl=0))
