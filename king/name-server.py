@@ -55,7 +55,7 @@ class DNSServerFactory(server.DNSServerFactory):
 
 def full_rpc(origin_ip, query_id):
     try:
-        rem = SshMachine(origin_ip, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
+        rem = SshMachine(origin_ip, user='ucb_268_measure', keyfile='~/.ssh/id_rsa', ssh_opts=["StrictHostKeyChecking no", "-o UserKnownHostsFile=/dev/null"])
         conn = ssh_connect(rem, 18861)
         conn.root.exposed_full_response(query_id, 'End Point Reached')
     except Exception, e:
