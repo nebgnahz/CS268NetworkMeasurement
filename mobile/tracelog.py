@@ -46,7 +46,7 @@ class Command(object):
 arguments = parser.parse_args()
 
 f = open('urllist.txt', 'r')
-logFile = open(str(strftime("./logs/%Y-%m-%d %H:%M:%S")), 'w')
+logFile = open(str(strftime("./logs/%Y_%m_%d_%H:%M:%S.txt")), 'w')
 logFile.write( '# %s\n\n' % (arguments.message) )
 count = 0
 
@@ -57,7 +57,7 @@ for line in f:
 	count += 1
 	url = urlparse(line.partition(" ")[0])
 	print "[%i] traceroute to %s" % (count, url.netloc)
-	command = Command(['traceroute', '-a', '-q 5', url.netloc], 30)
+	command = Command(['traceroute', '-a', '-q 5', url.netloc], 20)
 	command.run()
 
 logFile.close()
