@@ -37,7 +37,7 @@ class Command(object):
 		elif (self.process.returncode == -15):
 			print "timeout"
 		else:
-			print "check this traceroute manually:", self.cmd
+			print "check this command manually:", self.cmd
 		self.returncode = self.process.returncode
 			
 
