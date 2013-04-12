@@ -39,7 +39,8 @@ def testHost(host, buff):
                 return
 
         responses = []
-        for i in range(3):
+
+        def remote_call():
             try:
                 response = conn.root.get_latency('ns.nwt.cz','217.197.152.132','ns1.google.com','216.239.32.10')
                 responses.append(response)
@@ -49,6 +50,11 @@ def testHost(host, buff):
                 #responses.append((latency, address))
             except:
                 response.append(None)
+
+        for i in range(3):
+            t = Thread(target=remote_call)
+            t.daemon = True
+            t.start()
 
         a = responses[0]
         b = responses[1]
