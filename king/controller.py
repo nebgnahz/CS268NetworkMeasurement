@@ -1,5 +1,5 @@
 import redis, string
-from geoutils import distance
+from utilities import distance, threaded_map
 from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
 
@@ -9,7 +9,8 @@ geoip = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=
 pl_hosts = [line.split(' ')[0:4] for line in map(string.strip,open('pl-host-list-geo').readlines())]
 
 class PlanetLabNode(object):
-    def __init__(self, host, ip, lat, lon):
+    def __init__(self, id, host, ip, lat, lon):
+        self.id = id
         self.host = host
         self.ip = ip
         self.lat = float(lat)
@@ -17,11 +18,17 @@ class PlanetLabNode(object):
         try:
             self.connectPL()
         except AssertionError, e:
-            self.restartPL()
-            self.connectPL()
+            try:
+                self.restartPL()
+                self.connectPL()
+            except Exception, e:
+                self = None
+        except Exception, e:
+            self = None
+        print 'Done %s %i' % (host, id)
 
     def connectPL(self):
-        print 'Connecting to %s' % self.host
+        print 'Connecting to %s %i' % (self.host, self.id)
         rem = SshMachine(self.host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa',
                          ssh_opts=["-o StrictHostKeyChecking no",
                                    "-o UserKnownHostsFile=/dev/null"])
@@ -44,6 +51,6 @@ class PlanetLabNode(object):
     def get_distance(lat, lon):
         return distance((self.lat, self.lon), (lat, lon))
 
-pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
+pl_nodes = threaded_map(lambda x: PlanetLabNode(x[0], *x[1]), list(enumerate(pl_hosts)), 30.0)
 
 print pl_nodes
