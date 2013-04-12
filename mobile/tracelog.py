@@ -57,7 +57,7 @@ for line in f:
 	count += 1
 	url = urlparse(line.partition(" ")[0])
 	print "[%i] traceroute to %s" % (count, url.netloc)
-	command = Command(['traceroute', '-a', '-q 5', url.netloc], 20)
+	command = Command(['traceroute', '-a', '-m 13', url.netloc], 20)
 	command.run()
 
 logFile.close()

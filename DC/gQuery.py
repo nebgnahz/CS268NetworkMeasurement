@@ -3,14 +3,21 @@
 Search google for a url and estimate the time
 """
 from BeautifulSoup import BeautifulSoup, CData
-import re, time
-import urllib, urllib2
-import sys
-import getopt
+import urllib, urllib2, threading
+from Queue import Queue
+import sys, getopt, re, time
+from sysutils import tcpdump, ping
 
 def google_scrape(query):
 		address = "http://www.google.com/search?q=%s&num=100&hl=en&start=0" % (urllib.quote_plus(query))
 		request = urllib2.Request(address, None, {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11'})
+		# use tcpdump
+		# before this, I should probably obtain google's ip for this transaction
+
+		q = Queue()
+		thread = threading.Thread(target=tcpdump, args=(2, q))
+		thread.start()
+		
 		# count time around this command
 		start_time = time.time()
 		page = urllib2.urlopen(request).read()
@@ -28,6 +35,16 @@ def google_scrape(query):
 			print elapsed - float(queryTime.group(1)), float(queryTime.group(1))
 		except:
 			print "exception caught"
+
+		thread.join(3)
+		if thread.isAlive():
+			print "terminating process"
+			thread.join()
+
+		returncode, ip_src = q.get()
+		if ip_src is not None:
+			returncode, pingTime = ping(ip_src)
+			print pingTime
 
 
 def google_trends():
@@ -65,5 +82,5 @@ if __name__ == '__main__':
 	for arg in args:
 		print arg
 		htmlFile = open(arg + '.html', 'w')
-		print google_trends()
+		print google_scrape(arg)
 		
