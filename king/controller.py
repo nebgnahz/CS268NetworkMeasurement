@@ -51,6 +51,5 @@ class PlanetLabNode(object):
     def get_distance(lat, lon):
         return distance((self.lat, self.lon), (lat, lon))
 
-pl_nodes = threaded_map(lambda x: PlanetLabNode(x[0], *x[1]), list(enumerate(pl_hosts)), 30.0)
+pl_nodes = threaded_map(lambda x: PlanetLabNode(x[0], *x[1]), list(enumerate(pl_hosts)), timeout=10.0)
 
-print pl_nodes
