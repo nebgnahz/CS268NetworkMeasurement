@@ -27,8 +27,7 @@ def testHost(host, buff):
         except Exception, e:
             print >> buff, colored('Service is not Running', 'red')
             print >> buff, 'Attempting to Start Service...'
-            subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "-o StrictHostKeyChecking no", "-o UserKnownHostsFile=/dev/null", "ucb_268_measure@%s" % host, "sudo tking-server stop"], stdout=FNULL, stderr=subprocess.STDOUT)
-            subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "-o StrictHostKeyChecking no", "-o UserKnownHostsFile=/dev/null", "ucb_268_measure@%s" % host, "sudo tking-server start"], stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "-o StrictHostKeyChecking no", "-o UserKnownHostsFile=/dev/null", "ucb_268_measure@%s" % host, "sudo tking-server stop; sudo tking-server start;"], stdout=FNULL, stderr=subprocess.STDOUT)
             try:
                 sleep(4)
                 conn = ssh_connect(rem, 18861)
