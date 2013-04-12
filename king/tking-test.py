@@ -1,9 +1,11 @@
 from rpyc.utils.factory import ssh_connect
 from plumbum import SshMachine
 from termcolor import colored
-import string, subprocess, StringIO
+import string, subprocess, StringIO, os
 from time import sleep
 from threading import Thread
+
+FNULL = open(os.devnull, 'w')
 
 hosts = map(string.strip,open('pl-host-list').readlines())
 
@@ -16,7 +18,7 @@ def testHost(host, buff):
             pass
             #print >> buff, colored("Service Not Exposed Exterally",'green')
 
-        rem = SshMachine(host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa')
+        rem = SshMachine(host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa', ssh_opts=["-o StrictHostKeyChecking no", "-o UserKnownHostsFile=/dev/null"])
         #print >> buff, colored('SSH Connected', 'green')
         try:
             conn = ssh_connect(rem, 18861)
@@ -25,8 +27,8 @@ def testHost(host, buff):
         except Exception, e:
             print >> buff, colored('Service is not Running', 'red')
             print >> buff, 'Attempting to Start Service...'
-            subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "ucb_268_measure@%s" % host, "sudo tking-server stop"])
-            subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "ucb_268_measure@%s" % host, "sudo tking-server start"])
+            subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "-o StrictHostKeyChecking no", "-o UserKnownHostsFile=/dev/null", "ucb_268_measure@%s" % host, "sudo tking-server stop"], stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "-o StrictHostKeyChecking no", "-o UserKnownHostsFile=/dev/null", "ucb_268_measure@%s" % host, "sudo tking-server start"], stdout=FNULL, stderr=subprocess.STDOUT)
             try:
                 sleep(4)
                 conn = ssh_connect(rem, 18861)
