@@ -51,10 +51,13 @@ def testHost(host, buff):
             except:
                 response.append(None)
 
+        threads = []
         for i in range(3):
             t = Thread(target=remote_call)
-            t.daemon = True
             t.start()
+            threads.append(t)
+        for t in threads:
+            t.join()
 
         a = responses[0]
         b = responses[1]
