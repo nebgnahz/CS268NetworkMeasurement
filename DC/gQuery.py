@@ -82,10 +82,8 @@ def google_trends():
 	for cd in soup.findAll(text=True):
 		if isinstance(cd, CData):
 			s = BeautifulSoup(cd.encode())
-			for a in s.findAll('a'):
-				results.append(a.text)
-	return results
-	
+			results.extend([i.string for i in s.findAll('a')])
+	return results	
 			
 if __name__ == '__main__':
 	"""'myfunc' documentation."""
