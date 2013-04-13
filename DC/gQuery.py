@@ -9,6 +9,8 @@ from sysutils import tcpdump, ping
 import string, random, logging
 
 htmlFile = None
+# logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+
 
 def random_string(size=6, chars=string.ascii_letters + string.digits):
 	return ''.join(random.choice(chars) for x in range(size))
@@ -20,7 +22,7 @@ def google_scrape(query):
 	# before this, I should probably obtain google's ip for this transaction
 
 	q = Queue.Queue()
-	thread = threading.Thread(target=tcpdump, args=(5, q))
+	thread = threading.Thread(target=tcpdump, args=(5, q, 'eth0'))
 	thread.start()
 	
 	elapsed = -1
@@ -34,7 +36,7 @@ def google_scrape(query):
 				
 	logging.debug("time elapsed for google query: %f",  elapsed)
 
-	thread.join(5)
+	thread.join(10)
 	if thread.isAlive():
 		logging.debug("terminating tcpdump process")
 		thread.join()

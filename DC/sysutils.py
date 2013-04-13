@@ -63,16 +63,16 @@ def ping(dst, count = 10, timeout = 30):
 
 		return command.returncode, pingTimes
 
-def tcpdump(timeout, q):
+def tcpdump(timeout, q, interface):
 	""" This is a wrapper function to the system tcpdump.
 
 	It opens a new subprocess, and passes the parameter.
 	The implementation involves a threading solution, so that timeout value can be specified.
 	"""	
-	logging.debug('tcpdump -s 1024 -lqnAt tcp port 80')
+	logging.debug('tcpdump -s 1024 -lqnAt tcp port 80 -i eth0')
 	# tcpdump -s 1024 -lqnAt tcp port 80
 		
-	command = Command(['tcpdump', '-s 1024', '-lqnAt', 'tcp port 80'], timeout)
+	command = Command(['tcpdump', '-s 1024', '-lqnAt', '-i', interface, 'tcp port 80'], timeout)
 	command.run()
 
 	# when it's executing here, the results have been available
