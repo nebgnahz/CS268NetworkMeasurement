@@ -24,11 +24,11 @@ class PlanetLabNode(object):
     def connect(self):
         try:
             self.connectPL()
-        except AssertionError, e:
+        except (AssertionError, EOFError), e:
             try:
                 self.restartPL()
                 self.connectPL()
-            except AssertionError, e:
+            except (AssertionError, EOFError), e:
                 self.connected = False
 
     def connectPL(self):
@@ -36,13 +36,13 @@ class PlanetLabNode(object):
                          ssh_opts=["-o StrictHostKeyChecking no",
                                    "-o UserKnownHostsFile=/dev/null"])
         conn = ssh_connect(rem, 18861, config={'allow_pickle' : True})
-        assert conn.root.test() == 1, "%s: RPC Failure" % host
+        assert conn.root.test() == 1, "%s: RPC Failure" % self.host
         self.conn = conn
         self.connected = True
 
     def restartPL(self):
         subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "-o StrictHostKeyChecking no",
-                         "-o UserKnownHostsFile=/dev/null", "ucb_268_measure@%s" % host,
+                         "-o UserKnownHostsFile=/dev/null", "ucb_268_measure@%s" % self.host,
                          "sudo tking-server stop; sudo tking-server start;"],
                          stdout=FNULL, stderr=subprocess.STDOUT)
 
