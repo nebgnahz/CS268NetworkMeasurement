@@ -10,7 +10,6 @@ from sysutils import tcpdump, ping
 import string, random, logging
 
 htmlFile = None
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 def random_string(size=6, chars=string.ascii_letters + string.digits):
 	return ''.join(random.choice(chars) for x in range(size))
@@ -22,7 +21,7 @@ def google_scrape(query):
 	# before this, I should probably obtain google's ip for this transaction
 
 	q = Queue()
-	thread = threading.Thread(target=tcpdump, args=(2, q))
+	thread = threading.Thread(target=tcpdump, args=(5, q))
 	thread.start()
 	
 	elapsed = -1
@@ -36,10 +35,20 @@ def google_scrape(query):
 				
 	logging.debug("time elapsed for google query: %f",  elapsed)
 
+	thread.join(5)
+	if thread.isAlive():
+		logging.debug("terminating tcpdump process")
+		thread.join()
+	try:
+		returncode, ip_src = q.get(timeout = 1)
+	except Queue.Empty:
+		logging.debug("queue is empty for query: %s", query)
+		
+	# if write this to file for debugging
 	if htmlFile:
 		htmlFile.write(page)
 
-	
+	# parse the file
 	soup = BeautifulSoup(page)
 	googleTime = None
 	try:
@@ -53,11 +62,6 @@ def google_scrape(query):
 	except:
 		logging.debug("exception caught when parsing, no google stats for query: %s", query)
 
-	thread.join(3)
-	if thread.isAlive():
-		logging.debug("terminating tcpdump process")
-		thread.join()
-	returncode, ip_src = q.get()
 	queryTime = elapsed
 	if ip_src is not None:
 		logging.debug("find ip source, now pinging")
