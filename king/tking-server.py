@@ -44,17 +44,20 @@ class TurboKingService(rpyc.Service):
             query_id = randrange(0, sys.maxint)
         return query_id
 
-    def exposed_get_ping(self, ip1):
-        code, pingTimes = ping(ip1)
-        if len(pingTimes) > 0:
-            avg_ping_rtt = str(sum(pingTimes)/len(pingTimes))
-            mil, mic = avg_ping_rtt.split('.')
-            mil = int(mil)
-            mic = int(mic)
-            ping_time = timedelta(milliseconds = mil, microseconds=mic)
-            return ping_time, (10 - len(pingTimes)) # number of dropped pings
-        else:
-            return None, 10 # 10 dropped pings
+    def exposed_get_ping(self, t1, ip1):
+        times = []
+        random_int = randrange(0, sys.maxint)
+        for i in range(10):
+            addr = "%i.%s" % (random_int, t1)
+            query = dns.message.make_query(addr, dns.rdatatype.A)
+            start_time = datetime.now()
+            try:
+                response = dns.query.udp(query, ip1, timeout=5.0)
+                end_time = datetime.now()
+                times.append(end_time-start_time)
+            except Exception, e:
+                pass
+        return times[1:] #Only take times after the first query, because the DNS server will have cached its response
 
     def exposed_get_latency(self, t1, ip1, t2, ip2):
         query_id = self.generate_query_id()
@@ -69,7 +72,7 @@ class TurboKingService(rpyc.Service):
             print '...2'
             del returnedQueries[query_id]
             print '...3'
-            ping_time = self.exposed_get_ping(ip1)
+            ping_time = self.exposed_get_ping(t1, ip1)
             print '...4'
             return end_time, start_time, ping_time, address
         except Exception, e:
