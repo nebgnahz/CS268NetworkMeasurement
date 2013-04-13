@@ -13,8 +13,6 @@ from rpyc.utils.server import ThreadedServer
 from daemon import Daemon
 from sysping import ping
 
-rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
-
 myHostName = socket.gethostname().replace('.', '---')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
 myAddr = '%s---%s.nbapuns.com' % (myIP, myHostName)
@@ -197,7 +195,7 @@ def startDnsServer():
 class TkingServerDaemon(Daemon):
     def run(self):
         # Start RPYC
-        t = ThreadedServer(TurboKingService, hostname='localhost', port = 18861)
+        t = ThreadedServer(TurboKingService, hostname='localhost', port = 18861, protocol_config={'allow_pickle': True})
         dnsClient = Thread(target=t.start)
         dnsClient.daemon = True
         dnsClient.start()
