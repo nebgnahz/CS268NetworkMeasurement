@@ -149,8 +149,10 @@ class DNSServerFactory(server.DNSServerFactory):
             elif query_type == 'latency' or query_type == 'full':
                 print 'latency'
                 returnedQueries[query_id] = (query_time, address)
+                print 'outstanding queries'
                 target2, target2_ip = outstandingQueries[query_id]
                 del outstandingQueries[query_id]
+                print 'delete'
                 response = self.createReferral(encoded_url, target2, target2_ip, protocol, message, address)
                 print 'latency end'
                 return server.DNSServerFactory.gotResolverResponse(*response)
