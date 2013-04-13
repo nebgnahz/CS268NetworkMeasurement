@@ -12,8 +12,7 @@ geoip = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=
 pl_hosts = [line.split(' ')[0:4] for line in map(string.strip,open('pl-host-list-geo').readlines())]
 
 class PlanetLabNode(object):
-    def __init__(self, id, host, ip, lat, lon):
-        self.id = id
+    def __init__(self, host, ip, lat, lon):
         self.host = host
         self.ip = ip
         self.lat = float(lat)
@@ -80,27 +79,36 @@ class PlanetLabNode(object):
     def get_distance(self, lat, lon):
         return distance((self.lat, self.lon), (lat, lon))
 
-def random_latency():
+def select_random_points():
     target1 = open_resolvers.randomkey()
     target2 = geoip.randomkey()
     while not geoip.exists(target1):
         target1 = open_resolvers.randomkey()
 
-    ip1, (lat1, long1) = list(all_dns.smembers(target1))[0], eval(list(geoip.smembers(target1))[0])[1:]
-    ip2, (lat2, long2) = list(all_dns.smembers(target2))[0], eval(list(geoip.smembers(target2))[0])[1:]
+    ip1, coord1 = list(all_dns.smembers(target1))[0], eval(list(geoip.smembers(target1))[0])[1:]
+    ip2, coord2 = list(all_dns.smembers(target2))[0], eval(list(geoip.smembers(target2))[0])[1:]
 
-    #print ip1, lat1, long1, ip2, lat2, long2
+    return (target1, ip1, coord1), (target2, ip2, coord2)
 
-    return target1, ip1, target2, ip2
+def query_latency(target1, target2):
+    name1, ip1, coord1 = target1
+    name2, ip2, coord2 = target2
 
-def test(node):
-    node.get_latency(*random_latency())
+    # Get closest 4 PL Nodes
+    distances = map(lambda node: (distance(coord1, (node.lat, node.lon)), node), pl_nodes)
+    distances.sort()
+    distances = distances[:4]
 
-pl_nodes = map(lambda x: PlanetLabNode(x[0], *x[1]), list(enumerate(pl_hosts)))
+    print 'Issuing Queries'
+    results = threaded_map(lambda (dist, node): node.get_latency(name1, ip1, name2, ip2), distances, timeout=10.0)
+    print results
+    return results
 
+def one_round(x):
+    return query_latency(*select_random_points())
+
+pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 p = Pool(process_pool_size)
-results = p.map(test, pl_nodes)
+results = p.map(one_round, range(process_pool_size))
 
-print len(results)
-for r in results:
-    print r
+print results
