@@ -61,6 +61,8 @@ class TurboKingService(rpyc.Service):
         query_id = self.generate_query_id()
         outstandingQueries[query_id] = (t2, ip2)
 
+        print 'QID1', query_id, type(query_id)
+
         # Start DNS Client
         end_time = dnsClientQuery(query_id, ip1)
 
@@ -148,6 +150,7 @@ class DNSServerFactory(server.DNSServerFactory):
                 #print 'latency'
                 returnedQueries[query_id] = (query_time, address)
                 #print 'outstanding queries'
+                print 'QID2', query_id, type(query_id)
                 target2, target2_ip = outstandingQueries[query_id]
                 del outstandingQueries[query_id]
                 #print 'delete'
