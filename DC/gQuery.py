@@ -3,8 +3,7 @@
 Search google for a url and estimate the time
 """
 from BeautifulSoup import BeautifulSoup, CData
-import urllib, urllib2, threading, httplib
-from Queue import Queue
+import urllib, urllib2, threading, httplib, Queue
 import sys, getopt, re, time
 from sysutils import tcpdump, ping
 import string, random, logging
@@ -20,7 +19,7 @@ def google_scrape(query):
 	# use tcpdump
 	# before this, I should probably obtain google's ip for this transaction
 
-	q = Queue()
+	q = Queue.Queue()
 	thread = threading.Thread(target=tcpdump, args=(5, q))
 	thread.start()
 	
