@@ -1,7 +1,10 @@
-import redis, string
+import apscheduler, redis, string
+from multiprocessing import Pool
 from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
+
+process_pool_size = 60
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -77,19 +80,26 @@ class PlanetLabNode(object):
     def get_distance(self, lat, lon):
         return distance((self.lat, self.lon), (lat, lon))
 
-
-pl_nodes = threaded_map(lambda x: PlanetLabNode(x[0], *x[1]), list(enumerate(pl_hosts)))
-
 def random_latency():
     target1 = open_resolvers.randomkey()
     target2 = geoip.randomkey()
     while not geoip.exists(target1):
         target1 = open_resolvers.randomkey()
-    ip1 = list(all_dns.smembers(target1))[0]#, list(geoip.smembers(target1))[1:]
-    ip2 = list(all_dns.smembers(target2))[0]#, list(geoip.smembers(target2))[1:]
+
+    ip1, (lat1, long1) = list(all_dns.smembers(target1))[0], eval(list(geoip.smembers(target1))[0])[1:]
+    ip2, (lat2, long2) = list(all_dns.smembers(target2))[0], eval(list(geoip.smembers(target2))[0])[1:]
+
+    #print ip1, lat1, long1, ip2, lat2, long2
+
     return target1, ip1, target2, ip2
 
-results = threaded_map(lambda node: node.get_latency(*random_latency()), pl_nodes, timeout=10.0)
+def test(node):
+    node.get_latency(*random_latency())
+
+pl_nodes = map(lambda x: PlanetLabNode(x[0], *x[1]), list(enumerate(pl_hosts)))
+
+p = Pool(process_pool_size)
+results = p.map(test, pl_nodes)
 
 print len(results)
 for r in results:
