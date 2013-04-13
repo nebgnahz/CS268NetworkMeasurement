@@ -1,4 +1,4 @@
-import apscheduler, redis, string
+import apscheduler, os, redis, string, subprocess
 from datetime import timedelta
 from multiprocessing import Pool
 from plumbum import SshMachine
@@ -6,6 +6,7 @@ from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
 
 process_pool_size = 60
+FNULL = open(os.devnull, 'w')
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -23,14 +24,12 @@ class PlanetLabNode(object):
     def connect(self):
         try:
             self.connectPL()
-        except AssertionError, e:
+        except Exception, e:
             try:
                 self.restartPL()
                 self.connectPL()
             except Exception, e:
                 self.connected = False
-        except Exception, e:
-            self.connected = False
 
     def connectPL(self):
         rem = SshMachine(self.host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa',
