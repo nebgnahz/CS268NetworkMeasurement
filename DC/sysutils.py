@@ -5,8 +5,7 @@ Ping wrapper for system ping (Unix machine)
 
 """
 import sys, getopt, time, socket, re
-import threading, subprocess
-
+import threading, subprocess, logging
 
 class Command(object):
 	def __init__(self, cmd, timeout):
@@ -27,17 +26,17 @@ class Command(object):
 
 		thread.join(self.timeout)
 		if thread.isAlive():
-			print "terminating process"
+			logging.debug("terminating process")
 			self.process.terminate()
 			thread.join()
 
 		# timeout sees -15, normal sees 0x
 		if (self.process.returncode == 0):
-			print "succeeded"
+			logging.debug("succeeded")
 		elif (self.process.returncode == -15):
-			print "timeout"
+			logging.debug("timeout")
 		else:
-			print "check this command manually:", self.cmd
+			logging.debug("check this command manually: %s", self.cmd)
 		self.returncode = self.process.returncode
 			
 
@@ -48,7 +47,7 @@ def ping(dst, count = 10, timeout = 30):
 	The implementation involves a threading solution, so that timeout value can be specified.
 	"""	
 	pingTimes = []
-	print "ping %s (%i times)" % (dst, count)
+	logging.debug("ping %s (%i times)", dst, count)
 	command = Command(['ping', '-n', '-c', str(count), dst], timeout)
 	command.run()
 	# when it's executing here, the results have been available
@@ -70,7 +69,7 @@ def tcpdump(timeout, q):
 	It opens a new subprocess, and passes the parameter.
 	The implementation involves a threading solution, so that timeout value can be specified.
 	"""	
-	print 'tcpdump -s 1024 -lqnAt tcp port 80'
+	logging.debug('tcpdump -s 1024 -lqnAt tcp port 80')
 	# tcpdump -s 1024 -lqnAt tcp port 80
 		
 	command = Command(['tcpdump', '-s 1024', '-lqnAt', 'tcp port 80'], timeout)
