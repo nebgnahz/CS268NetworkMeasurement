@@ -112,10 +112,9 @@ results = p.map(one_round, range(process_pool_size))
 for r in results:
     end_time, start_time, ping_time, address = r
     print ping_time
-    if ping_time:
-        avg_ping = sum(filter(None,ping_time), timedelta())/len(ping_time)
-    else:
-        avg_ping = None
-    print end_time, start_time
-    print address, end_time, start_time, avg_ping
+#    if ping_time:
+#        avg_ping = sum(filter(None,ping_time), timedelta())/len(ping_time)
+#    else:
+#        avg_ping = None
+    print address, end_time, start_time
     
