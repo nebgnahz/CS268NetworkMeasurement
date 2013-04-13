@@ -36,7 +36,7 @@ class PlanetLabNode(object):
         rem = SshMachine(self.host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa',
                          ssh_opts=["-o StrictHostKeyChecking no",
                                    "-o UserKnownHostsFile=/dev/null"])
-        conn = ssh_connect(rem, 18861)
+        conn = ssh_connect(rem, 18861, config={'allow_pickle' : True})
         assert conn.root.test() == 1, "%s: RPC Failure" % host
         self.conn = conn
         self.connected = True
