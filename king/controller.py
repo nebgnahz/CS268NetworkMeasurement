@@ -4,7 +4,7 @@ from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
 
-process_pool_size = 60
+process_pool_size = 30
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -32,7 +32,6 @@ class PlanetLabNode(object):
             self.connected = False
 
     def connectPL(self):
-        #print 'Connecting to %s %i' % (self.host, self.id)
         rem = SshMachine(self.host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa',
                          ssh_opts=["-o StrictHostKeyChecking no",
                                    "-o UserKnownHostsFile=/dev/null"])
@@ -99,9 +98,7 @@ def query_latency(target1, target2):
     distances.sort()
     distances = distances[:4]
 
-    print 'Issuing Queries'
     results = threaded_map(lambda (dist, node): node.get_latency(name1, ip1, name2, ip2), distances, timeout=10.0)
-    print results
     return results
 
 def one_round(x):
@@ -111,4 +108,5 @@ pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 p = Pool(process_pool_size)
 results = p.map(one_round, range(process_pool_size))
 
-print results
+for r in results:
+    print r
