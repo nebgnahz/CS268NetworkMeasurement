@@ -65,13 +65,13 @@ class TurboKingService(rpyc.Service):
         end_time = dnsClientQuery(query_id, ip1)
 
         try:
-            print '...1'
+            #print '...1'
             start_time, address = returnedQueries[query_id]
-            print '...2'
+            #print '...2'
             del returnedQueries[query_id]
-            print '...3'
+            #print '...3'
             ping_time = self.exposed_get_ping(t1, ip1)
-            print '...4'
+            #print '...4'
             return end_time, start_time, ping_time, address
         except Exception, e:
             print "End error:", e
@@ -115,7 +115,7 @@ def dnsClientQuery(query_id, target1_ip, query_type="latency", timeout=5):
     try:
         response = dns.query.udp(query, target1_ip, timeout=timeout)
         end_time = datetime.now()
-        print "Recieved Response:", response
+        #print "Recieved Response:", response
     except dns.exception.Timeout, e:
         end_time = None
         print "Error:", e
@@ -145,14 +145,14 @@ class DNSServerFactory(server.DNSServerFactory):
                     returnedQueries[query_id] += 1
                 print 'kv end'
             elif query_type == 'latency' or query_type == 'full':
-                print 'latency'
+                #print 'latency'
                 returnedQueries[query_id] = (query_time, address)
-                print 'outstanding queries'
+                #print 'outstanding queries'
                 target2, target2_ip = outstandingQueries[query_id]
                 del outstandingQueries[query_id]
-                print 'delete'
+                #print 'delete'
                 response = self.createReferral(encoded_url, target2, target2_ip, protocol, message, address)
-                print 'latency end'
+                #print 'latency end'
                 return server.DNSServerFactory.gotResolverResponse(*response)
         except Exception, e:
             print "Bad Request", e
