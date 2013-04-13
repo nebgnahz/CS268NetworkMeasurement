@@ -140,15 +140,19 @@ class DNSServerFactory(server.DNSServerFactory):
             print encoded_url
 
             if query_type == 'kvalue':
+                print 'kv'
                 if query_id not in returnedQueries:
                     returnedQueries[query_id] = 1
                 else:
                     returnedQueries[query_id] += 1
+                print 'kv end'
             elif query_type == 'latency' or query_type == 'full':
+                print 'latency'
                 returnedQueries[query_id] = (query_time, address)
                 target2, target2_ip = outstandingQueries[query_id]
                 del outstandingQueries[query_id]
                 response = self.createReferral(encoded_url, target2, target2_ip, protocol, message, address)
+                print 'latency end'
                 return server.DNSServerFactory.gotResolverResponse(*response)
         except Exception, e:
             print "Bad Request", e
