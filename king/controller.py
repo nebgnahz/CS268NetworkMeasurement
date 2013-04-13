@@ -24,11 +24,11 @@ class PlanetLabNode(object):
     def connect(self):
         try:
             self.connectPL()
-        except Exception, e:
+        except AssertionError, e:
             try:
                 self.restartPL()
                 self.connectPL()
-            except Exception, e:
+            except AssertionError, e:
                 self.connected = False
 
     def connectPL(self):
