@@ -15,7 +15,7 @@ class PlanetLabNode(object):
         self.ip = ip
         self.lat = float(lat)
         self.lon = float(lon)
-        self.connect()
+        self.connected = False
 
     def connect(self):
         try:
@@ -78,7 +78,7 @@ class PlanetLabNode(object):
         return distance((self.lat, self.lon), (lat, lon))
 
 
-pl_nodes = threaded_map(lambda x: PlanetLabNode(x[0], *x[1]), list(enumerate(pl_hosts)), timeout=10.0)
+pl_nodes = threaded_map(lambda x: PlanetLabNode(x[0], *x[1]), list(enumerate(pl_hosts)))
 
 def random_latency():
     target1 = open_resolvers.randomkey()
@@ -89,7 +89,7 @@ def random_latency():
     ip2 = list(all_dns.smembers(target2))[0]#, list(geoip.smembers(target2))[1:]
     return target1, ip1, target2, ip2
 
-results = threaded_map(lambda node: node.get_latency(*random_latency()), pl_nodes)
+results = threaded_map(lambda node: node.get_latency(*random_latency()), pl_nodes, timeout=10.0)
 
 print len(results)
 for r in results:
