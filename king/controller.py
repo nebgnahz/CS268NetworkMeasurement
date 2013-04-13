@@ -1,10 +1,11 @@
 import apscheduler, redis, string
+from datetime import timedelta
 from multiprocessing import Pool
 from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
 
-process_pool_size = 30
+process_pool_size = 60
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -109,4 +110,12 @@ p = Pool(process_pool_size)
 results = p.map(one_round, range(process_pool_size))
 
 for r in results:
-    print r
+    end_time, start_time, ping_time, address = r
+    print ping_time
+    if ping_time:
+        avg_ping = sum(filter(None,ping_time), timedelta())/len(ping_time)
+    else:
+        avg_ping = None
+    print end_time, start_time
+    print address, end_time, start_time, avg_ping
+    

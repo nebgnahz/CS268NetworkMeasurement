@@ -67,13 +67,13 @@ class TurboKingService(rpyc.Service):
         end_time = dnsClientQuery(query_id, ip1)
 
         try:
-            #print '...1'
+            print '...1'
             start_time, address = returnedQueries[query_id]
-            #print '...2'
+            print '...2'
             del returnedQueries[query_id]
-            #print '...3'
+            print '...3'
             ping_time = self.exposed_get_ping(t1, ip1)
-            #print '...4'
+            print '...4'
             return end_time, start_time, ping_time, address
         except Exception, e:
             print "End error:", e
