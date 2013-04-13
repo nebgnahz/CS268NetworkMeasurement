@@ -72,7 +72,7 @@ def tcpdump(timeout, q, interface):
 	logging.debug('tcpdump -s 1024 -lqnAt tcp port 80 -i eth0')
 	# tcpdump -s 1024 -lqnAt tcp port 80
 		
-	command = Command(['tcpdump', '-s 1024', '-lqnAt', '-i', interface, 'tcp port 80'], timeout)
+	command = Command(['tcpdump', '-s 1024', '-lnAq', '-i', interface], timeout)
 	command.run()
 
 	# when it's executing here, the results have been available
@@ -84,14 +84,22 @@ def tcpdump(timeout, q, interface):
 		google_pattern = "domain=.google.com"
 		lines = command.out.split('\n')
 		last_ip = None
+
 		
 		for line in lines:
 			ip_src = re.search(ip_pattern, line)
 			if ip_src is not None:
 				last_ip = ip_src.group(1)
 			if re.search(google_pattern, line):
+				print last_ip
 				q.put((command.returncode, last_ip))
-				return
+				break
+		
+		for line in lines:
+			if re.search(last_ip, line) is not None:
+				print line
+
+		return
 
 if __name__=='__main__':
 	# parse command line options
