@@ -13,6 +13,8 @@ from rpyc.utils.server import ThreadedServer
 from daemon import Daemon
 from sysping import ping
 
+rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
+
 myHostName = socket.gethostname().replace('.', '---')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
 myAddr = '%s---%s.nbapuns.com' % (myIP, myHostName)
