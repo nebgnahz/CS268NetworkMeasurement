@@ -133,19 +133,19 @@ class DNSServerFactory(server.DNSServerFactory):
 
     def handleQuery(self, message, protocol, address):
         query_time = datetime.now()
-        print "Recieved Query", address, message
+        #print "Recieved Query", address, message
         try:
             encoded_url, query_id, origin, query_type = self.processMessage(message)
             query_id = int(query_id)
             print encoded_url
 
             if query_type == 'kvalue':
-                print 'kv'
+                #print 'kv'
                 if query_id not in returnedQueries:
                     returnedQueries[query_id] = 1
                 else:
                     returnedQueries[query_id] += 1
-                print 'kv end'
+                #print 'kv end'
             elif query_type == 'latency' or query_type == 'full':
                 #print 'latency'
                 returnedQueries[query_id] = (query_time, address)
