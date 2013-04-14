@@ -157,6 +157,8 @@ def doWork():
                             pass
                 s.commit()
         except Exception, e:
+            print target1, target2, result_set
+            exit(1)
             print e
 
 pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
