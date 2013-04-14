@@ -128,7 +128,7 @@ def query_latency(target1, target2):
     # Get closest 4 PL Nodes
     distances = map(lambda node: (distance(coord1, (node.lat, node.lon)), node), pl_nodes)
     distances.sort()
-    distances = distances[:4]
+    distances = distances[:7]
 
     results = threaded_map(lambda (dist, node): (node.host, node.get_latency(name1, ip1, name2, ip2)), distances, timeout=10.0)
     return results
