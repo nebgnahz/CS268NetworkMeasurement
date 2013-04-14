@@ -136,9 +136,12 @@ def query_latency(target1, target2):
     return results
 
 def one_round(x):
-    target1, target2 = select_random_points()
-    results = query_latency(target1, target2)
-    return target1, target2, results
+    try:
+        target1, target2 = select_random_points()
+        results = query_latency(target1, target2)
+        return target1, target2, results
+    except Exception, e:
+        return None
 
 pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 
