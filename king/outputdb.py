@@ -30,4 +30,10 @@ class DataPoint(Base):
 q = s.query(DataPoint)
 
 for r in q.all():
-    print r
+    print r.target1
+    print r.target2
+    print r.start
+    print r.end
+    print r.pings
+    print r.address
+    print '---------------------------------'
