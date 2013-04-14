@@ -18,14 +18,16 @@ class DataPoint(Base):
     end = Column(PickleType)
     pings = Column(PickleType)
     address = Column(PickleType)
+    test_point = Column(PickleType)
 
-    def __init__(self, target1, target2, start, end, pings, address):
+    def __init__(self, target1, target2, start, end, pings, address, test_point):
         self.target1 = target1
         self.target2 = target2
         self.start = start
         self.end = end
         self.pings = pings
         self.address = address
+        self.test_point = test_point
 
 q = s.query(DataPoint)
 
@@ -36,5 +38,5 @@ for r in q.all():
     print r.end
     print r.pings
     print r.address
-    print r.host
+    print r.test_point
     print '---------------------------------'
