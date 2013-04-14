@@ -8,7 +8,6 @@ from utilities import distance, threaded_map
 
 process_pool_size = 100
 sched = Scheduler()
-sched.start()
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -155,3 +154,4 @@ def task():
     s.commit()
 
 sched.add_interval_job(task, minutes=1)
+sched.start()
