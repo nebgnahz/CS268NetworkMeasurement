@@ -131,7 +131,7 @@ def query_latency(target1, target2):
     results = threaded_map(lambda (dist, node): (node.host, node.get_latency(name1, ip1, name2, ip2)), distances, timeout=10.0)
     return results
 
-def one_round(x):
+def one_round():
     print 'Task'
     try:
         target1, target2 = select_random_points()
