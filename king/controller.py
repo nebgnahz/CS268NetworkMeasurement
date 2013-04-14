@@ -6,7 +6,6 @@ from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
 
 process_pool_size = 60
-FNULL = open(os.devnull, 'w')
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -24,11 +23,11 @@ class PlanetLabNode(object):
     def connect(self):
         try:
             self.connectPL()
-        except (AssertionError, EOFError), e:
+        except Exception, e:
             try:
                 self.restartPL()
                 self.connectPL()
-            except (AssertionError, EOFError), e:
+            except Exception, e:
                 self.connected = False
 
     def connectPL(self):
@@ -41,10 +40,11 @@ class PlanetLabNode(object):
         self.connected = True
 
     def restartPL(self):
-        print 'Restart'
+        FNULL = open(os.devnull, 'w')
         subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "-o StrictHostKeyChecking no",
                          "-o UserKnownHostsFile=/dev/null", "ucb_268_measure@%s" % self.host,
-                         "sudo tking-server stop; sudo tking-server start;"])
+                         "sudo tking-server stop; sudo tking-server start;"],
+                         stdout=FNULL, stderr=FNULL)
 
     def handleConnExceptions(fn):
         def wrapped(self, *args, **kwargs):
@@ -110,10 +110,10 @@ results = p.map(one_round, range(process_pool_size))
 
 for r in results:
     end_time, start_time, ping_time, address = r
-    print ping_time
-#    if ping_time:
-#        avg_ping = sum(filter(None,ping_time), timedelta())/len(ping_time)
-#    else:
-#        avg_ping = None
-    print address, end_time, start_time
-    
+    print 'Start', start_time
+    print 'End', end_time
+    print 'Ping', ping_time
+    print' Address', address
+    print
+    print
+
