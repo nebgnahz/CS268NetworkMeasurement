@@ -6,7 +6,7 @@ from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
 from utilities import distance
 
-process_pool_size = 400
+process_pool_size = 50
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -56,10 +56,12 @@ class PlanetLabNode(object):
         try:
             self.connectPL()
         except Exception, e:
+            print e
             try:
                 self.restartPL()
                 self.connectPL()
             except Exception, e:
+                print e
                 self.connected = False
 
     def connectPL(self):
@@ -162,11 +164,13 @@ def doWork():
                             point = DataPoint(start_time, end_time, ping_times, address, host)
                             points.append(point)
                         except Exception, e:
+                            print e
                             pass
                 data_set = Query(target1, target2, points)
                 s.add(data_set)
                 s.commit()
         except Exception, e:
+            print e
             pass
 
 pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
