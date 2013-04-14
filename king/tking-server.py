@@ -114,13 +114,14 @@ def dnsClientQuery(query_id, target1_ip, query_type="latency", timeout=10):
     addr = "%s.%i.%s" % (query_type, query_id, myAddr)
     print addr
     query = dns.message.make_query(addr, dns.rdatatype.A)
+    end_time = None
     try:
         response = dns.query.udp(query, target1_ip, timeout=timeout)
         end_time = datetime.now()
-        #print "Recieved Response:", response
-    except dns.exception.Timeout, e:
-        end_time = None
-        print "Error:", e
+    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.exception.FormError):
+        end_time = datetime.now()
+    except Exception:
+        pass
     return end_time
 
 ##############
