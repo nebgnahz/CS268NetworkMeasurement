@@ -1,7 +1,7 @@
 import logging, os, redis, string, subprocess
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
-from multiprocessing import Process, JoinableQueue
+from multiprocessing import Process
 from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
@@ -162,7 +162,11 @@ def doWork():
 pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 
 def main():
+    processes = []
     for i in range(process_pool_size):
         p = Process(target=doWork)
         p.daemon = True
         p.start()
+        processes.append(p)
+    for p in processes:
+        p.join()
