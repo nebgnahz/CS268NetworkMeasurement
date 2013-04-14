@@ -145,7 +145,6 @@ def doWork():
     s = Session()
     while True:
         try:
-            print 'sjflskjfl'
             target1, target2, result_set = one_round()
             for host, info in filter(None,result_set):
                 if info:
@@ -156,8 +155,8 @@ def doWork():
                     except Exception, e:
                         pass
             s.commit()
-        except:
-            pass
+        except Exception, e:
+            print e
 
 pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 
