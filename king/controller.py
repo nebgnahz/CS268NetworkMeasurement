@@ -146,15 +146,16 @@ def doWork():
     while True:
         try:
             target1, target2, result_set = one_round()
-            for host, info in filter(None,result_set):
-                if info:
-                    try:
-                        (end_time, start_time, ping_times, address) = info
-                        point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
-                        s.add(point)
-                    except Exception, e:
-                        pass
-            s.commit()
+            if result_set:
+                for host, info in filter(None,result_set):
+                    if info:
+                        try:
+                            (end_time, start_time, ping_times, address) = info
+                            point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
+                            s.add(point)
+                        except Exception, e:
+                            pass
+                s.commit()
         except Exception, e:
             print e
 
