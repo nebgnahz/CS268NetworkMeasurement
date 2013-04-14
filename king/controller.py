@@ -5,7 +5,7 @@ from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
 
-process_pool_size = 60
+process_pool_size = 15
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -98,23 +98,27 @@ def query_latency(target1, target2):
     distances.sort()
     distances = distances[:4]
 
-    results = threaded_map(lambda (dist, node): node.get_latency(name1, ip1, name2, ip2), distances, timeout=10.0)
+    results = threaded_map(lambda (dist, node): (node.host, node.get_latency(name1, ip1, name2, ip2)), distances, timeout=10.0)
     return results
 
 def one_round(x):
-    return query_latency(*select_random_points())
+    target1, target2 = select_random_points()
+    results = query_latency(target1, target2)
+    return target1, target2, results
 
 pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 p = Pool(process_pool_size)
 results = p.map(one_round, range(process_pool_size))
 
-for result_set in filter(None,results):
-    for r in filter(None,result_set):
-        end_time, start_time, ping_time, address = r
-        print 'Start', start_time
-        print 'End', end_time
-        print 'Ping', ping_time
-        print' Address', address
-        print
-        print
-
+for target1, target2, result_set in filter(None,results):
+    for host, info in filter(None,result_set):
+        if info:
+            (end_time, start_time, ping_times, address) = info
+            print 'Target1', target1
+            print 'Target2', target2
+            print 'Host', host
+            print 'End', end_time
+            print 'Start', start_time
+            print 'Pings', ping_times
+            print 'Address', address
+            print '-----------------------'
