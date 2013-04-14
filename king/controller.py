@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 from multiprocessing import Process
 from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
-from utilities import distance, threaded_map
+from utilities import distance
 
-process_pool_size = 60
+process_pool_size = 400
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -99,7 +99,7 @@ class PlanetLabNode(object):
         return wrapped
 
     def timeout(fn):
-        return rpyc.timed(fn, 30)
+        return rpyc.timed(fn, 20)
 
     @timeout
     @handleConnExceptions
@@ -134,9 +134,9 @@ def query_latency(target1, target2):
     # Get closest 4 PL Nodes
     distances = map(lambda node: (distance(coord1, (node.lat, node.lon)), node), pl_nodes)
     distances.sort()
-    distances = distances[:7]
+    distances = distances[:5]
 
-    results = threaded_map(lambda (dist, node): (node.host, node.get_latency(name1, ip1, name2, ip2)), distances, timeout=10.0)
+    results = map(lambda (dist, node): (node.host, node.get_latency(name1, ip1, name2, ip2)), distances)
     return results
 
 def one_round():
