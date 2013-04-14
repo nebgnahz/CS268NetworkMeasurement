@@ -41,8 +41,6 @@ class DataPoint(Base):
         self.address = address
 
 Base.metadata.create_all()
-Session = sessionmaker(bind=engine)
-s = Session()
 
 class PlanetLabNode(object):
     def __init__(self, host, ip, lat, lon):
@@ -143,8 +141,11 @@ def one_round(x):
         return None
 
 def doWork():
+    Session = sessionmaker(bind=engine)
+    s = Session()
     while True:
         try:
+            print 'sjflskjfl'
             target1, target2, result_set = one_round()
             for host, info in filter(None,result_set):
                 if info:
@@ -154,7 +155,6 @@ def doWork():
                         s.add(point)
                     except Exception, e:
                         pass
-            p.close()
             s.commit()
         except:
             pass
