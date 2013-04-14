@@ -7,7 +7,7 @@ from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
 
 process_pool_size = 100
-sched = Scheduler()
+sched = Scheduler(standalone=True)
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
