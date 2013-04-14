@@ -1,4 +1,4 @@
-import logging, os, redis, string, subprocess
+import logging, os, redis, rpyc, string, subprocess
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
 from multiprocessing import Process
@@ -98,14 +98,20 @@ class PlanetLabNode(object):
                 return None
         return wrapped
 
+    def timeout(fn):
+        return rpyc.timed(fn, 30)
+
+    @timeout
     @handleConnExceptions
     def get_latency(self, target1, ip1, target2, ip2):
         return self.conn.root.get_latency(target1, ip1, target2, ip2)
 
+    @timeout
     @handleConnExceptions
     def get_k(self, target, ip):
         return self.conn.get_k(target, ip)
 
+    @timeout
     @handleConnExceptions
     def get_distance(self, lat, lon):
         return distance((self.lat, self.lon), (lat, lon))
