@@ -1,11 +1,13 @@
-import apscheduler, os, redis, string, subprocess
+import os, redis, string, subprocess
+from apscheduler.scheduler import Scheduler
 from datetime import timedelta
 from multiprocessing import Pool
 from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
 
-process_pool_size = 15
+process_pool_size = 100
+sched = Scheduler()
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -17,7 +19,7 @@ from sqlalchemy import Column, Integer, PickleType
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///:memory:', echo=True)
+engine = create_engine('sqlite:///latency.db', echo=True)
 Base = declarative_base(bind=engine)
 
 class DataPoint(Base):
@@ -141,10 +143,14 @@ pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 p = Pool(process_pool_size)
 results = p.map(one_round, range(process_pool_size))
 
-for target1, target2, result_set in filter(None,results):
-    for host, info in filter(None,result_set):
-        if info:
-            (end_time, start_time, ping_times, address) = info
-            point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
-            s.add(point)
-s.commit()
+@sched.interval_schedule(minutes=1)
+def task():
+    for target1, target2, result_set in filter(None,results):
+        for host, info in filter(None,result_set):
+            if info:
+                (end_time, start_time, ping_times, address) = info
+                point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
+                s.add(point)
+    s.commit()
+
+sched.start()
