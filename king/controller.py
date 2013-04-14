@@ -117,12 +117,12 @@ class PlanetLabNode(object):
     @handleConnExceptions
     def get_latency(self, target1, ip1, target2, ip2):
         timed_fn = rpyc.timed(self.conn.root.get_latency, 15)
-        return timed_fn(target1, ip1, target2, ip2).value()
+        return timed_fn(target1, ip1, target2, ip2)
 
     @handleConnExceptions
     def get_k(self, target, ip):
         timed_fn = rpyc.timed(self.conn.get_k, 15)
-        return timed_fn(target, ip).value()
+        return timed_fn(target, ip)
 
     def get_distance(self, lat, lon):
         return distance((self.lat, self.lon), (lat, lon))
@@ -147,7 +147,7 @@ def query_latency(target1, target2):
     distances.sort()
     distances = distances[:5]
 
-    results = map(lambda (dist, node): (node.host, node.get_latency(name1, ip1, name2, ip2)), distances)
+    results = map(lambda (dist, node): (node.host, node.get_latency(name1, ip1, name2, ip2).value()), distances)
     return results
 
 def one_round():
