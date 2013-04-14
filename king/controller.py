@@ -1,4 +1,4 @@
-import os, redis, string, subprocess
+import logging, os, redis, string, subprocess
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
 from multiprocessing import Pool
@@ -8,6 +8,7 @@ from utilities import distance, threaded_map
 
 process_pool_size = 60
 sched = Scheduler(standalone=True)
+logging.basicConfig()
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
