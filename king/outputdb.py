@@ -40,4 +40,5 @@ for r in q.all():
         print p.pings
         print p.address
         print p.test_point
+        print '***********'
     print '---------------------------------'
