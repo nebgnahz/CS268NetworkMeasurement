@@ -37,7 +37,7 @@ class Query(Base):
     target2 = Column(PickleType)
     points = Column(PickleType)
 
-    def __init__(self, target1, target2, points)
+    def __init__(self, target1, target2, points):
         self.target1 = target1
         self.target2 = target2
         self.points = points
