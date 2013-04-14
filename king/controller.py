@@ -142,10 +142,10 @@ def one_round(x):
 
 pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 p = Pool(process_pool_size)
-results = p.map(one_round, range(process_pool_size))
 
 def task():
     print 'Task'
+    results = p.map(one_round, range(process_pool_size))
     for target1, target2, result_set in filter(None,results):
         for host, info in filter(None,result_set):
             if info:
