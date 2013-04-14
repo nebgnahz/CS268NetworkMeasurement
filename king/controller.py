@@ -147,7 +147,7 @@ def query_latency(target1, target2):
     distances.sort()
     distances = distances[:5]
 
-    results = map(lambda (dist, node): (node.host, node.get_latency(name1, ip1, name2, ip2).value()), distances)
+    results = map(lambda (dist, node): (node.host, node.get_latency(name1, ip1, name2, ip2)), distances)
     return results
 
 def one_round():
