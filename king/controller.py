@@ -18,7 +18,7 @@ from sqlalchemy import Column, Integer, PickleType
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///latency.db', echo=True)
+engine = create_engine('sqlite:///latency.db', echo=False)
 Base = declarative_base(bind=engine)
 
 class DataPoint(Base):
@@ -157,7 +157,10 @@ def doWork():
                             pass
                 s.commit()
         except Exception, e:
-            print target1, target2, result_set
+            print target1
+            print target2
+            print result_set
+            print '---------------------'
             exit(1)
             print e
 
