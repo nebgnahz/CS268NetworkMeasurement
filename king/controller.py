@@ -1,4 +1,4 @@
-import logging, os, redis, rpyc, string, subprocess
+import logging, os, redis, rpyc, string, subprocess, sys
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
 from multiprocessing import Process
@@ -57,11 +57,17 @@ class PlanetLabNode(object):
             self.connectPL()
         except Exception, e:
             print e
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
             try:
                 self.restartPL()
                 self.connectPL()
             except Exception, e:
                 print e
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno)    
                 self.connected = False
 
     def connectPL(self):
@@ -90,12 +96,18 @@ class PlanetLabNode(object):
                     return fn(self, *args, **kwargs)
                 except Exception, e:
                     print e
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                    print(exc_type, fname, exc_tb.tb_lineno)
                     self.connected = False
                     try:
                         self.connect()
                         return fn(self, *args, **kwargs)
                     except Exception, e:
                         print e
+                        exc_type, exc_obj, exc_tb = sys.exc_info()
+                        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                        print(exc_type, fname, exc_tb.tb_lineno)
                         self.connected = False
                         return None
             else:
@@ -146,6 +158,9 @@ def one_round():
         return target1, target2, results
     except Exception, e:
         print e
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print(exc_type, fname, exc_tb.tb_lineno)
         return None
 
 def doWork():
@@ -165,12 +180,18 @@ def doWork():
                             points.append(point)
                         except Exception, e:
                             print e
+                            exc_type, exc_obj, exc_tb = sys.exc_info()
+                            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                            print(exc_type, fname, exc_tb.tb_lineno)
                             pass
                 data_set = Query(target1, target2, points)
                 s.add(data_set)
                 s.commit()
         except Exception, e:
             print e
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
             pass
 
 pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
