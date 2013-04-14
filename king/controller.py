@@ -87,11 +87,13 @@ class PlanetLabNode(object):
                 try:
                     return fn(self, *args, **kwargs)
                 except Exception, e:
+                    print e
                     self.connected = False
                     try:
                         self.connect()
                         return fn(self, *args, **kwargs)
                     except Exception, e:
+                        print e
                         self.connected = False
                         return None
             else:
@@ -141,6 +143,7 @@ def one_round():
         results = query_latency(target1, target2)
         return target1, target2, results
     except Exception, e:
+        print e
         return None
 
 def doWork():
