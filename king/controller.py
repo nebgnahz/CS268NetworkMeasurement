@@ -149,9 +149,12 @@ def task():
     for target1, target2, result_set in filter(None,results):
         for host, info in filter(None,result_set):
             if info:
-                (end_time, start_time, ping_times, address) = info
-                point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
-                s.add(point)
+                try:
+                    (end_time, start_time, ping_times, address) = info
+                    point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
+                    s.add(point)
+                except Exception, e:
+                    pass
     p.close()
     s.commit()
 
