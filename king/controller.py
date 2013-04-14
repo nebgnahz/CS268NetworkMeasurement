@@ -12,6 +12,37 @@ open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhos
 geoip = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=2))
 pl_hosts = [line.split(' ')[0:4] for line in map(string.strip,open('pl-host-list-geo').readlines())]
 
+from sqlalchemy import create_engine
+from sqlalchemy import Column, Integer, PickleType
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
+engine = create_engine('sqlite:///:memory:', echo=True)
+Base = declarative_base(bind=engine)
+
+class DataPoint(Base):
+    __tablename__ = 'data'
+
+    id = Column(Integer, primary_key=True)
+    target1 = Column(PickleType)
+    target2 = Column(PickleType)
+    start = Column(PickleType)
+    end = Column(PickleType)
+    pings = Column(PickleType)
+    address = Column(PickleType)
+
+    def __init__(self, target1, target2, start, end, pings, address):
+        self.target1 = target1
+        self.target2 = target2
+        self.start = start
+        self.end = end
+        self.pings = pings
+        self.address = address
+
+Base.metadata.create_all()
+Session = sessionmaker(bind=engine)
+s = Session()
+
 class PlanetLabNode(object):
     def __init__(self, host, ip, lat, lon):
         self.host = host
@@ -114,11 +145,6 @@ for target1, target2, result_set in filter(None,results):
     for host, info in filter(None,result_set):
         if info:
             (end_time, start_time, ping_times, address) = info
-            print 'Target1', target1
-            print 'Target2', target2
-            print 'Host', host
-            print 'End', end_time
-            print 'Start', start_time
-            print 'Pings', ping_times
-            print 'Address', address
-            print '-----------------------'
+            point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
+            s.add(point)
+s.commit()
