@@ -36,4 +36,5 @@ for r in q.all():
     print r.end
     print r.pings
     print r.address
+    print r.host
     print '---------------------------------'

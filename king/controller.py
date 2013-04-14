@@ -31,14 +31,16 @@ class DataPoint(Base):
     end = Column(PickleType)
     pings = Column(PickleType)
     address = Column(PickleType)
+    test_point = Column(PickleType)
 
-    def __init__(self, target1, target2, start, end, pings, address):
+    def __init__(self, target1, target2, start, end, pings, address, test_point):
         self.target1 = target1
         self.target2 = target2
         self.start = start
         self.end = end
         self.pings = pings
         self.address = address
+        self.test_point = test_point
 
 Base.metadata.create_all()
 
@@ -150,8 +152,9 @@ def doWork():
                 for host, info in filter(None,result_set):
                     if info:
                         try:
+                            # TODO: Store None Responses As Well
                             (end_time, start_time, ping_times, address) = info
-                            point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
+                            point = DataPoint(target1, target2, start_time, end_time, ping_times, address, host)
                             s.add(point)
                         except Exception, e:
                             pass
