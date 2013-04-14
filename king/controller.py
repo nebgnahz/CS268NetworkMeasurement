@@ -158,5 +158,5 @@ def task():
     p.close()
     s.commit()
 
-sched.add_interval_job(task, minutes=1)
+sched.add_interval_job(task, minutes=1, misfire_grace_time=15)
 sched.start()
