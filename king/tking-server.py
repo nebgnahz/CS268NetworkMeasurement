@@ -110,7 +110,7 @@ class TurboKingService(rpyc.Service):
 ##########
 # Client #
 ##########
-def dnsClientQuery(query_id, target1_ip, query_type="latency", timeout=5):
+def dnsClientQuery(query_id, target1_ip, query_type="latency", timeout=10):
     addr = "%s.%i.%s" % (query_type, query_id, myAddr)
     print addr
     query = dns.message.make_query(addr, dns.rdatatype.A)
