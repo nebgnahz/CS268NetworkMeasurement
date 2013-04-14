@@ -1,6 +1,6 @@
 """All sorts of geo utils for measurement project
 """
-import math, sys, getopt
+import math, sys, getopt, os
 
 def distance(origin, destination, radius = 6371):
 	"""Based on Haversine formula, default return result is kilometers"""
@@ -66,3 +66,9 @@ def threaded_map(func, data, timeout=None):
 
     return result
 ## end of http://code.activestate.com/recipes/577360/ }}}
+
+def outputException(e):
+    print e
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)
