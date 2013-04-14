@@ -41,10 +41,10 @@ class PlanetLabNode(object):
         self.connected = True
 
     def restartPL(self):
+        print 'Restart'
         subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "-o StrictHostKeyChecking no",
                          "-o UserKnownHostsFile=/dev/null", "ucb_268_measure@%s" % self.host,
-                         "sudo tking-server stop; sudo tking-server start;"],
-                         stdout=FNULL, stderr=subprocess.STDOUT)
+                         "sudo tking-server stop; sudo tking-server start;"])
 
     def handleConnExceptions(fn):
         def wrapped(self, *args, **kwargs):
