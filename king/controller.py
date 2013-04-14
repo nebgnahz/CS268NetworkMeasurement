@@ -152,6 +152,7 @@ def task():
                 (end_time, start_time, ping_times, address) = info
                 point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
                 s.add(point)
+    p.close()
     s.commit()
 
 sched.add_interval_job(task, minutes=1)
