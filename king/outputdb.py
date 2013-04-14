@@ -8,35 +8,36 @@ Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine)
 s = Session()
 
-class DataPoint(Base):
-    __tablename__ = 'data'
-
-    id = Column(Integer, primary_key=True)
-    target1 = Column(PickleType)
-    target2 = Column(PickleType)
-    start = Column(PickleType)
-    end = Column(PickleType)
-    pings = Column(PickleType)
-    address = Column(PickleType)
-    test_point = Column(PickleType)
-
-    def __init__(self, target1, target2, start, end, pings, address, test_point):
-        self.target1 = target1
-        self.target2 = target2
+class DataPoint(object):
+    def __init__(self, start, end, pings, address, test_point):
         self.start = start
         self.end = end
         self.pings = pings
         self.address = address
         self.test_point = test_point
 
-q = s.query(DataPoint)
+class Query(Base):
+    __tablename__ = 'data'
+
+    id = Column(Integer, primary_key=True)
+    target1 = Column(PickleType)
+    target2 = Column(PickleType)
+    points = Column(PickleType)
+
+    def __init__(self, target1, target2, points)
+        self.target1 = target1
+        self.target2 = target2
+        self.points = points
+
+q = s.query(Query)
 
 for r in q.all():
     print r.target1
     print r.target2
-    print r.start
-    print r.end
-    print r.pings
-    print r.address
-    print r.test_point
+    for p in r.points:
+        print p.start
+        print p.end
+        print p.pings
+        print p.address
+        print p.test_point
     print '---------------------------------'
