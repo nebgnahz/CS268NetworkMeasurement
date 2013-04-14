@@ -1,6 +1,6 @@
 import os, redis, string, subprocess
 from apscheduler.scheduler import Scheduler
-from datetime import timedelta
+from datetime import datetime, timedelta
 from multiprocessing import Pool
 from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
@@ -8,6 +8,7 @@ from utilities import distance, threaded_map
 
 process_pool_size = 100
 sched = Scheduler()
+sched.start()
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -143,8 +144,8 @@ pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 p = Pool(process_pool_size)
 results = p.map(one_round, range(process_pool_size))
 
-@sched.interval_schedule(minutes=1)
 def task():
+    print 'Task'
     for target1, target2, result_set in filter(None,results):
         for host, info in filter(None,result_set):
             if info:
@@ -153,4 +154,4 @@ def task():
                 s.add(point)
     s.commit()
 
-sched.start()
+sched.add_interval_job(task, minutes=1)
