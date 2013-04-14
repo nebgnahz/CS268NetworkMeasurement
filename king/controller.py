@@ -108,12 +108,13 @@ pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 p = Pool(process_pool_size)
 results = p.map(one_round, range(process_pool_size))
 
-for r in results:
-    end_time, start_time, ping_time, address = r
-    print 'Start', start_time
-    print 'End', end_time
-    print 'Ping', ping_time
-    print' Address', address
-    print
-    print
+for result_set in filter(None,results):
+    for r in filter(None,result_set):
+        end_time, start_time, ping_time, address = r
+        print 'Start', start_time
+        print 'End', end_time
+        print 'Ping', ping_time
+        print' Address', address
+        print
+        print
 
