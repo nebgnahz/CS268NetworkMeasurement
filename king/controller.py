@@ -1,14 +1,12 @@
 import logging, os, redis, string, subprocess
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
-from multiprocessing import Pool
+from multiprocessing import Process, JoinableQueue
 from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
 
 process_pool_size = 60
-sched = Scheduler(standalone=True)
-logging.basicConfig()
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -136,6 +134,7 @@ def query_latency(target1, target2):
     return results
 
 def one_round(x):
+    print 'Task'
     try:
         target1, target2 = select_random_points()
         results = query_latency(target1, target2)
@@ -143,23 +142,27 @@ def one_round(x):
     except Exception, e:
         return None
 
+def doWork():
+    while True:
+        try:
+            target1, target2, result_set = one_round()
+            for host, info in filter(None,result_set):
+                if info:
+                    try:
+                        (end_time, start_time, ping_times, address) = info
+                        point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
+                        s.add(point)
+                    except Exception, e:
+                        pass
+            p.close()
+            s.commit()
+        except:
+            pass
+
 pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 
-def task():
-    print 'Task'
-    p = Pool(process_pool_size)
-    results = p.map(one_round, range(process_pool_size))
-    for target1, target2, result_set in filter(None,results):
-        for host, info in filter(None,result_set):
-            if info:
-                try:
-                    (end_time, start_time, ping_times, address) = info
-                    point = DataPoint(target1, target2, start_time, end_time, ping_times, address)
-                    s.add(point)
-                except Exception, e:
-                    pass
-    p.close()
-    s.commit()
-
-sched.add_interval_job(task, minutes=1, misfire_grace_time=15)
-sched.start()
+def main():
+    for i in range(process_pool_size):
+        p = Process(target=doWork)
+        p.daemon = True
+        p.start()
