@@ -6,7 +6,7 @@ from plumbum import SshMachine
 from rpyc.utils.factory import ssh_connect
 from utilities import distance, threaded_map
 
-process_pool_size = 100
+process_pool_size = 60
 sched = Scheduler(standalone=True)
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
