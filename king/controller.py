@@ -170,3 +170,5 @@ def main():
         processes.append(p)
     for p in processes:
         p.join()
+
+main()
