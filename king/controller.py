@@ -44,7 +44,18 @@ def perThread(queue):
     from DataPoint import DataPoint, Session
     session = Session()
 
+    db_objects = []
     while True:
+        while len(db_objects) == 15:
+            try:
+                session.add_all(db_objects)
+                session.commit()
+                db_objects = []
+            except Exception, e:
+                outputException(e)
+                session.close()
+                session = Session()
+
         try:
             target1, target2, node = queue.get()
             #print target1, target2, node
@@ -57,12 +68,9 @@ def perThread(queue):
             else:
                 end_time = start_time = ping_times = address = None
             point = DataPoint(target1, target2, start_time, end_time, ping_times, address, node.host, success)
-            session.add(point)
-            session.commit()
+            db_objects.append(point)
         except Exception, e:
             outputException(e)
-            session.close()
-            session = Session()
 
 # TODO: Store None Responses As Well
 def perProcess():
