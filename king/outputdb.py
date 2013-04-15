@@ -3,9 +3,9 @@ from sqlalchemy import Column, Integer, PickleType
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from DataPoint import DataPoint, Query, session
+from DataPoint import DataPoint, Query, Session
 
-q = session.query(Query)
+q = Session().query(Query)
 
 for r in q.all():
     print r.target1
