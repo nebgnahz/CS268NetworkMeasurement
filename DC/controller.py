@@ -1,12 +1,46 @@
 from gQuery import google_scrape, random_string, google_trends
 import logging, sys, time
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, PickleType
+from sqlalchemy.ext.declarative import declarative_base
+
+engine = create_engine('sqlite:///gQuery.db', echo=False)
+
+Base = declarative_base(bind=engine)
+
+class Query(Base):
+	__tablename__ = 'data'
+
+	id = Column(Integer, primary_key=True)
+	index = Column(PickleType)
+	query = Column(PickleType)
+	return_ip = Column(PickleType)
+	queryTime = Column(PickleType)
+	googleTime = Column(PickleType)
+	pingTime = Column(PickleType)
+	tcpEntries = Column(PickleType)
+
+	def __init__(self, index, query, return_ip, queryTime, googleTime, pingTime, tcpEntries):
+		self.index = index
+		self.query = query
+		self.return_ip = return_ip
+		self.queryTime = queryTime
+		self.googleTime = googleTime
+		self.pingTime = pingTime
+		self.tcpEntries = tcpEntries
+
+Base.metadata.create_all()
+Session = sessionmaker(bind=engine)
+s = Session()
+		
 # I might have to rate limit this query
 # from someone on stackoverflow, it seems safe to have automatic query with an interval larger than 1 second
 # also diverse the search, rather than repeated search a single word
 
 print "Starting", str(time.strftime("%Y/%m/%d %H:%M:%S.%f"))
- 
+
 hot_items = google_trends()
 random_list = []
 for i in range(len(hot_items)):
@@ -30,10 +64,15 @@ repeated_times = 10
 
 for i in range(repeated_times):
 	for item in reduced_list:
-		# search hot item		
-		qTime, gTime, ip, pingTime = google_scrape(item)
+		# search hot item
+		print "[%i] %s" % (i, item)
+		qTime, gTime, ip, pingTime, tcpEntries = google_scrape(item, 'eth0')
 		if ip is not None:
-			print item, qTime, gTime, ip, pingTime
+			print ("[%i]" % i), item, qTime, gTime, ip
+			data = Query(i, item, ip, qTime, gTime, pingTime, tcpEntries)
+			s.add(data)
+			s.commit()
+			
 		time.sleep(sleep_time)
 
 print "Ending", str(time.strftime("%Y/%m/%d %H:%M:%S.%f"))
