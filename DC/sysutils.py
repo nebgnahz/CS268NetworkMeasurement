@@ -29,7 +29,7 @@ class Command(object):
 		if thread.isAlive():
 			logging.debug("terminating process")
 			# python 2.5 doesn't have process.terminate
-			os.kill(self.process, signal.SIGTERM)
+			os.kill(self.process.pid, signal.SIGTERM)
 			thread.join()
 
 		# timeout sees -15, normal sees 0x
