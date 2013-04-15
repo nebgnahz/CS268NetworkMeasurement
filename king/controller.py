@@ -1,18 +1,18 @@
-import logging, os, redis, string
+import logging, multiprocessing, os, Queue, redis, string, threading
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
-import multiprocessing
-from multiprocessing import Process, Queue
+
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
-num_processes = 200
+num_processes = 50
+num_threads = 10
+
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
 geoip = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=2))
 pl_hosts = [line.split(' ')[0:4] for line in map(string.strip,open('pl-host-list-geo').readlines())]
 pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
-q = Queue(num_processes)
 
 def select_random_points():
     target1 = open_resolvers.randomkey()
@@ -39,43 +39,52 @@ def query_latency(target1, target2, node):
     name2, ip2, coord2 = target2
     return node.get_latency(name1, ip1, name2, ip2)
 
-# TODO: Store None Responses As Well
-def doWork():
-    from DataPoint import Session, DataPoint
-    s = Session()
+
+def perThread(queue, session):
     while True:
         try:
-            target1, target2, node = q.get()
+            target1, target2, node = queue.get()
             #print target1, target2, node
             result = query_latency(target1, target2, node)
             success = False
             if result:
                 end_time, start_time, ping_times, address = result
                 if end_time and start_time and ping_times and address:
-                    #print 'Successo'
                     success = True
             else:
                 end_time = start_time = ping_times = address = None
             point = DataPoint(target1, target2, start_time, end_time, ping_times, address, node.host, success)
-            s.add(point)
-            s.commit()
+            session.add(point)
+            session.commit()
         except Exception, e:
             outputException(e)
+
+# TODO: Store None Responses As Well
+def perProcess():
+    from DataPoint import Session, DataPoint
+    s = Session()
+    thread_queue = Queue.Queue(num_threads)
+
+    threads = []
+    for i in range(num_threads):
+        t = threading.Thread(target=perThread, args=(thread_queue, s))
+        t.daemon = True
+        t.start()
+        threads.append(t)
+
+    while True:
+        t1, t2 = select_random_points()
+        closest_nodes = closestNodes(target1, t2)
+        for node in closest_nodes:
+            thread_queue.put((t1, t2, node))
 
 def main():
     processes = []
     for i in range(num_processes):
-        p = Process(target=doWork)
+        p = multiprocessing.Process(target=perProcess)
         p.daemon = True
         p.start()
         processes.append(p)
-
-    while True:
-        for i in range(100):
-            t1, t2 = select_random_points()
-            closest_nodes = closestNodes(t1, t2)
-            for node in closest_nodes:
-                q.put((t1, t2, node))
-        print 'Active Processes:', len(multiprocessing.active_children())
-
+    for p in processes:
+        p.join()
 main()
