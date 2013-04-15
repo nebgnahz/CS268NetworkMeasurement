@@ -1,6 +1,6 @@
 import os, rpyc, subprocess
 from utilities import distance, outputException
-from rpyc.utils.factory import ssh_connect
+from rpyc.utils.factory import connect_stream
 from CustomMachine import CustomMachine
 
 class PlanetLabNode(object):
@@ -25,7 +25,8 @@ class PlanetLabNode(object):
 
     def connectPL(self):
         rem = CustomMachine(self.host)
-        conn = ssh_connect(rem, 18861, config={'allow_pickle' : True})
+        conn = connect_stream(rpyc.SocketStream(rem.connect_sock(18861)),
+                              config={'allow_pickle' : True})
         assert conn.root.test() == 1, "%s: RPC Failure" % self.host
         self.conn = conn
         self.connected = True

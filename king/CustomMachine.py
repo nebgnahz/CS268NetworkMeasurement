@@ -10,6 +10,6 @@ def monkey(self, host, encoding='utf8'):
     self._client.connect(host, username='ucb_268_measure', password=None)
     BaseRemoteMachine.__init__(self, encoding)
 
-#ParamikoMachine.__init__ = monkey
+ParamikoMachine.__init__ = monkey
 
 CustomMachine = ParamikoMachine
