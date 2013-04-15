@@ -48,6 +48,7 @@ def doWork():
             target1, target2, node = q.get()
             #print target1, target2, node
             result = query_latency(target1, target2, node)
+            success = False
             if result:
                 end_time, start_time, ping_times, address = result
                 if end_time and start_time and ping_times and address:
@@ -55,7 +56,6 @@ def doWork():
                     success = True
             else:
                 end_time = start_time = ping_times = address = None
-                success = False
             point = DataPoint(target1, target2, start_time, end_time, ping_times, address, node.host, success)
             s.add(point)
             s.commit()
