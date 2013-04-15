@@ -1,5 +1,5 @@
 import os, paramiko, rpyc, subprocess
-from plumbum import ParamikoMachine
+from plumbum.paramiko_machine import ParamikoMachine
 from rpyc.utils.factory import ssh_connect
 from utilities import distance, outputException
 
