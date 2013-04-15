@@ -4,7 +4,7 @@
 Ping wrapper for system ping (Unix machine)
 
 """
-import sys, getopt, time, socket, re
+import sys, getopt, time, socket, re, os, signal
 import threading, subprocess, logging
 from datetime import timedelta
 
@@ -28,7 +28,8 @@ class Command(object):
 		thread.join(self.timeout)
 		if thread.isAlive():
 			logging.debug("terminating process")
-			self.process.terminate()
+			# python 2.5 doesn't have process.terminate
+			os.kill(self.process, signal.SIGTERM)
 			thread.join()
 
 		# timeout sees -15, normal sees 0x
