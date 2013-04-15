@@ -1,6 +1,5 @@
 from gQuery import google_scrape, random_string, google_trends
-import logging, sys, time
-
+import logging, sys, time, datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, PickleType
@@ -39,7 +38,7 @@ s = Session()
 # from someone on stackoverflow, it seems safe to have automatic query with an interval larger than 1 second
 # also diverse the search, rather than repeated search a single word
 
-print "Starting", str(time.strftime("%Y/%m/%d %H:%M:%S.%f"))
+print "Starting", datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S.%f")
 
 hot_items = google_trends()
 random_list = []
@@ -65,14 +64,12 @@ repeated_times = 10
 for i in range(repeated_times):
 	for item in reduced_list:
 		# search hot item
-		print "[%i] %s" % (i, item)
+		print "\n[%i] %s" % (i+1, item)
 		qTime, gTime, ip, pingTime, tcpEntries = google_scrape(item, 'eth0')
-		if ip is not None:
-			print ("[%i]" % i), item, qTime, gTime, ip
-			data = Query(i, item, ip, qTime, gTime, pingTime, tcpEntries)
-			s.add(data)
-			s.commit()
-			
+		data = Query(i, item, ip, qTime, gTime, pingTime, tcpEntries)
+		s.add(data)
+		s.commit()
+		
 		time.sleep(sleep_time)
 
-print "Ending", str(time.strftime("%Y/%m/%d %H:%M:%S.%f"))
+print "Ending", datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S.%f")
