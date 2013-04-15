@@ -96,27 +96,28 @@ def tcpdump(timeout, q, interface):
 				break
 
 		gEntries = []
-		
-		# second time scan parse tcpdump for query entries
-		for line in lines:
-			last_ip_pos = re.search(last_ip, line)
-			if last_ip_pos is None:
-				continue
+		if last_ip is not None:
 			
-			if line.index('>') > last_ip_pos.start():
-				# from remote to this place
-				traffic_type = 1			
-			else:
-				# out to remote
-				traffic_type = 0
+			# second time scan parse tcpdump for query entries
+			for line in lines:
+				last_ip_pos = re.search(last_ip, line)
+				if last_ip_pos is None:
+					continue
 			
-			time_pattern = "([0-9]+:[0-9]+:[0-9]+.[0-9]+) IP"
-			timestamp = re.search(time_pattern, line)
-			time_str = timestamp.group(1)
-			h, m, s, ms = map(int, re.split(r'[.:]+', time_str))
-			timestamp_delta = timedelta(hours=h, minutes=m, seconds=s, microseconds=ms)
-			gEntries.append( (timestamp_delta, traffic_type) )
-			# print line
+				if line.index('>') > last_ip_pos.start():
+					# from remote to this place
+					traffic_type = 1			
+				else:
+					# out to remote
+					traffic_type = 0
+			
+				time_pattern = "([0-9]+:[0-9]+:[0-9]+.[0-9]+) IP"
+				timestamp = re.search(time_pattern, line)
+				time_str = timestamp.group(1)
+				h, m, s, ms = map(int, re.split(r'[.:]+', time_str))
+				timestamp_delta = timedelta(hours=h, minutes=m, seconds=s, microseconds=ms)
+				gEntries.append( (timestamp_delta, traffic_type) )
+				# print line
 
 		q.put((command.returncode, last_ip, gEntries))
 		return
