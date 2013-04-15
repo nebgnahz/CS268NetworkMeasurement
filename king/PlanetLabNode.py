@@ -24,7 +24,7 @@ class PlanetLabNode(object):
                 self.connected = False
 
     def connectPL(self):
-        rem = ParamikoMachine(self.host, user='ucb_268_measure', keyfile='~/.ssh/id_rsa',
+        rem = ParamikoMachine(self.host, user='ucb_268_measure',
                              missing_host_policy=paramiko.AutoAddPolicy())
 
         conn = ssh_connect(rem, 18861, config={'allow_pickle' : True})
