@@ -2,11 +2,12 @@
 
 Search google for a url and estimate the time
 """
-from BeautifulSoup import BeautifulSoup, CData
 import urllib, urllib2, threading, httplib, Queue
 import sys, getopt, re, time
-from sysutils import tcpdump, ping
 import string, random, logging
+from BeautifulSoup import BeautifulSoup, CData
+from datetime import timedelta
+from sysutils import tcpdump, ping
 
 htmlFile = None
 # logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
@@ -15,14 +16,14 @@ htmlFile = None
 def random_string(size=6, chars=string.ascii_letters + string.digits):
 	return ''.join(random.choice(chars) for x in range(size))
 
-def google_scrape(query):
+def google_scrape(query, interface):
 	address = "http://www.google.com/search?hl=en&output=search&q=%s" % (urllib.quote_plus(query))
 	request = urllib2.Request(address, None, {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11'})
 	# use tcpdump
 	# before this, I should probably obtain google's ip for this transaction
 
 	q = Queue.Queue()
-	thread = threading.Thread(target=tcpdump, args=(5, q, 'eth0'))
+	thread = threading.Thread(target=tcpdump, args=(5, q, interface))
 	thread.start()
 	
 	elapsed = -1
@@ -41,7 +42,7 @@ def google_scrape(query):
 		logging.debug("terminating tcpdump process")
 		thread.join()
 	try:
-		returncode, ip_src = q.get(timeout = 1)
+		returncode, ip_src, tcpEntries = q.get(timeout = 1)
 	except Queue.Empty:
 		logging.debug("queue is empty for query: %s", query)
 		
@@ -58,17 +59,19 @@ def google_scrape(query):
 		pattern = '\(([0-9]+\.[0-9]+)'
 		text = str(soup.nobr.text)
 		webpage_time = re.search(pattern, soup.nobr.text)
-		googleTime = float(webpage_time.group(1))
-		logging.debug("%s %f %f", query, elapsed - googleTime, googleTime)
+		googleTime = timedelta( seconds = float(webpage_time.group(1)) )
+		logging.debug("%s %f %f", query, elapsed, float(webpage_time.group(1)))
 	except:
 		logging.debug("exception caught when parsing, no google stats for query: %s", query)
-
-	queryTime = elapsed
+		
+	queryTime = timedelta(seconds=elapsed)
+	
 	if ip_src is not None:
 		logging.debug("find ip source, now pinging")
 		returncode, pingTime = ping(ip_src)
-		return queryTime, googleTime, ip_src, pingTime
-	return queryTime, googleTime, ip_src, None
+		pingTimeDelta = map(lambda t: timedelta(seconds=t), pingTime)
+		return queryTime, googleTime, ip_src, pingTimeDelta, tcpEntries
+	return queryTime, googleTime, ip_src, None, tcpEntries
 
 def google_trends():
 	address = "http://www.google.com/trends/hottrends/atom/hourly"
@@ -105,5 +108,6 @@ if __name__ == '__main__':
 	for arg in args:
 		print arg
 		htmlFile = open(arg + '.html', 'w')
-		print google_scrape(arg)
-		
+		qTime, gTime, ip, pingTime, tcpEntries = google_scrape(arg, 'en0')
+		print qTime, gTime, ip, pingTime
+
