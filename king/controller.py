@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
-num_processes = 50
+num_processes = 25
 num_threads = 10
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
