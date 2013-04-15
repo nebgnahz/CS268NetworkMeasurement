@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import multiprocessing
 #from multiprocessing import Process, Queue
 from threading import Thread as Process
-import Queue
+from Queue import Queue
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
