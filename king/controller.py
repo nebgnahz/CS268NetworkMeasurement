@@ -71,11 +71,11 @@ def main():
         processes.append(p)
 
     while True:
-        t1, t2 = select_random_points()
-        closest_nodes = closestNodes(t1, t2)
-        for node in closest_nodes:
-            q.put((t1, t2, node))
-        print multiprocessing.active_children()
-        print len(multiprocessing.active_children())
+        for i in range(100):
+            t1, t2 = select_random_points()
+            closest_nodes = closestNodes(t1, t2)
+            for node in closest_nodes:
+                q.put((t1, t2, node))
+        print 'Active Processes:', len(multiprocessing.active_children())
 
 main()
