@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from multiprocessing import Process, Queue
 
 from PlanetLabNode import PlanetLabNode
-from DataPoint import Session, DataPoint
 from utilities import outputException, distance
 
 num_processes = 200
@@ -42,6 +41,7 @@ def query_latency(target1, target2, node):
 
 # TODO: Store None Responses As Well
 def doWork():
+    from DataPoint import Session, DataPoint
     s = Session()
     while True:
         try:
