@@ -42,4 +42,4 @@ for r in q.all():
 
 	print "------------------"
 print "+++++++++++++++++++++++++++++++\n"
-	
+print "record #:", q.count()	
