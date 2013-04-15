@@ -52,9 +52,11 @@ def doWork():
                 end_time, start_time, ping_times, address = result
                 if end_time and start_time and ping_times and address:
                     print 'Successo'
+                    success = True
             else:
                 end_time = start_time = ping_times = address = None
-            point = DataPoint(target1, target2, start_time, end_time, ping_times, address, node.host)
+                success = False
+            point = DataPoint(target1, target2, start_time, end_time, ping_times, address, node.host, success)
             s.add(point)
             s.commit()
         except Exception, e:
