@@ -41,6 +41,7 @@ def query_latency(target1, target2, node):
 
 
 def perThread(queue, session):
+    from DataPoint import DataPoint
     while True:
         try:
             target1, target2, node = queue.get()
@@ -61,7 +62,7 @@ def perThread(queue, session):
 
 # TODO: Store None Responses As Well
 def perProcess():
-    from DataPoint import Session, DataPoint
+    from DataPoint import Session
     s = Session()
     thread_queue = Queue.Queue(num_threads)
 
