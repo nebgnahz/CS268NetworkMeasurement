@@ -68,12 +68,8 @@ def threaded_map(func, data, timeout=None):
 ## end of http://code.activestate.com/recipes/577360/ }}}
 
 import rpyc, traceback
-from multiprocessing import Lock
-
-printLock = Lock()
 
 def outputException(e):
-    printLock.acquire()
     if type(e) is rpyc.core.async.AsyncResultTimeout:
         print 'Result Timeout'
     elif type(e) is EOFError:
@@ -82,4 +78,3 @@ def outputException(e):
         print e
         #exc_type, exc_value, exc_traceback = sys.exc_info()
         #traceback.print_tb(exc_traceback)
-    printLock.release()

@@ -45,7 +45,7 @@ class TurboKingService(rpyc.Service):
     def exposed_get_ping(self, t1, ip1):
         times = []
         random_int = randrange(0, sys.maxint)
-        for i in range(10):
+        for i in range(6):
             addr = "%i.%s" % (random_int, t1)
             query = dns.message.make_query(addr, dns.rdatatype.A)
             start_time = datetime.now()
