@@ -73,7 +73,7 @@ def tcpdump(timeout, q, interface):
 	logging.debug('tcpdump -s 1024 -lqnAt tcp port 80 -i eth0')
 	# tcpdump -s 1024 -lqnAt tcp port 80
 		
-	command = Command(['tcpdump', '-s 1024', '-lnAq', '-i', interface], timeout)
+	command = Command(['/usr/sbin/tcpdump', '-s 1024', '-lnAq', '-i', interface], timeout)
 	command.run()
 
 	# when it's executing here, the results have been available
