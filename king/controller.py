@@ -46,7 +46,7 @@ def doWork():
     while True:
         try:
             target1, target2, node = q.get()
-            print target1, target2, node
+            #print target1, target2, node
             result = query_latency(target1, target2, node)
             if result:
                 end_time, start_time, ping_times, address = result
