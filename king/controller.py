@@ -74,7 +74,7 @@ def perProcess():
 
     while True:
         t1, t2 = select_random_points()
-        closest_nodes = closestNodes(target1, t2)
+        closest_nodes = closestNodes(t1, t2)
         for node in closest_nodes:
             thread_queue.put((t1, t2, node))
 
