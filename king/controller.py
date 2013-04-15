@@ -50,6 +50,8 @@ def doWork():
             result = query_latency(target1, target2, node)
             if result:
                 end_time, start_time, ping_times, address = result
+                if end_time and start_time and ping_times and address:
+                    print Success
             else:
                 end_time = start_time = ping_times = address = None
             point = DataPoint(target1, target2, start_time, end_time, ping_times, address, node.host)
