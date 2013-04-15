@@ -6,7 +6,7 @@ from multiprocessing import Process, Queue
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
-num_processes = 125
+num_processes = 400
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
 geoip = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=2))
