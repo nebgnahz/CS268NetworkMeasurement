@@ -61,15 +61,15 @@ class PlanetLabNode(object):
                 return None
         return wrapped
 
+    timed_latency = rpyc.timed(self.conn.root.get_latency, 6)
     @handleConnExceptions
     def get_latency(self, target1, ip1, target2, ip2):
-        timed_fn = rpyc.timed(self.conn.root.get_latency, 6)
-        return timed_fn(target1, ip1, target2, ip2).value
+        return self.timed_latency(target1, ip1, target2, ip2).value
 
+    timed_k = rpyc.timed(self.conn.get_k, 6)
     @handleConnExceptions
     def get_k(self, target, ip):
-        timed_fn = rpyc.timed(self.conn.get_k, 6)
-        return timed_fn(target, ip).value
+        return self.timed_k(target, ip).value
 
     def get_distance(self, lat, lon):
         return distance((self.lat, self.lon), (lat, lon))
