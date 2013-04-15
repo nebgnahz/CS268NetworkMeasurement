@@ -61,6 +61,8 @@ def perThread(queue):
             session.commit()
         except Exception, e:
             outputException(e)
+            session.close()
+            session = Session()
 
 # TODO: Store None Responses As Well
 def perProcess():
