@@ -6,6 +6,7 @@ Ping wrapper for system ping (Unix machine)
 """
 import sys, getopt, time, socket, re
 import threading, subprocess, logging
+from datetime import timedelta
 
 class Command(object):
 	def __init__(self, cmd, timeout):
@@ -85,22 +86,41 @@ def tcpdump(timeout, q, interface):
 		lines = command.out.split('\n')
 		last_ip = None
 
-		
+		# first time scan for google's return ip
 		for line in lines:
 			ip_src = re.search(ip_pattern, line)
 			if ip_src is not None:
 				last_ip = ip_src.group(1)
 			if re.search(google_pattern, line):
 				print last_ip
-				q.put((command.returncode, last_ip))
 				break
+
+		gEntries = []
 		
+		# second time scan parse tcpdump for query entries
 		for line in lines:
-			if re.search(last_ip, line) is not None:
-				print line
+			last_ip_pos = re.search(last_ip, line)
+			if last_ip_pos is None:
+				continue
+			
+			if line.index('>') > last_ip_pos.start():
+				# from remote to this place
+				traffic_type = 1			
+			else:
+				# out to remote
+				traffic_type = 0
+			
+			time_pattern = "([0-9]+:[0-9]+:[0-9]+.[0-9]+) IP"
+			timestamp = re.search(time_pattern, line)
+			time_str = timestamp.group(1)
+			h, m, s, ms = map(int, re.split(r'[.:]+', time_str))
+			timestamp_delta = timedelta(hours=h, minutes=m, seconds=s, microseconds=ms)
+			gEntries.append( (timestamp_delta, traffic_type) )
+			# print line
 
+		q.put((command.returncode, last_ip, gEntries))
 		return
-
+	
 if __name__=='__main__':
 	# parse command line options
 	try:
