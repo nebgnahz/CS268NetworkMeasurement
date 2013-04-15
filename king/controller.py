@@ -1,8 +1,8 @@
 import logging, os, redis, string
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
+import multiprocessing
 from multiprocessing import Process, Queue
-
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
