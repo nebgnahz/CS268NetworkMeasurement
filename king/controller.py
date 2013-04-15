@@ -2,11 +2,13 @@ import logging, os, redis, string
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
 import multiprocessing
-from multiprocessing import Process, Queue
+#from multiprocessing import Process, Queue
+from threading import Thread as Process
+import Queue
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
-num_processes = 200
+num_processes = 400
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
 geoip = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=2))
@@ -71,11 +73,11 @@ def main():
         processes.append(p)
 
     while True:
-        for i in range(100):
+        for i in range(num_processes):
             t1, t2 = select_random_points()
             closest_nodes = closestNodes(t1, t2)
             for node in closest_nodes:
                 q.put((t1, t2, node))
-        print 'Active Processes:', len(multiprocessing.active_children())
+        print 'Active Processes:', len(threading.activeCount())
 
 main()
