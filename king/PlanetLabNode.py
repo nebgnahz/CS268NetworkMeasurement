@@ -1,18 +1,7 @@
-import os, paramiko, rpyc, subprocess
-from plumbum.remote_machine import BaseRemoteMachine
-from plumbum.paramiko_machine import ParamikoMachine
-from rpyc.utils.factory import ssh_connect
+import os, rpyc, subprocess
 from utilities import distance, outputException
-
-def monkey(self, host, encoding='utf8'):
-    self.host = host
-    self._client = paramiko.SSHClient()
-    self._client.load_system_host_keys()
-    self._client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    self._client.connect(host, username='ucb_268_measure', password=None)
-    BaseRemoteMachine.__init__(self, encoding)
-
-ParamikoMachine.__init__ = monkey
+from rpyc.utils.factory import ssh_connect
+from CustomMachine import CustomMachine
 
 class PlanetLabNode(object):
     def __init__(self, host, ip, lat, lon):
@@ -35,7 +24,7 @@ class PlanetLabNode(object):
                 self.connected = False
 
     def connectPL(self):
-        rem = ParamikoMachine(self.host)
+        rem = CustomMachine(self.host)
         conn = ssh_connect(rem, 18861, config={'allow_pickle' : True})
         assert conn.root.test() == 1, "%s: RPC Failure" % self.host
         self.conn = conn
