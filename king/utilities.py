@@ -70,11 +70,15 @@ def threaded_map(func, data, timeout=None):
 import rpyc, traceback
 
 def outputException(e):
-    if type(e) is rpyc.core.async.AsyncResultTimeout:
-        print 'Result Timeout'
-    elif type(e) is EOFError:
-        print e, '-----------'
-    else:
-        print e
-        #exc_type, exc_value, exc_traceback = sys.exc_info()
-        #traceback.print_tb(exc_traceback)
+    try:
+        return
+        if type(e) is rpyc.core.async.AsyncResultTimeout:
+            print 'Result Timeout'
+        elif type(e) is EOFError:
+            print e, '-----------'
+        else:
+            print e
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_tb(exc_traceback)
+    except:
+        return

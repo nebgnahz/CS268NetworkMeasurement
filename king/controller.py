@@ -1,9 +1,7 @@
 import logging, os, redis, string
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
-#from multiprocessing import Process, Queue
-from threadings import Thread as Process
-import Queue
+from multiprocessing import Process, Queue
 
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
@@ -54,7 +52,7 @@ def doWork():
             if result:
                 end_time, start_time, ping_times, address = result
                 if end_time and start_time and ping_times and address:
-                    print 'Successo'
+                    #print 'Successo'
                     success = True
             else:
                 end_time = start_time = ping_times = address = None
@@ -77,5 +75,7 @@ def main():
         closest_nodes = closestNodes(t1, t2)
         for node in closest_nodes:
             q.put((t1, t2, node))
+        print multiprocessing.active_children()
+        print len(multiprocessing.active_children())
 
 main()
