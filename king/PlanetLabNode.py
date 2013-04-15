@@ -1,12 +1,12 @@
 import os, rpyc, subprocess
-from plumbum import SshMachine
+#from plumbum import SshMachine
 import paramiko
-#from rpyc.utils.factory import ssh_connect
+from rpyc.utils.factory import ssh_connect
 from utilities import distance, outputException
 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh_connect = ssh.connect
+SshMachine = ssh.connect
 
 class PlanetLabNode(object):
     def __init__(self, host, ip, lat, lon):
