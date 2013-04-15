@@ -114,11 +114,13 @@ def tcpdump(timeout, q, interface):
 			
 				time_pattern = "([0-9]+:[0-9]+:[0-9]+.[0-9]+) IP"
 				timestamp = re.search(time_pattern, line)
-				time_str = timestamp.group(1)
-				h, m, s, ms = map(int, re.split(r'[.:]+', time_str))
-				timestamp_delta = timedelta(hours=h, minutes=m, seconds=s, microseconds=ms)
-				gEntries.append( (timestamp_delta, traffic_type) )
-				# print line
+				if timestamp is not None:
+					time_str = timestamp.group(1)
+					h, m, s, ms = map(int, re.split(r'[.:]+', time_str))
+					timestamp_delta = timedelta(hours=h, minutes=m, seconds=s, microseconds=ms)
+					gEntries.append( (timestamp_delta, traffic_type) )
+				else:
+					gEntries.append( (None, -1))
 
 		q.put((command.returncode, last_ip, gEntries))
 		return
