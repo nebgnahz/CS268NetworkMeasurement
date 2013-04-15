@@ -108,6 +108,6 @@ if __name__ == '__main__':
 	for arg in args:
 		print arg
 		htmlFile = open(arg + '.html', 'w')
-		qTime, gTime, ip, pingTime, tcpEntries = google_scrape(arg, 'en0')
+		qTime, gTime, ip, pingTime, tcpEntries = google_scrape(arg, 'eth0')
 		print qTime, gTime, ip, pingTime
 
