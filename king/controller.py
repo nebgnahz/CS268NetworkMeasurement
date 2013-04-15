@@ -7,7 +7,7 @@ from PlanetLabNode import PlanetLabNode
 from DataPoint import Session, DataPoint
 from utilities import outputException, distance
 
-num_processes = 1
+num_processes = 200
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
 geoip = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=2))
@@ -47,7 +47,11 @@ def doWork():
         try:
             target1, target2, node = q.get()
             print target1, target2, node
-            end_time, start_time, ping_times, address = query_latency(target1, target2, node)
+            result = query_latency(target1, target2, node)
+            if result:
+                end_time, start_time, ping_times, address = result
+            else:
+                end_time = start_time = ping_times = address = None
             point = DataPoint(target1, target2, start_time, end_time, ping_times, address, node.host)
             s.add(point)
             s.commit()
