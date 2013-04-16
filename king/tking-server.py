@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import exceptions, sys, os, socket, rpyc, pickle
+import exceptions, sys, os, socket, rpyc, pickle, cPickle
 import dns.query, dns.rdatatype, dns.exception
 from twisted.internet import reactor
 from twisted.names import dns as twisted_dns
@@ -74,10 +74,10 @@ class TurboKingService(rpyc.Service):
             print '...3'
             ping_time = self.exposed_get_ping(t1, ip1)
             print '...4'
-            return end_time, start_time, ping_time, address
+            return cPickle.dumps((end_time, start_time, ping_time, address))
         except Exception, e:
             print "End error:", e
-            return None, None, None, None
+            return cPickle.dumps((None, None, None, None))
 
     def exposed_get_k(self, t1, ip1):
         query_id = self.generate_query_id()
