@@ -56,7 +56,7 @@ def perThread(queue):
                     success = True
             else:
                 end_time = start_time = ping_times = address = None
-            point = DataPoint(target1, target2, start_time, end_time, ping_times, address, node.host, success)
+            point = DataPoint(target1[0], target2[0], target1, target2, start_time, end_time, ping_times, address, node.host, success)
             while True:
                 try:
                     session.add(point)

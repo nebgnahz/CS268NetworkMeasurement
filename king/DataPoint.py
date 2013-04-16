@@ -11,8 +11,10 @@ class DataPoint(Base):
     __tablename__ = 'data'
 
     id = Column(Integer, primary_key=True)
-    target1 = Column(String)
-    target2 = Column(String)
+    name1 = Column(String)
+    name2 = Column(String)
+    target1 = Column(PickleType)
+    target2 = Column(PickleType)
     start = Column(PickleType)
     end = Column(PickleType)
     pings = Column(PickleType)
@@ -20,7 +22,10 @@ class DataPoint(Base):
     test_point = Column(String)
     success = Column(Boolean)
 
-    def __init__(self, target1, target2, start, end, pings, address, test_point, success):
+    def __init__(self, name1, name2, target1, target2, start, end,
+                 pings, address, test_point, success):
+        self.name1 = name1
+        self.name2 = name2
         self.target1 = target1
         self.target2 = target2
         self.start = start
