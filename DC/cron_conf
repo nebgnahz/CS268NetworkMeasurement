@@ -1,2 +1,2 @@
 #!/bin/bash
-*/5 * * * * bash controller.sh
+* */2 * * * bash controller.sh
