@@ -89,7 +89,7 @@ def perProcess():
             thread_queue.put((t1, t2, node))
 
 def main():
-    echo 'Start: ', datetime.now(),
+    print 'Start:', datetime.now(),
     processes = []
     for i in range(num_processes):
         p = multiprocessing.Process(target=perProcess)
@@ -98,6 +98,6 @@ def main():
         processes.append(p)
     for p in processes:
         p.join(time_limit/num_processes)
-    echo 'End: ', datetime.now()
+    print 'End:', datetime.now()
 
 main()
