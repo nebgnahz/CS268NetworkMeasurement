@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, PickleType, Boolean, String
+from sqlalchemy import Column, Integer, PickleType, Boolean, String, DateTime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -15,8 +15,8 @@ class DataPoint(Base):
     name2 = Column(String)
     target1 = Column(PickleType)
     target2 = Column(PickleType)
-    start = Column(PickleType)
-    end = Column(PickleType)
+    start = Column(DateTime)
+    end = Column(DateTime)
     pings = Column(PickleType)
     address = Column(PickleType)
     test_point = Column(String)
