@@ -1,9 +1,12 @@
+import socket
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, PickleType
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///gQuery.db', echo=False)
+db_name = 'gQuery_' + socket.gethostname() + '.db'
+engine = create_engine('sqlite:///' + db_name, echo=False)
+
 Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine)
 s = Session()

@@ -1,11 +1,12 @@
 from gQuery import google_scrape, random_string, google_trends
-import logging, sys, time, datetime
+import logging, sys, time, datetime, socket
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, PickleType
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///gQuery.db', echo=False)
+db_name = 'gQuery_' + socket.gethostname() + '.db'
+engine = create_engine('sqlite:///' + db_name, echo=False)
 
 Base = declarative_base(bind=engine)
 
@@ -49,7 +50,7 @@ for i in range(len(hot_items)):
 merged_list =  [j for i in zip(hot_items, random_list) for j in i]
 reduced_list = merged_list[0:20]
 
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 sleep_time = 5
 
 # schedule every two hours running
