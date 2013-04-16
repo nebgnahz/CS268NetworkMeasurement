@@ -2,8 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, PickleType, Boolean, String, DateTime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
-engine = create_engine('sqlite:///latency.db', echo=False)
+engine = create_engine('mysql+mysqldb://ucb_268_measure:ucb_268_measure@data.cnobwey0khau.us-west-2.rds.amazonaws.com:3306/mydb', echo=False)
 Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine)
 
@@ -11,6 +12,7 @@ class DataPoint(Base):
     __tablename__ = 'data'
 
     id = Column(Integer, primary_key=True)
+    timestamp = Column(DateTime)
     name1 = Column(String)
     name2 = Column(String)
     target1 = Column(PickleType)
@@ -24,6 +26,7 @@ class DataPoint(Base):
 
     def __init__(self, name1, name2, target1, target2, start, end,
                  pings, address, test_point, success):
+        self.timestamp = datetime.now()
         self.name1 = name1
         self.name2 = name2
         self.target1 = target1

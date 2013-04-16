@@ -9,6 +9,7 @@ q = Session().query(DataPoint)
 
 for r in q.all():
     if r.success:
+        print 'Date of Measurement', r.timestamp
         print r.name1, r.name2
         print r.target1
         print r.target2
