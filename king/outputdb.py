@@ -8,14 +8,13 @@ from DataPoint import DataPoint, Session
 q = Session().query(DataPoint)
 
 for r in q.all():
-    if r.success:
-        print 'Date of Measurement', r.timestamp
-        print r.name1, r.name2
-        print r.target1
-        print r.target2
-        print r.test_point
-        print r.address
-        print r.start
-        print r.end
-        print r.pings
-        print '---------------------------------'
+    print 'Date of Measurement', r.timestamp
+    print r.name1, r.name2
+    print r.target1
+    print r.target2
+    print r.test_point
+    print r.address
+    print r.start
+    print r.end
+    print r.pings
+    print '---------------------------------'
