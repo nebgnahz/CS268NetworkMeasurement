@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
+round_length = 10
+time_limit = 60.0
+
 num_processes = 50
 num_threads = 10
 
@@ -79,13 +82,14 @@ def perProcess():
         t.start()
         threads.append(t)
 
-    while True:
+    for i in range(round_length):
         t1, t2 = select_random_points()
         closest_nodes = closestNodes(t1, t2)
         for node in closest_nodes:
             thread_queue.put((t1, t2, node))
 
 def main():
+    echo 'Start: ', datetime.now(),
     processes = []
     for i in range(num_processes):
         p = multiprocessing.Process(target=perProcess)
@@ -93,5 +97,7 @@ def main():
         p.start()
         processes.append(p)
     for p in processes:
-        p.join()
+        p.join(time_limit/num_processes)
+    echo 'End: ', datetime.now()
+
 main()
