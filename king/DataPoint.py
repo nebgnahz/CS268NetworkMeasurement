@@ -13,15 +13,15 @@ class DataPoint(Base):
 
     id = Column(Integer, primary_key=True)
     timestamp = Column(DateTime)
-    name1 = Column(String)
-    name2 = Column(String)
+    name1 = Column(String(length=200))
+    name2 = Column(String(length=200))
     target1 = Column(PickleType)
     target2 = Column(PickleType)
     start = Column(DateTime)
     end = Column(DateTime)
     pings = Column(PickleType)
     address = Column(PickleType)
-    test_point = Column(String)
+    test_point = Column(String(length=200))
     success = Column(Boolean)
 
     def __init__(self, name1, name2, target1, target2, start, end,
