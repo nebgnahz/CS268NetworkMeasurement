@@ -62,7 +62,8 @@ def perThread(queue):
                     session.add(point)
                     session.commit()
                     break
-                except:
+                except Exception, e:
+                    print e
                     session.close()
                     session = Session()
         except Exception, e:
