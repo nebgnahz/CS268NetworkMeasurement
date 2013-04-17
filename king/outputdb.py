@@ -2,7 +2,7 @@ from DataPoint import DataPoint, Session
 
 s = Session()
 
-num_items = s.query(DataPoint).count()
+num_items = s.query(DataPoint).all().count()
 
 print num_items
 
