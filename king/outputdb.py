@@ -1,13 +1,13 @@
-from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, PickleType
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-
 from DataPoint import DataPoint, Session
 
-q = Session().query(DataPoint)
+s = Session()
 
-for r in q.all():
+num_items = s.query(DataPoint).count()
+
+print num_items
+
+for x in range(num_items):
+    r = s.query(DataPoint).filter(DataPoint.id == x,).limit(1)
     print 'Date of Measurement', r.timestamp
     print r.name1, r.name2
     print r.target1
