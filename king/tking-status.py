@@ -42,27 +42,16 @@ def perNode(node):
 results = threaded_map(perNode, pl_nodes)
 
 import smtplib
-TO = ["ahirreddy@gmail.com"] # must be a list
-SUBJECT = "Tking-Status %s" % str(datetime.now())
 
-TEXT = "Operational:\n"
+msg = "Tking-Status %s\n" % str(datetime.now())
+msg += "Operational:\n"
 for host, success in results:
     if success:
-        TEXT += "%s\n" % host
-TEXT = "\nNon-Operational:\n"
+        msg += "%s\n" % host
+msg = "\nNon-Operational:\n"
 for host, success in results:
     if not success:
-        TEXT += "%s\n" % host
-
-# Prepare actual message
-
-message = """\
-From: %s
-To: %s
-Subject: %s
-
-%s
-""" % (FROM, ", ".join(TO), SUBJECT, TEXT)
+        msg += "%s\n" % host
 
 # Send the mail
 server = smtplib.SMTP('smtp.gmail.com',587) #port 465 or 587
@@ -70,5 +59,5 @@ server.ehlo()
 server.starttls()
 server.ehlo()
 server.login('ucb.268.measure@gmail.com','ahirandben')
-server.sendmail('ucb.268.measure@gmail.com',TO,TEXT)
+server.sendmail('ucb.268.measure@gmail.com',["ahirreddy@gmail.com"],msg)
 server.close()
