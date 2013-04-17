@@ -42,8 +42,6 @@ def perNode(node):
 results = threaded_map(perNode, pl_nodes)
 
 import smtplib
-SERVER = "localhost"
-FROM = "ahir@internetlatencymeasurementstudy.org"
 TO = ["ahirreddy@gmail.com"] # must be a list
 SUBJECT = "Tking-Status %s" % str(datetime.now())
 
@@ -67,7 +65,10 @@ Subject: %s
 """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
 
 # Send the mail
-
-server = smtplib.SMTP('smtp.gmail.com',587)
-server.sendmail(FROM, TO, message)
-server.quit()
+server = smtplib.SMTP('smtp.gmail.com',587) #port 465 or 587
+server.ehlo()
+server.starttls()
+server.ehlo()
+server.login('ucb.268.measure@gmail.com','ahirandben')
+server.sendmail('ucb.268.measure@gmail.com',TO,TEXT)
+server.close()
