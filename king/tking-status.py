@@ -43,15 +43,23 @@ results = threaded_map(perNode, pl_nodes)
 
 import smtplib
 
-msg = "Tking-Status %s\n" % str(datetime.now())
+
+msg = "\n\nTking-Status %s\n" % str(datetime.now())
 msg += "Operational:\n"
 for host, success in results:
     if success:
         msg += "%s\n" % host
-msg = "\nNon-Operational:\n"
+msg += "\nNon-Operational:\n"
 for host, success in results:
     if not success:
         msg += "%s\n" % host
+
+from DataPoint import DataPoint, Session
+db_successes = Session().query(DataPoint).filter(DataPoint.success == True,).count()
+db_fails = Session().query(DataPoint).filter(DataPoint.success == False,).count()
+
+msg += 'Successes: %i\n' % db_successes
+msg += 'Fails: %i\n' % db_fails
 
 # Send the mail
 server = smtplib.SMTP('smtp.gmail.com',587) #port 465 or 587
