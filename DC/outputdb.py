@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, PickleType
 from sqlalchemy.ext.declarative import declarative_base
 
-db_name = 'gQuery_' + socket.gethostname() + '.db'
+db_name = os.getenv("HOME") + '/gQuery_' + socket.gethostname() + '.db'
 engine = create_engine('sqlite:///' + db_name, echo=False)
 
 Base = declarative_base(bind=engine)
