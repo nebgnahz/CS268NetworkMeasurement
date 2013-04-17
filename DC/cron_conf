@@ -1,2 +1,2 @@
 #!/bin/bash
-* */2 * * * sudo /bin/bash /home/ucb_268_measure/CS268NetworkMeasurement/DC/controller.sh
+0 */2 * * * echo sss >> /var/log/cron.log; sudo /bin/bash /home/ucb_268_measure/CS268NetworkMeasurement/DC/controller.sh;  echo eee >> /var/log/cron.log;
