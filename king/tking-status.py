@@ -58,8 +58,8 @@ from DataPoint import DataPoint, Session
 db_successes = Session().query(DataPoint).filter(DataPoint.success == True,).count()
 db_fails = Session().query(DataPoint).filter(DataPoint.success == False,).count()
 
-msg += 'Successes: %i\n' % db_successes
-msg += 'Fails: %i\n' % db_fails
+msg += '\nSuccessful Measurements: %i\n' % db_successes
+msg += 'Failed Measurements: %i\n' % db_fails
 
 # Send the mail
 server = smtplib.SMTP('smtp.gmail.com',587) #port 465 or 587
@@ -67,5 +67,5 @@ server.ehlo()
 server.starttls()
 server.ehlo()
 server.login('ucb.268.measure@gmail.com','ahirandben')
-server.sendmail('ucb.268.measure@gmail.com',["ahirreddy@gmail.com"],msg)
+server.sendmail('ucb.268.measure@gmail.com',["ahirreddy@gmail.com", "nebgnahz@gmail.com"],msg)
 server.close()
