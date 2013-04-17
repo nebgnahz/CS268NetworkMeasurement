@@ -2,7 +2,8 @@ from DataPoint import DataPoint, Session
 
 s = Session()
 
-num_items = s.query(DataPoint).all().count()
+num_items = s.query(DataPoint).filter(DataPoint.success == True,).count()
+num_items += s.query(DataPoint).filter(DataPoint.success == False,).count()
 
 print num_items
 
