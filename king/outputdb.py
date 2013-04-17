@@ -8,7 +8,7 @@ num_items += s.query(DataPoint).filter(DataPoint.success == False,).count()
 print num_items
 
 for x in range(num_items):
-    r = s.query(DataPoint).filter(DataPoint.id == x,).limit(1)
+    r = s.query(DataPoint).filter(DataPoint.id == x,).limit(1).all()[0]
     print 'Date of Measurement', r.timestamp
     print r.name1, r.name2
     print r.target1
