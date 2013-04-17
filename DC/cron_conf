@@ -1,2 +1,2 @@
 #!/bin/bash
-* */2 * * * bash controller.sh
+* */2 * * * sudo /bin/bash /home/ucb_268_measure/CS268NetworkMeasurement/DC/controller.sh
