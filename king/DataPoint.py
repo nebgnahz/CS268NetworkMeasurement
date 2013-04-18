@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
-engine = create_engine('mysql+mysqldb://ucb_268_measure:ucb_268_measure@data.cnobwey0khau.us-west-2.rds.amazonaws.com:3306/mydb', echo=False)
+engine = create_engine('mysql+pymysql://ucb_268_measure:ucb_268_measure@data.cnobwey0khau.us-west-2.rds.amazonaws.com:3306/mydb', echo=False)
 Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine)
 
