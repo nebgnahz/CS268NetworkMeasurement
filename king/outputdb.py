@@ -1,31 +1,31 @@
-import sys
-from compiler.ast import flatten
-from multiprocessing import Pool
-from DataPoint import Session, DataPoint
+import MySQLdb, MySQLdb.cursors
+import sqlalchemy.ext.serializer
 
-s = Session()
+connection = MySQLdb.connect(host = "data.cnobwey0khau.us-west-2.rds.amazonaws.com",
+                             user = 'ucb_268_measure',
+                             passwd = 'ucb_268_measure',
+                             db = 'mydb',
+                             ssl = {},
+                             cursorclass = MySQLdb.cursors.SSCursor)
 
-def page_query(q):
-    offset = 0
-    while True:
-        r = False
-        for elem in q.limit(2000).offset(offset):
-           r = True
-           yield elem
-        offset += 1000
-        if not r:
-            break
+cur = connection.cursor()
+cur.execute("SELECT count(*) from data;")
+print 'Entries: %i' % cur.fetchone()
+cur.close()
 
-total = s.query(DataPoint).filter(DataPoint.success == True,).count()
+cur = connection.cursor()
+cur.execute("SELECT * from data where success;")
+for r in cur:
+    for att in r:
+        print '--------'
+        print att
+    break
+cur.close()
 
-print 'Total', total
-
-for count, r in enumerate(page_query(s.query(DataPoint).filter(DataPoint.success == True,))):
-    if (count % 2000 == 0):
-        print '\r                      \r','{0:.0f}%'.format(float(count)/total * 100),
-        sys.stdout.flush()
-#    print 'Date of Measurement', r.timestamp
-#    print r.name1, r.name2
+#for r in s.query(DataPoint).filter(DataPoint.success == True,):
+#    print r.id
+#    print 'Date of Measurement', self.r.timestamp
+#    print r.name1, self.r.name2
 #    print r.target1
 #    print r.target2
 #    print r.test_point
