@@ -12,7 +12,7 @@ def page_query(args):
 
     from DataPoint import DataPoint, Session
     s = Session()
-    q = s.query(DataPoint)
+    q = s.query(DataPoint).filter(DataPoint.success == True,)
 
     offset = start
     results = []
