@@ -1,22 +1,36 @@
+from compiler.ast import flatten
+from multiprocessing import Pool
 from DataPoint import DataPoint, Session
 
-s = Session()
-
 query_size = 25000
+total = Session().query(DataPoint).count()
+print total
 
-def page_query(q):
-    offset = 0
-    while True:
-        r = False
-        for elem in q.limit(query_size).offset(offset):
-           r = True
-           yield elem
+def page_query(args):
+    start, end = args
+
+    from DataPoint import DataPoint, Session
+    s = Session()
+    q = s.query(DataPoint)
+
+    offset = start
+    results = []
+    while offset < end:
+        r = q.limit(min(query_size, end - offset + 1)).offset(offset).all()
+        results.append(r)
         offset += query_size
-        if not r:
-            break
+    return results
 
-for count, r in enumerate(page_query(s.query(DataPoint))):
-    print count
+slices = []
+x = 0
+while x < total:
+    slices.append((x, x+query_size))
+    x += query_size
+
+p = Pool(10)
+results = flatten(p.map(page_query, slices))
+print len(results)
+
 #    print 'Date of Measurement', r.timestamp
 #    print r.name1, r.name2
 #    print r.target1
