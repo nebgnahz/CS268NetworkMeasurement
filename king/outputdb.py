@@ -2,20 +2,28 @@ from DataPoint import DataPoint, Session
 
 s = Session()
 
-num_items = s.query(DataPoint).filter(DataPoint.success == True,).count()
-num_items += s.query(DataPoint).filter(DataPoint.success == False,).count()
+query_size = 25000
 
-print num_items
+def page_query(q):
+    offset = 0
+    while True:
+        r = False
+        for elem in q.limit(query_size).offset(offset):
+           r = True
+           yield elem
+        offset += query_size
+        if not r:
+            break
 
-for x in range(num_items):
-    r = s.query(DataPoint).filter(DataPoint.id == x,).limit(1).all()[0]
-    print 'Date of Measurement', r.timestamp
-    print r.name1, r.name2
-    print r.target1
-    print r.target2
-    print r.test_point
-    print r.address
-    print r.start
-    print r.end
-    print r.pings
-    print '---------------------------------'
+for count, r in enumerate(page_query(s.query(DataPoint))):
+    print count
+#    print 'Date of Measurement', r.timestamp
+#    print r.name1, r.name2
+#    print r.target1
+#    print r.target2
+#    print r.test_point
+#    print r.address
+#    print r.start
+#    print r.end
+#    print r.pings
+#    print '---------------------------------'
