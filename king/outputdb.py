@@ -24,8 +24,10 @@ def page_query(args):
 slices = []
 x = 0
 while x < total:
-    slices.append((x, x+query_size))
+    slices.append((x, min(x+query_size,total)))
     x += query_size
+
+print slices
 
 p = Pool(10)
 results = flatten(p.map(page_query, slices))
