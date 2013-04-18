@@ -21,8 +21,9 @@ total = s.query(DataPoint).filter(DataPoint.success == True,).count()
 print 'Total', total
 
 for count, r in enumerate(page_query(s.query(DataPoint).filter(DataPoint.success == True,))):
-    print '\r                      \r','{0:.0f}%'.format(float(count)/total * 100),
-    sys.stdout.flush()
+    if (count % 2000 == 0):
+        print '\r                      \r','{0:.0f}%'.format(float(count)/total * 100),
+        sys.stdout.flush()
 #    print 'Date of Measurement', r.timestamp
 #    print r.name1, r.name2
 #    print r.target1
