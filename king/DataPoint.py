@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, PickleType, Boolean, String, DateTime
+from sqlalchemy import Column, Integer, PickleType, Boolean, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -12,13 +12,13 @@ class DataPoint(Base):
     __tablename__ = 'data'
 
     id = Column(Integer, primary_key=True)
-    timestamp = Column(DateTime) # Time measurement taken
+    timestamp = Column(PickleType) # Time measurement taken
     name1 = Column(String(length=200)) # First Test Point
     name2 = Column(String(length=200)) # 2nd Test point
     target1 = Column(PickleType) # Geo IP
     target2 = Column(PickleType) # Geo IP
-    start = Column(DateTime) # Start Tking step 5
-    end = Column(DateTime) # End Tking Step 8
+    start = Column(PickleType) # Start Tking step 5
+    end = Column(PickleType) # End Tking Step 8
     pings = Column(PickleType) # 5 ping times
     address = Column(PickleType) # DNS Server that responded (check for forwarder)
     test_point = Column(String(length=200)) # Planet Lab Node that did testing
