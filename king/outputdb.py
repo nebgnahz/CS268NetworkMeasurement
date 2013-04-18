@@ -3,7 +3,8 @@ from multiprocessing import Pool
 from DataPoint import DataPoint, Session
 
 query_size = 25000
-total = Session().query(DataPoint).count()
+#total = Session().query(DataPoint).count()
+total = 100000
 print total
 
 def page_query(args):
@@ -29,7 +30,7 @@ while x < total:
 
 print slices
 
-p = Pool(10)
+p = Pool(5)
 results = flatten(p.map(page_query, slices))
 print len(results)
 
