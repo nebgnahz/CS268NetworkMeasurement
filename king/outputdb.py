@@ -1,6 +1,5 @@
 from compiler.ast import flatten
 from multiprocessing import Pool
-from DataPoint import DataPoint, Session
 
 query_size = 25000
 #total = Session().query(DataPoint).count()
@@ -20,6 +19,7 @@ def page_query(args):
         r = q.limit(min(query_size, end - offset + 1)).offset(offset).all()
         results.append(r)
         offset += query_size
+    print args
     return results
 
 slices = []
