@@ -1,7 +1,7 @@
 from compiler.ast import flatten
 from multiprocessing import Pool
 
-query_size = 25000
+query_size = 1000
 #total = Session().query(DataPoint).count()
 total = 100000
 print total
@@ -30,7 +30,7 @@ while x < total:
 
 print slices
 
-p = Pool(5)
+p = Pool(25)
 results = flatten(p.map(page_query, slices))
 print len(results)
 
