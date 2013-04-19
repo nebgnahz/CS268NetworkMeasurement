@@ -32,7 +32,11 @@ if arguments.csv:
         end = pickle.loads(end)
         pings = pickle.loads(pings)
         latency = (end - start - sum(pings, timedelta())/len(pings)).total_seconds()
-        if latency >= 0:
+
+        address = pickle.loads(address)
+        
+
+        if latency >= 0 and target1[1] == address[0]:
             print dist, ',', latency
     cur.close()
 else:
