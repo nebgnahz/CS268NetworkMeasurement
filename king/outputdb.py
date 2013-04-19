@@ -7,6 +7,7 @@ from utilities import distance
 import argparse
 parser = argparse.ArgumentParser(description='Output db')
 parser.add_argument('--csv', action='store_true', default=False, help='Output CSV file of data')
+parser.add_argument('--count', action='store_true', default=False, help='Only Print Count and Exit')
 arguments = parser.parse_args()
 
 connection = MySQLdb.connect(host = "data.cnobwey0khau.us-west-2.rds.amazonaws.com",
@@ -15,6 +16,18 @@ connection = MySQLdb.connect(host = "data.cnobwey0khau.us-west-2.rds.amazonaws.c
                              db = 'mydb',
                              ssl = {},
                              cursorclass = MySQLdb.cursors.SSCursor)
+
+if arguments.count:
+    cur = connection.cursor()
+    cur.execute("""SELECT
+    	               SUM(IF(success, 1, 0)),
+    	               SUM(IF(not success, 1, 0))
+                   FROM data;""")
+    num_success, num_fail = cur.fetchone()
+    percent = float(num_success)/float(num_fail+num_success)
+    print 'Success %i, Fail %i, Success Rate %s' % (num_success, num_fail, "{0:.0f}%".format(percent * 100))
+    cur.close()
+    exit(0)
 
 cur = connection.cursor()
 cur.execute("SELECT * from data where success;")
