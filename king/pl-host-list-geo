@@ -8,7 +8,6 @@ onelab3.info.ucl.ac.be 130.104.72.213 50.8833 4.7 Louvain
 planetlab1.xeno.cl.cam.ac.uk 128.232.103.201 52.2 0.1167 Cambridge
 peeramide.irisa.fr 131.254.208.10 48.112 -1.6743 Rennes
 planetlab01.tkn.tu-berlin.de 130.149.49.136 52.5167 13.4 Berlin
-planetlab2.umassd.edu 134.88.5.253 41.6623 -71.0107 North Dartmouth
 planetlab4.wail.wisc.edu 198.133.224.149 43.0761 -89.4104 Madison
 planetlab2.koganei.wide.ad.jp 202.249.37.69 36.0 138.0 
 planetlab-2.cmcl.cs.cmu.edu 128.2.211.114 40.4439 -79.9561 Pittsburgh
@@ -20,26 +19,38 @@ planetlab-3.cs.ucy.ac.cy 194.42.17.121 35.1667 33.3667 Nicosia
 planetlab1.sics.se 193.10.64.35 62.0 15.0 
 planet-lab4.uba.ar 157.92.44.104 -34.5875 -58.6725 Buenos Aires
 planetlab1.lkn.ei.tum.de 138.246.99.249 48.15 11.5833 Munich
+aguila2.lsi.upc.edu 147.83.29.234 41.3984 2.1741 Barcelona
+planck249ple.test.iminds.be 193.191.148.249 51.05 3.7167 Gent
+planetlab3.di.unito.it 130.192.157.138 45.05 7.6667 Torino
+aguila1.lsi.upc.edu 147.83.29.232 41.3984 2.1741 Barcelona
+plab-2.diegm.uniud.it 158.110.27.127 46.0619 13.2422 Udine
+planetlab2.upm.ro 193.226.19.31 46.0 25.0 
+planetlab1.tmit.bme.hu 152.66.245.161 47.5 19.0833 Budapest
+plab-1.diegm.uniud.it 158.110.27.116 46.0619 13.2422 Udine
+planetlab-um00.di.uminho.pt 193.136.19.13 41.5503 -8.4201 Braga
+147-179.surfsnel.dsl.internl.net 145.99.179.147 51.5834 5.2086 Oisterwijk
+plab4.ple.silweb.pl 83.230.127.124 52.0 20.0 
+planetlab-1.imag.fr 129.88.70.226 45.2224 5.8035 Montbonnot
+planetlab1.esprit-tn.com 41.225.7.3 34.0 9.0 
 planetlab1.cs.ucla.edu 131.179.150.70 33.7866 -118.2987 Los Angeles
+planetlab1.upc.es 147.83.30.166 41.3984 2.1741 Barcelona
+planetlab1.millennium.berkeley.edu 169.229.50.3 37.8668 -122.2536 Berkeley
+planetlab2.mnlab.cti.depaul.edu 140.192.249.204 41.8776 -87.6272 Chicago
+planetlab3.cs.columbia.edu 128.59.20.228 40.8006 -73.9653 New York
+righthand.eecs.harvard.edu 140.247.60.126 42.38 -71.1329 Cambridge
+pl1.ccsrfi.net 131.227.23.10 51.5 -0.13 
 planetlab2.iitkgp.ac.in 203.110.240.191 22.3333 87.3333 Kharagpur
 planetlab-1.imperial.ac.uk 193.63.75.18 51.5142 -0.0931 London
-pl1.6test.edu.cn 219.243.208.60 39.9289 116.3883 Beijing
-pl2.planetlab.ics.tut.ac.jp 133.15.59.2 36.0 138.0 
-planetlab1.esprit-tn.com 41.225.7.3 34.0 9.0 
-planetlab1.itsec.rwth-aachen.de 137.226.138.155 50.7708 6.1053 Aachen
-planetlab2.itsec.rwth-aachen.de 137.226.138.157 50.7708 6.1053 Aachen
-planetlab2.tlm.unavarra.es 130.206.158.140 42.8141 -1.6412 Pamplona
-planetlab-2.di.fc.ul.pt 194.117.20.215 38.7167 -9.1333 Lisbon
-wlab02.pl.sophia.inria.fr 138.96.116.2 43.6413 7.0057 Valbonne
-planetlab-1.di.fc.ul.pt 194.117.20.214 38.7167 -9.1333 Lisbon
-planetlab1.cs.colorado.edu 128.138.207.54 40.0878 -105.3735 Boulder
-server4.planetlab.iit-tech.net 141.8.226.7 47.0 8.0 
-pl2snu.koren.kr 116.89.165.135 37.0 127.5 
-planetlab3.canterbury.ac.nz 132.181.10.56 -43.5333 172.6333 Christchurch
-planetlab2.c3sl.ufpr.br 200.17.202.195 -25.4167 -49.25 Curitiba
-planetlab1.ucsd.edu 132.239.17.224 32.8807 -117.2359 La Jolla
-plink.cs.uwaterloo.ca 129.97.74.12 43.4667 -80.5333 Waterloo
-planetlab-01.vt.nodes.planet-lab.org 198.82.160.238 37.2669 -80.4325 Blacksburg
-planetlab4.goto.info.waseda.ac.jp 133.9.81.164 36.0 138.0 
-planetlab-2.cs.auckland.ac.nz 130.216.1.23 -36.8667 174.7667 Auckland
 planetlab1.cs.uml.edu 129.63.159.101 42.6523 -71.3506 Lowell
+planetlab-2.cs.auckland.ac.nz 130.216.1.23 -36.8667 174.7667 Auckland
+planetlab4.goto.info.waseda.ac.jp 133.9.81.164 36.0 138.0 
+planetlab-01.vt.nodes.planet-lab.org 198.82.160.238 37.2669 -80.4325 Blacksburg
+plink.cs.uwaterloo.ca 129.97.74.12 43.4667 -80.5333 Waterloo
+pl1.6test.edu.cn 219.243.208.60 39.9289 116.3883 Beijing
+planetlab1.ucsd.edu 132.239.17.224 32.8807 -117.2359 La Jolla
+planetlab2.c3sl.ufpr.br 200.17.202.195 -25.4167 -49.25 Curitiba
+planetlab3.canterbury.ac.nz 132.181.10.56 -43.5333 172.6333 Christchurch
+pl2snu.koren.kr 116.89.165.135 37.0 127.5 
+server4.planetlab.iit-tech.net 141.8.226.7 47.0 8.0 
+pl2.planetlab.ics.tut.ac.jp 133.15.59.2 36.0 138.0 
+planetlab1.cs.colorado.edu 128.138.207.54 40.0878 -105.3735 Boulder
