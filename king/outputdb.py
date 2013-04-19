@@ -33,3 +33,5 @@ for r in cur:
     print 'Pings:', pickle.loads(pings)
     print '---------------------------------'
 cur.close()
+
+print 'Success %i, Fail %i, Success Rate %s' % (num_success, num_fail, "{0:.0f}%".format(percent * 100)) 
