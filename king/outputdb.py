@@ -44,13 +44,28 @@ if arguments.csv:
         start = pickle.loads(start)
         end = pickle.loads(end)
         pings = pickle.loads(pings)
-        latency = (end - start - sum(pings, timedelta())/len(pings)).total_seconds()
-
+				
+				# the minimum makes more sense than average actually
+        latency = (end - start - min(pings)).total_seconds()
         address = pickle.loads(address)
-        
 
-        if latency >= 0 and target1[1] == address[0]:
-            print dist, ',', latency
+				# speed-of-light limit violation. check them manually
+        if latency < (dist/3.0/100000):
+					pass
+					# print "++++++++++++++++++++++++++"
+					# print 'Target1:', name1, target1
+					# print 'Target2:', name2, target2
+					# print 'Test Point:', test_point
+					# print 'Response Address', address
+					# print 'Start:', start
+					# print 'End:', end
+					# print 'Pings:', pings
+					# print dist/3.0/100000, latency
+					# print "++++++++++++++++++++++++++"
+					
+        if latency > 0 and dist > 0 and target1[1] == address[0] and latency > (dist/3.0/100000) \
+					and len(filter(lambda x: x.total_seconds()/latency > 1.2, pings)) != 0 and latency < 5:
+            print dist, latency
     cur.close()
 else:
     for r in cur:
