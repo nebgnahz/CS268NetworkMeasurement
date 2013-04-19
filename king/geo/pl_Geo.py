@@ -4,7 +4,7 @@
 from GeoIP import ip_db_lookup
 import socket, sys, getopt
 
-pl_filename = "./pl-host-list"
+pl_filename = "../pl-host-list"
 
 def main():
 	try:
