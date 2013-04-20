@@ -9,7 +9,7 @@ round_length = 10
 time_limit = 60.0
 
 num_processes = 50
-num_threads = 10
+num_threads = 20
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -19,18 +19,19 @@ pl_nodes = map(lambda args: PlanetLabNode(*args), pl_hosts)
 
 def select_random_points():
     target1 = open_resolvers.randomkey()
-    target2 = geoip.randomkey()
+    target2 = open_resolvers.randomkey()
     while not geoip.exists(target1):
         target1 = open_resolvers.randomkey()
+    while not geoip.exists(target2):
+        target2 = open_resolvers.randomkey()
 
     ip1, coord1 = list(all_dns.smembers(target1))[0], eval(list(geoip.smembers(target1))[0])[1:]
     ip2, coord2 = list(all_dns.smembers(target2))[0], eval(list(geoip.smembers(target2))[0])[1:]
 
     return (target1, ip1, coord1), (target2, ip2, coord2)
 
-def closestNodes(target1, target2):
-    name1, ip1, coord1 = target1
-    name2, ip2, coord2 = target2
+def closestNodes(target):
+    name1, ip1, coord1 = target
     # Get closest 10 PL Nodes
     distances = map(lambda node: (distance(coord1, (node.lat, node.lon)), node), pl_nodes)
     distances.sort()
@@ -84,9 +85,12 @@ def perProcess():
 
     for i in range(round_length):
         t1, t2 = select_random_points()
-        closest_nodes = closestNodes(t1, t2)
-        for node in closest_nodes:
+        closest_nodes1 = closestNodes(t1)
+        closest_nodes2 = closestNodes(t2)
+        for node in closest_nodes1:
             thread_queue.put((t1, t2, node))
+        for node in closest_nodes2:
+            thread_queue.put((t2, t1, node))
 
 def main():
     print 'Start:', datetime.now(),
