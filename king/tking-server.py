@@ -11,7 +11,6 @@ from time import sleep
 from datetime import datetime
 from rpyc.utils.server import ThreadedServer
 from daemon import Daemon
-from sysping import ping
 
 myHostName = socket.gethostname().replace('.', '---')
 myIP = socket.gethostbyname(socket.gethostname()).replace('.', '---')
