@@ -20,7 +20,7 @@ class DNSServerFactory(server.DNSServerFactory):
             query_type = target.split('.')[0]
             if query_type == 'ns1':
                 A = dns.RRHeader(name=target, type=dns.A, cls=dns.IN, ttl=0,
-                                payload=dns.Record_A(address='54.244.114.147', ttl=None))
+                                payload=dns.Record_A(address='54.214.0.110', ttl=None))
                 args = (self, ([A], [], []), protocol, message, address)
                 return server.DNSServerFactory.gotResolverResponse(*args)
             elif query_type == 'ns2':
