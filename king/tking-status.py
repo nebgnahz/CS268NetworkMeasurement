@@ -20,6 +20,7 @@ def perNode(node):
                 #print_lock.acquire()
                 #print thread_count.next(), colored(node.host, 'green') 
                 #print_lock.release()
+                print thread_count.next(), node.host, True
                 return node.host, True
         except Exception as e:
             ##print_lock.acquire()
@@ -37,6 +38,7 @@ def perNode(node):
     #print_lock.acquire()
     #print thread_count.next(), colored(node.host, 'red', timeout=)
     #print_lock.release()
+    print thread_count.next(), node.host, False
     return node.host, False
 
 results = threaded_map(perNode, pl_nodes)
