@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import exceptions, sys, os, socket, rpyc, pickle, cPickle
-import dns.query, dns.rdatatype, dns.exception
+import dns.query, dns.rdatatype, dns.exception, dns.resolver
 from twisted.internet import reactor
 from twisted.names import dns as twisted_dns
 from twisted.names import server
