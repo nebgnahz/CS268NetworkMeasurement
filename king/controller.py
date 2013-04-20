@@ -6,9 +6,9 @@ from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
 round_length = 10
-time_limit = 60.0
+time_limit = 120.0
 
-num_processes = 50
+num_processes = 25
 num_threads = 20
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
