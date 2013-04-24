@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
-round_length = 10
+round_length = 12
 time_limit = 120.0
 
 num_processes = 25
