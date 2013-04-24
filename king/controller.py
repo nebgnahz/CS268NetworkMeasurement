@@ -3,6 +3,7 @@ from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
 
 from PlanetLabNode import PlanetLabNode
+from DataPoint import DataPoint, Session
 from utilities import outputException, distance
 
 round_length = 10
@@ -45,7 +46,6 @@ def query_latency(target1, target2, node):
 
 
 def perThread(queue):
-    from DataPoint import DataPoint, Session
     session = Session()
 
     while True:
