@@ -5,11 +5,11 @@ from datetime import datetime, timedelta
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
-round_length = 12
+round_length = 20
 time_limit = 110.0
 
-num_processes = 25
-num_threads = 20
+num_processes = 100
+num_threads = 40
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
@@ -93,7 +93,7 @@ def perProcess():
             thread_queue.put((t2, t1, node))
 
 def main():
-    print 'Start:', datetime.now(),
+    print 'Start:', datetime.now()
     processes = []
     for i in range(num_processes):
         p = multiprocessing.Process(target=perProcess)
@@ -102,6 +102,6 @@ def main():
         processes.append(p)
     for p in processes:
         p.join(time_limit/num_processes)
-    print 'End:', datetime.now()
+    print '\nEnd:', datetime.now()
 
 main()
