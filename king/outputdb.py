@@ -77,17 +77,20 @@ if arguments.csv:
         and (name2, name1) in seen and seen[(name2, name1)] >= 2:
             print name1, name2, dist, latency, test_point
 else:
+    output_file = open("results.pickle", "wb")
+    results = []
     for r in cur:
-        id, timestamp, name1, name2, target1, target2, start, end, pings, address, test_point, success = r
-        print 'Date of Measurement', pickle.loads(timestamp)
-        print 'Target1:', name1, pickle.loads(target1)
-        print 'Target2:', name2, pickle.loads(target2)
-        print 'Test Point:', test_point
-        print 'Response Address', pickle.loads(address)
-        print 'Start:', pickle.loads(start)
-        print 'End:', pickle.loads(end)
-        print 'Pings:', pickle.loads(pings)
-        print '---------------------------------'
+		results.append(r)
+        #id, timestamp, name1, name2, target1, target2, start, end, pings, address, test_point, success = r
+        # print 'Date of Measurement', pickle.loads(timestamp)
+        # print 'Target1:', name1, pickle.loads(target1)
+        # print 'Target2:', name2, pickle.loads(target2)
+        # print 'Test Point:', test_point
+        # print 'Response Address', pickle.loads(address)
+        # print 'Start:', pickle.loads(start)
+        # print 'End:', pickle.loads(end)
+        # print 'Pings:', pickle.loads(pings)
+        # print '---------------------------------'
     cur.close()
     cur = connection.cursor()
     cur.execute("""SELECT
@@ -98,3 +101,4 @@ else:
     percent = float(num_success)/float(num_fail+num_success)
     print 'Success %i, Fail %i, Success Rate %s' % (num_success, num_fail, "{0:.0f}%".format(percent * 100)) 
     cur.close()
+    pickle.dump(results, output_file)
