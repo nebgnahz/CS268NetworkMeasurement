@@ -26,7 +26,6 @@ for r in results:
     and dist > 0 \
     and target1[1] == address[0] \
     and latency > (dist/3.0/100000) \
-    and len(filter(lambda x: x.total_seconds()/latency > 1.2, pings)) != 0 \
     and latency < 5:
         seen[(name1, name2)].append((dist, latency, test_point, timestamp))
 
