@@ -1,6 +1,5 @@
-import string, subprocess, sys
-sys.path.insert(0, '../king')
-from utilities import threaded_map
+import string, subprocess
+from multiprocessing import Pool
 
 pl_hosts = [line.split(' ')[0] for line in map(string.strip,open('../king/pl-host-list-geo').readlines())]
 
@@ -19,4 +18,5 @@ def get_db(host):
     subprocess.call(cp)
     subprocess.call(rsync, shell=True)
 
-map(get_db, pl_hosts)
+p = Pool(10)
+p.map(get_db, pl_hosts)
