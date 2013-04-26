@@ -8,8 +8,8 @@ from utilities import outputException, distance
 round_length = 20
 time_limit = 110.0
 
-num_processes = 100
-num_threads = 40
+num_processes = 90
+num_threads = 30
 
 all_dns = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=0))
 open_resolvers = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port=6379, db=1))
