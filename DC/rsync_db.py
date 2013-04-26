@@ -10,7 +10,7 @@ def get_db(host):
           "-o UserKnownHostsFile=/dev/null", "ucb_268_measure@%s" % host,
           "sudo cp /root/%s ~/" % file_name]
 
-    rsync = 'rsync -a -v -e ssh -z --progress ucb_268_measure@%s:%s .' % (host, file_name)
+    rsync = 'rsync -a -v -e ssh -z --progress --partial ucb_268_measure@%s:%s .' % (host, file_name)
 
     print cp
     print rsync
