@@ -40,7 +40,7 @@ for r in results:
             zero_dist += 1
         if target1[1] != address[0]:
             forwarder_present += 1
-        if latency > (dist/2.0/100000):
+        if latency < (dist/2.0/100000):
             faster_than_light += 1
         if latency >= 5:
             greater_than_5 += 1
@@ -62,9 +62,9 @@ for name1, name2 in seen.keys():
             else:
                 print name1, name2, dist, latency, test_point
 
-print "total", total
-print "negative_latency", negative_latency
-print "zero_dist", zero_dist
-print "forwarder_present", forwarder_present
-print "faster_than_light", faster_than_light
-print "greater_than_5", greater_than_5
+print >> sys.stderr, "total", total
+print >> sys.stderr, "negative_latency", negative_latency
+print >> sys.stderr, "zero_dist", zero_dist
+print >> sys.stderr, "forwarder_present", forwarder_present
+print >> sys.stderr, "faster_than_light", faster_than_light
+print >> sys.stderr, "greater_than_5", greater_than_5
