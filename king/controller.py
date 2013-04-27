@@ -5,6 +5,12 @@ from datetime import datetime, timedelta
 from PlanetLabNode import PlanetLabNode
 from utilities import outputException, distance
 
+import argparse
+parser = argparse.ArgumentParser(description='Tking Controller')
+parser.add_argument('--max', default=None, type=int, help='Set a Maximum Distance between targets')
+parser.add_argument('--min', default=0, type=int, help='Set a Minimum Distance between targets')
+args = parser.parse_args()
+
 round_length = 20
 time_limit = 110.0
 
@@ -84,7 +90,15 @@ def perProcess():
         threads.append(t)
 
     for i in range(round_length):
-        t1, t2 = select_random_points()
+        while True:
+            t1, t2 = select_random_points()
+            dist = distance(t1[2], t2[2])
+            if args.max and dist > args.max:
+                continue
+            elif dist <= args.min:
+                continue
+            else:
+                break
         closest_nodes1 = closestNodes(t1)
         closest_nodes2 = closestNodes(t2)
         for node in closest_nodes1:
