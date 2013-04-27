@@ -67,9 +67,8 @@ def threaded_map(func, data, timeout=None):
     return result
 ## end of http://code.activestate.com/recipes/577360/ }}}
 
-import rpyc, traceback
-
 def outputException(e):
+    import rpyc, traceback
     try:
         return
         if type(e) is rpyc.core.async.AsyncResultTimeout:
