@@ -7,7 +7,7 @@ print '<kml xmlns="http://earth.google.com/kml/2.2">'
 print '    <Document>'
 print '       <Folder>'
 
-for log, lat in pl_hosts:
+for lat, log in pl_hosts:
     print "<Placemark><Point><coordinates>"
     print log, ',', lat, ', 0'
     print "</coordinates></Point></Placemark>"
