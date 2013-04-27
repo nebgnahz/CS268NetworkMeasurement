@@ -2,6 +2,8 @@ import cPickle as pickle
 from collections import defaultdict
 from utilities import distance
 
+import sys
+
 input_file = open('results.pickle', 'r')
 
 results = pickle.load(input_file)
@@ -18,6 +20,7 @@ greater_than_5 = 0
 for r in results:
     try:
         total += 1
+        print >> sys.stderr, total
         id, timestamp, name1, name2, target1, target2, start, end, pings, address, test_point, success = r
         timestamp =  pickle.loads(timestamp)
         target1 = pickle.loads(target1)
@@ -35,7 +38,7 @@ for r in results:
             negative_latency += 1
         if dist <= 0:
             zero_dist += 1
-        if target[1] != address[0]:
+        if target1[1] != address[0]:
             forwarder_present += 1
         if latency > (dist/2.0/100000):
             faster_than_light += 1
@@ -47,7 +50,8 @@ for r in results:
         and target1[1] == address[0] \
         and latency > (dist/2.0/100000):
             seen[(name1, name2)].append((dist, latency, test_point, timestamp))
-    except:
+    except Exception, e:
+        print >> sys.stderr, e
         continue
 
 for name1, name2 in seen.keys():
