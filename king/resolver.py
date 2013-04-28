@@ -4,6 +4,7 @@ input_file = open('results.pickle', 'r')
 results = pickle.load(input_file)
 
 forwarder_present = 0
+seen = {}
 
 for r in results:
     try:
@@ -16,11 +17,13 @@ for r in results:
         end = pickle.loads(end)
         pings = pickle.loads(pings)
 
-        if target1[1] != address[0]  target1[2]:
+        if target1[1] != address[0]:
             forwarder_present += 1
-        if forwarder_present == 10:
+            seen[target1] = address
+        if len(seen.keys()) == 10:
             break
-        print target1, address
     except Exception, e:
         print e
-        continue
+
+for key, value in seen.items():
+    print key, value
