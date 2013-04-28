@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.2">
+    <Document>
+       <Folder>
+<Placemark><LineString><coordinates>
+9.0 , 51.0 , 0
+13.4 , 52.5167 , 0
+</coordinates></LineString></Placemark>
+<Placemark><LineString><coordinates>
+19.9167 , 50.0833 , 0
+19.9167 , 50.0833 , 0
+</coordinates></LineString></Placemark>
+<Placemark><LineString><coordinates>
+20.0 , 52.0 , 0
+21.01178 , 52.22977 , 0
+</coordinates></LineString></Placemark>
+<Placemark><LineString><coordinates>
+-74.3124 , 40.6224 , 0
+-74.4637 , 40.5516 , 0
+</coordinates></LineString></Placemark>
+<Placemark><LineString><coordinates>
+-79.4167 , 43.6667 , 0
+-113.64258 , 60.10867 , 0
+</coordinates></LineString></Placemark>
+<Placemark><LineString><coordinates>
+-55.0 , -10.0 , 0
+-53.5667 , -26.75 , 0
+</coordinates></LineString></Placemark>
+<Placemark><LineString><coordinates>
+15.0 , 62.0 , 0
+15 , 62 , 0
+</coordinates></LineString></Placemark>
+<Placemark><LineString><coordinates>
+-55.0 , -10.0 , 0
+-46.63611 , -23.5475 , 0
+</coordinates></LineString></Placemark>
+<Placemark><LineString><coordinates>
+5.75 , 52.5 , 0
+4.88969 , 52.37403 , 0
+</coordinates></LineString></Placemark>
+<Placemark><LineString><coordinates>
+-79.977 , 40.4426 , 0
+-79.977 , 40.4426 , 0
+</coordinates></LineString></Placemark>
+        </Folder>
+    </Document>
+</kml>
