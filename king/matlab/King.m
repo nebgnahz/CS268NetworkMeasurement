@@ -3,6 +3,11 @@ clear all; close all; clc;
 load dist_king.mat
 [dist, I] = sort(dist_raw);
 latency = latency_raw(I);
+
+% filtering
+dist = dist(latency<5);
+latency = latency(latency<5);
+
 step = 1000;
 
 size = floor(length(dist)/step);
@@ -32,7 +37,7 @@ subplot(2, 1, 1)
 h = bar(x, mean_v);
 set(h(1),'facecolor','red') % use color name
 hold all;
-plot(x, x/3/100000);
+plot(x, x/2/100000, '-g');
 xlim([0 20000])
 errorbar(x, mean_v, std_v(1:end, 1), std_v(1:end, 2), '.');
 subplot(2, 1, 2)
