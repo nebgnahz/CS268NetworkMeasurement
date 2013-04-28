@@ -55,21 +55,21 @@ def extract(db_name):
 
 def process(r):
     output = StringIO()
-    print >> output, r.query,
-    print >> output, r.index,
-    print >> output, r.return_ip,
-    print >> output, r.queryTime.total_seconds(),
+    print >> output, r.query, ',',
+    print >> output, r.index, ',',
+    print >> output, r.return_ip, ',',
+    print >> output, r.queryTime.total_seconds(), ',',
     if not r.googleTime:
-        print >> output, '-1',
+        print >> output, '-1', ',',
     else:
-        print >> output, r.googleTime.total_seconds(),
+        print >> output, r.googleTime.total_seconds(), ',',
 
     if not r.pingTime:
-        print >> output, '-1',
+        print >> output, '-1', ',',
     else:
         print >> output, min(r.pingTime).total_seconds(),
 
     return output.getvalue()
 
-p = Pool(3)
+p = Pool(20)
 p.map(extract, files)
