@@ -21,7 +21,8 @@ parser.add_argument('--hop_stat', action='store_true', default=False, help='Outp
 parser.add_argument('--hop_delay', action='store_true', default=False, help='Output all delays')
 parser.add_argument('--att_exit', action='store_true', default=False, help='Detect the exit point of ATT exit')
 parser.add_argument('--dst_dump', action='store_true', default=False, help='Detect the exit point of ATT exit')
-parser.add_argument('--route_flaps', action='store_true', default=False, help='Detect the exit point of ATT exit')
+parser.add_argument('--route_flaps', action='store_true', default=False, help='Count the amount of routing flaps')
+parser.add_argument('--ad_hoc', action='store_true', default=False, help='some add hoc implementation')
 
 
 arguments = parser.parse_args()
@@ -51,7 +52,7 @@ class Trace(Base):
     self.radio_type = radio_type
     self.current_dst = current_dst
     self.hop_n = hop_n
-    self.hop_ASN = hop_ASN 
+    self.hop_ASN = hop_ASN
     self.hop_hostname = hop_hostname
     self.hop_ip = hop_ip
     self.delay = delay
@@ -198,11 +199,11 @@ if __name__=='__main__':
     for r in q.all():
       host_name, host_ip = r.current_dst
       all_dst[host_name].append(host_ip)
-
     for key in all_dst:
       if len(all_dst[key]) == 1:
         print key, ',', all_dst[key][0]
     pickle.dump(all_dst, open( "traceroutedst.p", "wb" ))
+
   elif arguments.route_flaps:
     # given a dst, and a specific hop, count the flaps in
     hop_flaps = defaultdict(set)
@@ -222,4 +223,45 @@ if __name__=='__main__':
     
     for key in flaps_count:
       print 'd%d=' % key, flaps_count[key], ';'
+  
+  elif arguments.att_exit:
+    # python tracerouteParse.py --att_exit > dst_exit.csv
+    # count the first hop that isn't belonging to ATT AS7018/AS0
+    q = s.query(Trace.current_dst, Trace.logTime, Trace.hop_n, Trace.hop_ip, Trace.hop_ASN).\
+          filter(Trace.radio_type=='LTE').\
+          order_by(Trace.hop_n)
+    exit_points = defaultdict(list)
+    att_set = set([0, 7018])
+    for r in q.all():
+      name, ip = r.current_dst
+      if r.hop_ASN not in att_set \
+          and r.hop_n > 3 \
+          and r.hop_ip is not None:
+        if not exit_points[r.current_dst]:
+          exit_points[r.current_dst].append((r.hop_n, r.hop_ASN, r.hop_ip))
 
+    print "dst, exit"
+
+    pickle.dump(exit_points, open("dst_exit.p", "wb"))
+    
+    for key in exit_points:
+      name, dst_ip = key
+      n, asn, ip = exit_points[key][0]
+            
+      # print '%d, ' % n,
+      print "%s, %s" % (dst_ip, ip)
+      
+    # I have selected 
+    # NY_set = set(["64.145.94.19", "208.64.111.142", "209.196.216.50", "69.60.7.199", "165.1.125.44", "207.241.148.80", "161.221.89.118", "129.228.25.181", "208.93.170.15", "107.6.107.204", "63.240.8.32", "67.214.157.20", "209.81.86.122", "206.220.43.92", "74.113.188.100", "206.220.43.92", "199.59.243.105", "173.231.134.18"])
+    # for hop 9, it turns out that there are still 19 different IPs along the path
+
+  elif arguments.ad_hoc:
+    q = s.query(Trace).\
+          filter(Trace.radio_type=='LTE')
+    for r in q.all():
+      name, ip = r.current_dst
+      if ip == "70.42.185.10":
+        print datetime.datetime(*r.logTime[:6]), r.rssi, r.radio_type, r.current_dst, r.hop_n, r.hop_ASN, r.hop_hostname, r.hop_ip, r.delay
+
+
+    # an interesting path 70.42.185.10
