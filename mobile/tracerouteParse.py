@@ -27,7 +27,7 @@ parser.add_argument('--ad_hoc', action='store_true', default=False, help='some a
 
 arguments = parser.parse_args()
 
-db_name = 'traceroute.db'
+db_name = '../CS268Data/logs/traceroute.db'
 engine = create_engine('sqlite:///' + db_name, echo=False)
 Base = declarative_base(bind=engine)
 
@@ -170,8 +170,8 @@ if __name__=='__main__':
     for i in range(1, 14):
       if arguments.hop_delay:
         print "d%d" % i, '= [',
-      q = s.query(Trace.delay, Trace.hop_ip, Trace.hop_ASN).\
-          filter(Trace.hop_n==i, Trace.radio_type=='LTE')
+      q = s.query(Trace.delay, Trace.hop_ip, Trace.hop_ASN, Trace.radio_type).\
+          filter(Trace.hop_n==i)
       # print q.count()
       for r in q.all():
         hop_ipNum[i-1][(r.hop_ASN, r.hop_ip)] += 13
@@ -179,7 +179,8 @@ if __name__=='__main__':
           hop_None[i-1] += 1
         else:
           if arguments.hop_delay:
-            print r.delay,
+            if r.radio_type is None:
+              print r.delay,
           pass
       if arguments.hop_delay:
         print '];'
