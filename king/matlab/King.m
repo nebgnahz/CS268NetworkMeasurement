@@ -16,7 +16,7 @@ num_bin = floor(max(dist)/step);
 x = (1:num_bin).*step;
 
 min_prc = 5;
-max_prc = 80;
+max_prc = 95;
 
 mean_v = zeros(num_bin, 1);
 num_v = zeros(num_bin, 1);
@@ -30,18 +30,37 @@ for i=1:num_bin
     std_v(i, :) = prctile(data, [min_prc max_prc]);
 end
 
-
+%%
 figure(1);
 box on;
-subplot(2, 1, 1)
+f = subplot(2, 1, 1);
 h = bar(x, mean_v);
 set(h(1),'facecolor','red') % use color name
 hold all;
-plot(x, x/2/100000, '-g');
+xlabel('distance (km)');
+ylabel('latency (second)');
+
+plot(x, x/2/100000, '-gs','LineWidth',2);
 xlim([0 20000])
 errorbar(x, mean_v, std_v(1:end, 1), std_v(1:end, 2), '.');
-subplot(2, 1, 2)
+
+%# make all text in the figure to size 14 and bold
+set(gca,'FontSize',16,'fontWeight','bold')
+set(findall(f,'type','text'),'fontSize',18,'fontWeight','bold')
+title('latency vs. distance');
+
+legend('average latency', 'speed-of-light limit');
+
+f = subplot(2, 1, 2);
 bar(x, num_v);
 xlim([0 20000])
+xlabel('distance (km)');
+ylabel('count');
+title('distribution of distances');
+
+%# make all text in the figure to size 14 and bold
+set(gca,'FontSize',16,'fontWeight','bold')
+set(findall(f,'type','text'),'fontSize',18,'fontWeight','bold')
+
 
 
