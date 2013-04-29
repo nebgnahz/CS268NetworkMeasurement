@@ -8,8 +8,8 @@ from sqlalchemy import Column, Integer, PickleType
 from sqlalchemy.ext.declarative import declarative_base
 
 
-files = [f for f in os.listdir('.') if os.path.isfile(f)]
-files = filter(lambda f: f.endswith('.db'),files)
+files = ['../CS268Data/' + f for f in os.listdir('../CS268Data') if os.path.isfile(f) and f.endswith('.db')]
+print files
 
 counter = Value('i', 0)
 
@@ -71,5 +71,5 @@ def process(r):
 
     return output.getvalue()
 
-p = Pool(20)
+p = Pool(3)
 p.map(extract, files)
