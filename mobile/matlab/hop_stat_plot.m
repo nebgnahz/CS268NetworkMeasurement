@@ -1,4 +1,5 @@
 % clear all; close all; clc;
+% draw those with None responds
 load hop_stat_SFO.mat;
 
 max_hop = 13;
@@ -9,10 +10,11 @@ for i=1:max_hop
     nonzero_count(i) = sum(count(ASN~=-1 & hop==i));
 end
 bar(1:max_hop, [zero_count, nonzero_count]);
+
 %%
 % filter out ip None data
 % clear all; close all; clc;
-load hop_stat_SFO.mat;
+load hop_stat_LTE.mat;
 
 count = count(ASN~=-1);
 hop = hop(ASN~=-1);
