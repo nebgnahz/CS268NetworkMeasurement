@@ -8,7 +8,7 @@ from sqlalchemy import Column, Integer, PickleType
 from sqlalchemy.ext.declarative import declarative_base
 
 
-files = ['../CS268Data/' + f for f in os.listdir('../CS268Data') if os.path.isfile(f) and f.endswith('.db')]
+files = ['../CS268Data/' + f for f in os.listdir('../CS268Data') if os.path.isfile('../CS268Data/'+ f) and f.endswith('.db')]
 print files
 
 counter = Value('i', 0)
