@@ -1,4 +1,4 @@
-import os, operator
+import datetime, os, operator
 
 from StringIO import StringIO
 from multiprocessing import Pool, Value
@@ -67,7 +67,7 @@ def process(r):
     if not r.pingTime:
         print >> output, '-1', ',',
     else:
-        print >> output, min(r.pingTime).total_seconds(), ',',
+        print >> output, sum(r.pingTime, datetime.timedelta(0)).total_seconds()/len(r.pingTime) , ',',
 
     if len(r.query) == 32:
         print >> output, '1',
