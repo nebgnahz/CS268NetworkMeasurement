@@ -63,4 +63,14 @@ set(gca,'FontSize',16,'fontWeight','bold')
 set(findall(f,'type','text'),'fontSize',18,'fontWeight','bold')
 
 
-
+% Linear model Poly1:
+%      f(x) = p1*x + p2
+% Coefficients (with 95% confidence bounds):
+%        p1 =   1.798e-05  (1.604e-05, 1.992e-05)
+%        p2 =      0.2326  (0.2104, 0.2547)
+% 
+% Goodness of fit:
+%   SSE: 0.008216
+%   R-square: 0.9573
+%   Adjusted R-square: 0.9548
+%   RMSE: 0.02198
