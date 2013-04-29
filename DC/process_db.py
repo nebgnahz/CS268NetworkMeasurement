@@ -70,9 +70,9 @@ def process(r):
         print >> output, min(r.pingTime).total_seconds(), ',',
 
     if len(r.query) == 32:
-        print >> output, '1'
+        print >> output, '1',
     else:
-        print >> output, '0'
+        print >> output, '0',
 
     return output.getvalue()
 
