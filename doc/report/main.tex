@@ -1,3 +1,4 @@
+
 \documentclass{sig-alternate}
 
 \usepackage{times}
@@ -15,8 +16,7 @@
 \usepackage{url}         %
 
 \hypersetup{%
-pdftitle={Your Title}, pdfauthor={Your Authors}, pdfkeywords={your
-keywords}, bookmarksnumbered, pdfstartview={FitH}, colorlinks,
+pdftitle={An Internet Latency Measurement Study}, pdfauthor={Ben Zhang, Ahir Reddy}, pdfkeywords={Internet, Latency, Measurement}, bookmarksnumbered, pdfstartview={FitH}, colorlinks,
 citecolor=black, filecolor=black, linkcolor=black, urlcolor=black,
 breaklinks=true,}
 
@@ -57,7 +57,7 @@ breaklinks=true,}
 \setlength{\pdfpageheight}{\paperheight}
 \setlength{\pdfpagewidth}{\paperwidth}
 
-\title{Internet Measurement Project Proposal}
+\title{Measurements and Analysis of Internet}
 
 \author{
 {Ben Zhang, Ahir Reddy}\\
@@ -68,11 +68,13 @@ breaklinks=true,}
 
 \maketitle
 
-% \begin{abstract}
-
+\begin{abstract}
 % Abstract for measurement project.
+Understanding the state-of-art Internet performance and locating the bottle-neck is critical to both academic research and industrial systems. Though various metrics (connectivity, available Bandwidth, etc.) are to be evaluated, in this project, we focus on the latency of current Internet (as time of year 2013) -- including Wide Area Network (WAN), Data Center, and Celullar Networks. 
 
-% \end{abstract}
+We employed King/T-King method proposed in the literature to measure the latency between two arbitrary hosts in the Internet. The correlation of latency with geographical information identifies the gap between existing network performance and speed-of-light limit. Such data serves as the starting point of analyzing wide area network performance. With increasing demand of putting service into the cloud, the latency experienced by end-user is not only depending on the WAN, but also the data center performance. We choose Google Search as a case study to understand the composition of time in typical query conversations. The third study we did is about celullar networks, specifically about the latest 4G-LTE network in Bay Area deployed by AT\&T. We used {\it traceroute} to test the latency of this new flat IP architecture in LTE networks. And the data suggests fairly good traffic engineering work within AT\&T's celular backbone.
+
+\end{abstract}
 
 %\category{C.2.1}{Computer-Communication Networks}{Network Architecture and Design}[Wireless communication]
 %\keywords{Collection, CTP, Sensor Network, Routing}

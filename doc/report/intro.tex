@@ -1,7 +1,22 @@
 \section{Introduction}
 \label{sec:introduction}
 
-The measurement of Internet has become increasingly important and challenging due to its complexity, large-scale and variability. A numbers of tools have been proposed to accomplish this task (see Sec.\,\ref{sec:related-work} for a complete review). In this project, our primary goal is not to introduce a novel network measurement tool; instead, we adapt existing measurement techniques to characterize the performance of current Internet. We base our work on previous investigations, and try to elucidate the changes in measurement strategies and outcomes. Specifically, the cloud computing service model and mobile computing have re-shaped the Internet in unanticipated ways. The impact of these new models on end-to-end latency and measurement techniques have never been formally studied. We propose the questions listed bellow as motivations for our study.
+% why do measurement
+The measurement of Internet has become increasingly important and challenging due to its complexity, large-scale, heterogeneity and variability. 
+
+% why do latency
+
+% split up to three parts
+Our work has three distinct part: the latency of WAN, the latency experienced by end-user when doing DC related service, and the latency within cellular networks.
+
+The first measurement tries to understand how the latency of the WAN is related to the geo-location. The traditional model used to calculate the latency between end-hosts is to sum propagation delay, transmission delay, queuing delay and processing delay. The propogation delay is is determined the by the length of cables (if wired network), and will have the lower bound, which we will refer to speed-of-light limit in this paper. The transmission delay and processing delay depend on the speed of router/switch and the size of the packet, and they are generally getting smaller and smaller. Queuing delay has a lot of variation depending on the traffic load, and in worst case, it even leads to packet drop. So the question we were asking is, given the recent development of hardware and software, what is the state-of-art latency performance in comparison with the speed-of-light limit? And if there is a huge gap in between, which constitute the major portion? 
+
+
+% summarize the contribution
+
+% rest of the paper
+
+A numbers of tools have been proposed to accomplish this task (see Sec.\,\ref{sec:related-work} for a complete review). In this project, our primary goal is not to introduce a novel network measurement tool; instead, we adapt existing measurement techniques to characterize the performance of current Internet. We base our work on previous investigations, and try to elucidate the changes in measurement strategies and outcomes. Specifically, the cloud computing service model and mobile computing have re-shaped the Internet in unanticipated ways. The impact of these new models on end-to-end latency and measurement techniques have never been formally studied. We propose the questions listed bellow as motivations for our study.
 
 \begin{itemize}
 \item How does network latency vary among different kinds of end hosts -- generic end users(including mobile/wireless end hosts), regular web servers, and cloud service from data centers?
