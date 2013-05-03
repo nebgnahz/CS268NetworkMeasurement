@@ -2,47 +2,27 @@
 \label{sec:introduction}
 
 % why do measurement
-The measurement of Internet has become increasingly important and challenging due to its complexity, large-scale, heterogeneity and variability. 
-
-% why do latency
+The measurement of Internet has become increasingly challenging due to its complexity, large-scale, heterogeneity and variability. However, the importance is also increasing since the understanding of how the Internet architecture performs will provide insight to design a better solution, either incrementally deployable or clean slate design. Depending on figure of interest, there exist many metrics to characterize the performance -- connectivity, available Bandwidth, latency, throughput. And various tools have been proposed to conduct these measurements (see Sec.\,\ref{sec:related-work} for a complete review). This work is not targeted to introduce any new tools for people to conduct measurements. Instead, we base our work on many existing tools and available infrastructure. Though we will discuss our methodology, we focus more on the analysis of the data throughout this report.
 
 % split up to three parts
-Our work has three distinct part: the latency of WAN, the latency experienced by end-user when doing DC related service, and the latency within cellular networks.
+In short, Our work has three distinct part: the latency of WAN, the latency experienced by end-user when doing DC related service, and the latency within cellular networks.
 
-The first measurement tries to understand how the latency of the WAN is related to the geo-location. The traditional model used to calculate the latency between end-hosts is to sum propagation delay, transmission delay, queuing delay and processing delay. The propogation delay is is determined the by the length of cables (if wired network), and will have the lower bound, which we will refer to speed-of-light limit in this paper. The transmission delay and processing delay depend on the speed of router/switch and the size of the packet, and they are generally getting smaller and smaller. Queuing delay has a lot of variation depending on the traffic load, and in worst case, it even leads to packet drop. So the question we were asking is, given the recent development of hardware and software, what is the state-of-art latency performance in comparison with the speed-of-light limit? And if there is a huge gap in between, which constitute the major portion? 
+The first measurement tries to understand how the latency of the WAN is related to the geo-location. The traditional model used to calculate the latency between end-hosts is to sum propagation delay, transmission delay, queuing delay and processing delay \cite{kurose2001computer}. The propogation delay is is determined the by the length of cables (if wired network), and will have the lower bound, which we will refer to speed-of-light limit in this paper. The transmission delay and processing delay depend on the speed of router/switch and the size of the packet, and they are generally getting smaller and smaller. Queuing delay has a lot of variation depending on the traffic load, and in worst case, it even leads to packet drop. So the question we were asking is, given the recent development of hardware and software, what is the state-of-art latency performance in comparison with the speed-of-light limit? And if there is a huge gap in between, which delay constitutes the major portion? To answer these questions, we adopted King/T-King \cite{gummadi2002king, leonard2008turbo} methods and employed PlanetLab \cite{chun2003planetlab} to perform this measurement globally. For a continuous study spanning 20 days, we've obtained 5 million measurements for analysis.
 
+For the second measurement involved with cloud service. We choose to perform the study over Google Search due to its popularity and its requirements of delivering timely response for end-users. Also one thing that motivates us of using Google Search is that every return page from Google includes an estimated time which they use to generate the query results. By inspecting the TCP trace of a query conversation, we found out that this estimated time is fairly accurate to reflect the time portion within Google Data Center. Since each transaction involves several rounds of data transmission, the round-trip time (RTT) will influence the overall query time. We extract Google's IP address from the {\it tcpdump} and use {\it ping} to measure the network latency. By examining this data from various vantage points, we would like to partition the latency and provide insights for network optimizations.
+
+The third part is about mobile networks, especially the ever increasing 4G-LTE deployment. By adopting flat IP architecture, carriers promise to reduce the network latency and decouple radio access from core network evolution. To figure out the real performance, we use {\it traceroute} to examine the latency on each hop and the routing stability within celullar backbone. 
 
 % summarize the contribution
-
-% rest of the paper
-
-A numbers of tools have been proposed to accomplish this task (see Sec.\,\ref{sec:related-work} for a complete review). In this project, our primary goal is not to introduce a novel network measurement tool; instead, we adapt existing measurement techniques to characterize the performance of current Internet. We base our work on previous investigations, and try to elucidate the changes in measurement strategies and outcomes. Specifically, the cloud computing service model and mobile computing have re-shaped the Internet in unanticipated ways. The impact of these new models on end-to-end latency and measurement techniques have never been formally studied. We propose the questions listed bellow as motivations for our study.
-
+To summarize, we made the following contribution in this measurement work
 \begin{itemize}
-\item How does network latency vary among different kinds of end hosts -- generic end users(including mobile/wireless end hosts), regular web servers, and cloud service from data centers?
-\item How current Internet latency performs in comparison to the speed-of-light limit?
-\item How wide-area networks and data centers contribute to end-to-end latency experienced by end users?
-\item How latency is affected by edge caching of content, especially on mobile networks?
-\item What are the characteristics of time-series analysis for latency on a daily/weekly/yearly basis?
+\item We present a state-of-art Internet latency performance study by conducting a series of experiments in various contexts. We also publicize all the traces.
+\item We analyze the data and compare them to figure out where the bottleneck is in current Internet.
 \end{itemize}
 
-Our initial approach will consist of re-implementing and re-producing previous measurement works in the context of current Internet, following the guidelines outlined in \cite{paxson2004strategies}. One major strategy we intend to re-implement is King \cite{gummadi2002king}, a technique which leverages the DNS infrastructure to measure end-to-end latency of arbitrary end hosts. To guarantee deliverables, we have a outlined an initial timetable for our study below (see Table.\,\ref{tab:plan}).
+% rest of the paper
+In the rest of this paper, we will first describe the related works in Sec.\,\ref{sec:related-work}. And then detail our measure methodology in Sec.\,\ref{sec:methodology}. The experiment setup is in Sec.\,\ref{sec:experiment}, which is followed by the analysis of the data in Sec.\,\ref{sec:analysis}. We then briefly discuss a few questions regarding our measurements in Sec.\,\ref{sec:discussion}. Sec.\,\ref{sec:conclusion} concludes the paper and discusses some of the future work.
 
-\begin{table}
-  \centering
-  \begin{tabular}{ c|p{4cm} }
-    \hline
-    Period & Task \\
-    \hline
-    Late Feburary & Literature review \\
-    March & Re-implementation and initial measurements \\
-    April & Revision/correction of any possible methodology flaws \\
-    Early May & Wrap up and report \\ 
-    \hline
-  \end{tabular}
-  \label{tab:plan}
-  \caption{timeline for project}
-\end{table}
 
 %%% Local Variables: 
 %%% mode: latex

@@ -4,15 +4,31 @@
 %% Describe related work here.
 % the following related works are more from end-host perspective.
 
-In this section we will review the possible tools and methodologies that we hope will prove valuable for our projects.
+\subsection{Tools and Infrastructures}
+\label{sec:tools}
 
-There are a number of existing tools for Internet measurement; they primarily differ in the network characteristics they measure. To name a few, {\em ping} is the popular tool used to test reachability and measure round-trip time (RTT). {\em traceroute} \cite{jacobson1989traceroute} and {\em tcptraceroute} \cite{toren2001tcptraceroute} reveal the routing path as well as the RTT. King \cite{gummadi2002king} measures the end-to-end latency using recursive DNS queries. {\em pathchar} \cite{jacobson1997pathchar} measures the hop-by-hop bandwidth and \cite{jain2002pathload} reports the available bandwidth of a path. \cite{paxson2002experiences} provides dedicated hardware for measurements, only affiliated  users can access. Therefore in \cite{spring2003scriptroute}, Spring {\em et al.}\, seeks to build a generic platform for ordinary users to conduct measurements from remote vantage points.
+There are a number of existing tools for Internet measurement; they primarily differ in the network characteristics they measure. To name a few, {\em ping} is the popular tool used to test reachability and measure RTT. {\em traceroute} \cite{jacobson1989traceroute} and {\em tcptraceroute} \cite{toren2001tcptraceroute} reveal the routing path as well as the RTT. King \cite{gummadi2002king} measures the end-to-end latency using recursive DNS queries. To increase the accuracy, one enhanced version -- Turbo King (T-King \cite{leonard2008turbo}) -- is proposed. {\em pathchar} \cite{jacobson1997pathchar} measures the hop-by-hop bandwidth and \cite{jain2002pathload} reports the available bandwidth of a path. \cite{paxson2002experiences} provides dedicated hardware for measurements, only affiliated  users can access. Therefore in \cite{spring2003scriptroute}, Spring {\em et al.}\, seeks to build a generic platform for ordinary users to conduct measurements from remote vantage points.
 
-On top of these tools, many large Internet monitoring projects (such as pingER \cite{matthews2000pinger}) have been built. Furthermore, researchers are also trying to infer Internet performance and security \cite{paxson1999bro} based on measurement results (\cite{downey1999using} utilized {\em pathchar} tool to estimate Internet link characteristics).
+On top of these tools, many large Internet monitoring projects (such as pingER \cite{matthews2000pinger}, iPlane \cite{madhyastha2006iplane}) have been built. Numbers of infrastructures that serves as experimental testbed are also available to conduct large scale measurement. Among them, GENI \cite{elliott2008geni} and PlanetLab \cite{chun2003planetlab} are two active project in U.S.  
 
-With the advent of cloud computing and mobile computing, it becomes important to characterize their performance. \cite{kandula2009nature, benson2010network} analyzes traffic patterns in data center, and \cite{huang2011mobiperf} is an ongoing project in measuring mobile end-host network performance.
+% Furthermore, researchers are also trying to infer Internet performance and security \cite{paxson1999bro} based on measurement results (\cite{downey1999using} utilized {\em pathchar} tool to estimate Internet link characteristics). 
 
-Vern Paxson's work in \cite{paxson1997measurements, paxson1997end, paxson2004strategies} serves as guidelines in our design and implementation of all measurement experiements.
+In our measurement study, we are not adding new weapons to this armory. We use these existing tools King/T-King, {\it traceroute}, {\it ping}, and research-oriented infrastructure PlanetLab.
+
+\subsection{Measurements}
+\label{sec:measurements}
+
+With the advent of cloud computing and mobile computing, it becomes important to characterize their performance. 
+
+\cite{benson2010network, kandula2009nature} analyzes traffic patterns in data center. These measurement results help people who don't have access to Data Center to understand operational data center traffic nature, and guide many system designs (such as in VL2 \cite{greenberg2009vl2}, the validation of Valient Load Balancing on flow level is based on the small flow traffic pattern inside their DC). Our measurement is not to address the latency within data center. Instead, we start from the experience of end users, and tries to partition the latency of conversations with cloud-based services, Google Search specifically in our study. The motivation behind is such partition stems from several studies about application deadlines in DC \cite{wilson2011better}. By comparing the time portion in WAN and DC, we would like to know which constitute the major part that would affect end users' experience.
+
+For mobile networks, there are also a few works \cite{xu2011cellular, huang2011mobiperf} that tries to infer the networking condition by distributing their applications to a large number of people. These work provides insight on a larger scale, but seldom touch on the latency dynamics for a single user in a longer time period, where our measurement fills the hole. On the other side, most of our celullar network measurements are in 4G-LTE network, which reveals more of the recent development of celullar carrier.
+
+
+%\subsection{Measurement Methodologies}
+%\label{sec:meas-meth}
+
+% Early Vern Paxson's work in \cite{paxson1997measurements, paxson1997end, paxson2004strategies} serves as guidelines in our design and implementation of all measurement experiements.
 
 %%% Local Variables: 
 %%% mode: latex
