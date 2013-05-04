@@ -31,7 +31,7 @@ def perNode(node):
                 subprocess.call(["ssh", "-t", "-i", "~/.ssh/id_rsa", "-o StrictHostKeyChecking no",
                                  "-o UserKnownHostsFile=/dev/null", "-o ConnectTimeout=60", "ucb_268_measure@%s" % node.host,
                                  "sudo tking-server stop; sudo tking-server start;"],
-                                 stdout=FNULL, stderr=FNULL)
+                                 stdout=FNULL, stderr=FNULL, stdin=FNULL)
             except Exception, e:
                 pass
             continue
