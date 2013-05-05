@@ -4,14 +4,16 @@ load delay_hop.mat;
 hop_max = 11;
 min_prc = 5;
 max_prc = 95;
+prc = [5 95 99];
+
 x=1:hop_max;
 mean_v = zeros(hop_max, 1);
-std_v = zeros(hop_max, 2);
+std_v = zeros(hop_max, 3);
 for i=1:hop_max
     data = eval(genvarname(['d' sprintf('%d',i)]));
     % data = latency((i-1)*step+1:i*step);
     mean_v(i) = mean(data);
-    std_v(i, :) = prctile(data, [min_prc max_prc]);
+    std_v(i, :) = prctile(data, prc);
 end
 
 hold on;
@@ -20,7 +22,7 @@ f = subplot(2, 1, 1);
 h = bar(x, mean_v);
 % t = text(x, mean_v' + 0.01*max(mean_v'), num2str(mean_v, '%2.2f'),...
 %      'horiz','center','vert','bottom', 'BackgroundColor',[.7 .9 .7]);
-text(x, 250*ones(1, length(x)), num2str(mean_v, '%2.2f'),...
+text(x, 150*ones(1, length(x)), num2str(mean_v, '%2.2f'),...
       'horiz','center','vert','bottom');
 set(h(1),'facecolor','red') % use color name
 hold all;
@@ -31,7 +33,13 @@ hold all;
 % 
 % set(f,'XTickLabel', [index concat str])
 
-errorbar(x, mean_v, std_v(1:end, 1), std_v(1:end, 2), '.');
+% plot(x, std_v(1:end, 1), '-bv',...
+%      x, std_v(1:end, 2), '-rs', ...
+%      x, std_v(1:end, 3), '-g*',...
+%      'LineWidth', 2,...
+%      'MarkerSize',10);
+
+errorbar(x, mean_v, std_v(1:end, 1)-mean_v, std_v(1:end, 2)-mean_v, '.');
 xlabel('hop #');
 ylabel('latency statistics');
 title('latency using traceroute');
@@ -63,7 +71,7 @@ f = subplot(2, 1, 1);
 h = bar(x, mean_v);
 % t = text(x, mean_v' + 0.01*max(mean_v'), num2str(mean_v, '%2.2f'),...
 %      'horiz','center','vert','bottom', 'BackgroundColor',[.7 .9 .7]);
-text(x, 500*ones(1, length(x)), num2str(mean_v, '%2.2f'),...
+text(x, 450*ones(1, length(x)), num2str(mean_v, '%2.2f'),...
       'horiz','center','vert','bottom');
 set(h(1),'facecolor','red') % use color name
 hold all;
@@ -74,7 +82,7 @@ hold all;
 % 
 % set(f,'XTickLabel', [index concat str])
 
-errorbar(x, mean_v, std_v(1:end, 1), std_v(1:end, 2), '.');
+errorbar(x, mean_v, std_v(1:end, 1)-mean_v, std_v(1:end, 2)-mean_v, '.');
 xlabel('hop #');
 ylabel('latency statistics');
 title('latency using traceroute');
