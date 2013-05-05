@@ -4,7 +4,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, PickleType
 from sqlalchemy.ext.declarative import declarative_base
 
-db_name = os.getenv("HOME") + '/gQuery_' + socket.gethostname() + '.db'
+# db_name = '../CS268Data/gQuery_lsirextpc01.epfl.ch.db'
+db_name = '../CS268Data/gQuery_pl1.6test.edu.cn.db'
+#gQuery_dhcp-44-12.eecs.berkeley.edu.db'
+
 engine = create_engine('sqlite:///' + db_name, echo=False)
 
 Base = declarative_base(bind=engine)
@@ -33,16 +36,16 @@ class Query(Base):
 		self.tcpEntries = tcpEntries
 
 		
-
-q = s.query(Query)
-
-for r in q.all():
+for r in s.query(Query).yield_per(100):
 	print r.index
 	print r.query
 	print r.return_ip
 	print r.queryTime
 	print r.googleTime
+	print r.pingTime
+	for entry in r.tcpEntries:
+		print entry
 
-	print "------------------"
+	print "\n------------------"
 print "+++++++++++++++++++++++++++++++\n"
 print "record #:", q.count()	

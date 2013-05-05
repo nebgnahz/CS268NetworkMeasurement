@@ -42,7 +42,7 @@ ylabel('latency (second)');
 
 plot(x, x/2/100000, '-gs','LineWidth',2);
 xlim([0 20000])
-errorbar(x, mean_v, std_v(1:end, 1), std_v(1:end, 2), '.');
+errorbar(x, mean_v, std_v(1:end, 1)-mean_v, std_v(1:end, 2)-mean_v, '.');
 
 %# make all text in the figure to size 14 and bold
 set(gca,'FontSize',16,'fontWeight','bold')
@@ -56,7 +56,7 @@ bar(x, num_v);
 xlim([0 20000])
 xlabel('distance (km)');
 ylabel('count');
-title('distribution of distances');
+title('histogram of the distances between two DNS servers in our measurements');
 
 %# make all text in the figure to size 14 and bold
 set(gca,'FontSize',16,'fontWeight','bold')

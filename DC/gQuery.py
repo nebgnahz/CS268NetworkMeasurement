@@ -31,10 +31,13 @@ def google_scrape(query, interface):
 		# count time around this command
 		start_time = time.time()
 		page = urllib2.urlopen(request).read()
-		elapsed = time.time() - start_time
+		end_time = time.time()
+		print int(round(start_time * 1000)), int(round(end_time * 1000))
+		elapsed = end_time - start_time
 	except httplib.BadStatusLine:
 		print request
-				
+
+	print len(page)
 	logging.debug("time elapsed for google query: %f",  elapsed)
 
 	thread.join(10)
