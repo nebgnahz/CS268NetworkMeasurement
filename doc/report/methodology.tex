@@ -5,7 +5,11 @@ In this section, we will fully describe our approaches in conducting these laten
 
 \subsection{Latency in WAN}
 \label{sec:latency-wan}
-We base our measurement methodology on top of King \cite{gummadi2002king} and Turbo-King \cite{leonard2008turbo}, and the modified version that we are using is illustrated in Fig.\,\ref{fig:king_model}.
+We derive our measurement methodology from King \cite{gummadi2002king} and Turbo-King \cite{leonard2008turbo}, and developed a Turbo-King variant illustrated in Fig.\,\ref{fig:king_model}.
+
+The King method leverages DNS name-servers to make measurements that approximate latency between arbitrary end hosts. It utilizes properties of DNS to coerce recursive DNS resolvers into making outbound queries on behalf of measuring party. Turbo-King builds upon King by allowing for detection of DNS forwarders. DNS forwarders aggregate DNS queries within a network that target external DNS servers and can serve responses. The original King method has no means of detecting these servers, and as a result they may skew measurement results.
+
+Our methodology is composed of 4 elements, a measurement node, a central domain name server, and 2 target name servers. A measurement nodes is composed of a DNS client and server. A node accepts remote-procedure calls that specify 2 target DNS servers and returns both DNS latency measurements and multiple round trip time calculations to the first target server. The central domain name server simply refers incoming DNS requests to the originating measurement node. The 2 target name servers must have known locations and the first must be an open-recursive resolver.
 
 \begin{figure}
   \centering
@@ -13,6 +17,8 @@ We base our measurement methodology on top of King \cite{gummadi2002king} and Tu
   \caption{King/T-King method illustration}
   \label{fig:king_model}
 \end{figure}
+
+
 
 \subsection{Latency for DC conversations}
 \label{sec:latency-dc-conv}
