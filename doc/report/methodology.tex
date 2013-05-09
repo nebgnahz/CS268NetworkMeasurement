@@ -37,7 +37,14 @@ It is important to note that upon the first DNS request to the second target DNS
   \label{fig:king_model}
 \end{figure}
 
+\subsubsection{Reverse DNS Crawl}
+The Turbo-King methodology requires a large set of known open recursive name servers to generate latency measurements. An open recursive name server will respond to requests for any arbitrary domain from clients outside its AS. Only the first target name server must be an open resolver, the second server may be any DNS server that issues any response to external queries. To build a set of DNS servers, we performed a crawl of the reverse DNS tree.
 
+Reverse DNS requests take the form of requests for the ".in-addr.arpa" prefixed in reverse order with the octets of the IP to be resolved. Queries operate as normal DNS queries do, where in each octet is a sub-domain for which a DNS server is responsible for.
+At the first level of the DNS tree we issue a query to the "in-addr.arpa" domain for the first octet (1-255) and receive responses (start of authority, SOA, records) that indicate the servers responsible for the next level of the tree. We continue by issuing requests for the second octet (second.first.in-addr.arpa) to these servers, and we proceed similarly for the third octet. If we do not receive an SOA record skip further search down the tree that contains that prefix. At each step, we record any responses that indicate authoritative name servers. Thus, after a three level traversal we are left with a set of authoritative DNS servers.
+
+\subsubsection{Open Resolvers}
+Our methodology requires that the first DNS resolver be an open recursive resolver. To build this set, we leverage the service provided by the DNS Measurement Factory. By issuing a DNS query to the Measurement Factory name server it will check if that server is an open resolver and return the results.\cite{dnsfactory}
 
 \subsection{Latency for DC conversations}
 \label{sec:latency-dc-conv}
