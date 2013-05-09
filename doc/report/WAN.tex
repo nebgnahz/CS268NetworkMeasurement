@@ -4,6 +4,7 @@
 \subsection{Methodology}
 \label{sec:methodology}
 
+
 We derive our measurement methodology from King \cite{gummadi2002king} and Turbo-King \cite{leonard2008turbo}, and developed a Turbo-King variant illustrated in Fig.\,\ref{fig:king_model}. The King method leverages DNS name-servers to make measurements that approximate latency between arbitrary end hosts. It utilizes properties of DNS to coerce recursive DNS resolvers into making outbound queries on behalf of measuring party. Turbo-King builds upon King by allowing for detection of DNS forwarders. DNS forwarders aggregate DNS queries within a network that target external DNS servers and can serve responses. The original King method has no means of detecting these servers, and as a result they may skew measurement results.
 
 \subsubsection{Overview}
@@ -34,6 +35,23 @@ It is important to note that upon the first DNS request to the second target DNS
   \caption{King/T-King method illustration}
   \label{fig:king_model}
 \end{figure}
+
+\subsubsection{Reverse DNS Crawl}
+The Turbo-King methodology requires a large set of known open recursive name servers to generate latency measurements. An open recursive name server will respond to requests for any arbitrary domain from clients outside its AS. Only the first target name server must be an open resolver, the second server may be any DNS server that issues any response to external queries. To build a set of DNS servers, we performed a crawl of the reverse DNS tree.
+
+Reverse DNS requests take the form of requests for the ".in-addr.arpa" prefixed in reverse order with the octets of the IP to be resolved. Queries operate as normal DNS queries do, where in each octet is a sub-domain for which a DNS server is responsible for.
+At the first level of the DNS tree we issue a query to the "in-addr.arpa" domain for the first octet (1-255) and receive responses (start of authority, SOA, records) that indicate the servers responsible for the next level of the tree. We continue by issuing requests for the second octet (second.first.in-addr.arpa) to these servers, and we proceed similarly for the third octet. If we do not receive an SOA record skip further search down the tree that contains that prefix. At each step, we record any responses that indicate authoritative name servers. Thus, after a three level traversal we are left with a set of authoritative DNS servers. We implemented and deployed a multi-threaded crawler to Amazon EC2 that was able to complete a traversal on the order of 1 day.
+
+\subsubsection{Open Resolvers}
+Our methodology requires that the first DNS resolver be an open recursive resolver. To build this set, we leverage the service provided by the DNS Measurement Factory. By issuing a DNS query to the Measurement Factory name server it will check if that server is an open resolver and return the results.\cite{dnsfactory}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{../figs/geo_viz.pdf}
+  \caption{(up) Distribution of open resolvers, visualized using Google Map, (down) Distribution of PlanetLab nodes that we are using, visualized using Google Map}
+  \label{fig:geo_viz}
+\end{figure}
+
 
 \subsection{Implementation and Experiement}
 \label{sec:impl-exper}
