@@ -41,6 +41,11 @@ In summary, to conduct the WAN vs. DC measurement, we issue query to Google and 
   \label{tab:DC_method}
 \end{table}
 
+\subsection{Implementation and Experiement}
+\label{sec:impl-exper}
+
+We implement this measurement script in Python, and use {\it cron} to schedule the execution every two hours. Each time, the script will first visit Google Trends webpage and obtain the hot-trend words for that hour. Together with random generated strings, we obtain a list of 20 words for query. The entire list is queried for 10 times repeatedly, and four ``times'' are recorded. Each query is conducted using Python urllib2 library through HTTP. 
+
 % \begin{itemize}
 % \setlength{\leftmargin}{-1pt}
 % \setlength{\itemsep}{1pt}
