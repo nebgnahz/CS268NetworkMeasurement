@@ -1,0 +1,80 @@
+\section{Latency in WAN}
+\label{sec:latency-wan}
+
+\subsection{Methodology}
+\label{sec:methodology}
+
+We derive our measurement methodology from King \cite{gummadi2002king} and Turbo-King \cite{leonard2008turbo}, and developed a Turbo-King variant illustrated in Fig.\,\ref{fig:king_model}. The King method leverages DNS name-servers to make measurements that approximate latency between arbitrary end hosts. It utilizes properties of DNS to coerce recursive DNS resolvers into making outbound queries on behalf of measuring party. Turbo-King builds upon King by allowing for detection of DNS forwarders. DNS forwarders aggregate DNS queries within a network that target external DNS servers and can serve responses. The original King method has no means of detecting these servers, and as a result they may skew measurement results.
+
+\subsubsection{Overview}
+Our methodology is composed of 4 elements, a measurement node, a central domain name server, and 2 target name servers. A measurement nodes is composed of a DNS client and server. A node accepts remote-procedure calls that specify 2 target DNS servers and returns both DNS latency measurements and multiple round trip time calculations to the first target server. The central domain name server simply refers incoming DNS requests to the originating measurement node. The 2 target name servers must have known locations and the first must be an open-recursive resolver. Below we outline the measurement process.
+
+\begin{enumerate}
+	\item DNS Client on measurement node will issue a request to the first target DNS server. The requested URL will be of the form "qid.myAddr.mydomain.com", where qid is the query id, myAddr is an encoding of the measurement nodes public name, and mydomain is the domain controlled our central name server.
+	\item The target server will issue a request containing the requested URL to the central name server
+	\item The central name server will decode the "myAddr" element of the requested URL to the url of the originating measurement node. It will return a response to the querying target server with a referral to the measurement node.
+	\item The target name server will then issue a DNS query with the requested URL to the measurement node.
+	\item The measurement node will receive a DNS query, lookup the query id and return a referral with the corresponding second target DNS server.
+	\item The first target DNS server will issue a request to the second DNS server
+	\item The second server will deliver a response (to be discussed more)
+	\item The first target name server will then pass along this response to the DNS client of the measurement node.
+\end{enumerate}
+
+We record the time delta between step 5 and 8, and subtract the round-trip time between the measurement node and the first target to generate a latency measurement between the two target DNS servers.
+
+\subsubsection{Round Trip Time Latency}
+To determine the round trip latency between a measurement node and the first target server, we issue a DNS query for a random subdomain in the domain controlled by the target name server. We issue this request multiple times to allow and discard the first measurement. In this way we allow for the request to be cached on the target server and minimize the processing time to generate more accurate round-trip time measurements. We adopted This method is over ICMP ping because a fraction of DNS servers we queried did not respond to ICMP requests.
+
+\subsubsection{Additional Considerations}
+It is important to note that upon the first DNS request to the second target DNS server, that server itself may try a complete resolution if it is an open resolver. In this case, the second target server will issue a request to resolve our domain and will be referred to the originating measurement node. It will issue a request to this node that contains the original query id; in this event the measurement node will not issue a response and allow the second target server to time out. The second target will then return a NXDomain response to the first target name server, and upon subsequent requests for our domain (within some time period dictated by that servers caching policy) it will issue continue to issue error responses. Thus, we always discard the first latency measurement in every round to account for this additional lookup latency.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{../figs/king_model.pdf}
+  \caption{King/T-King method illustration}
+  \label{fig:king_model}
+\end{figure}
+
+\subsection{Implementation and Experiement}
+\label{sec:impl-exper}
+
+The data presented was collected between 4/20/13 to 4/28/13, and is composed of approximately 4.95 million successful measurements.
+
+\subsubsection{Measurement Node}
+We utilized the dnspython libraries to implement our Turbo-King variant. Each measurement node runs a Turbo-King server (composed of a DNS client and server) which exposes a remote procedure call service using the RPYC library. We deployed the Turbo-King server to 56 Planet Lab nodes (Fig. X).
+
+\subsubsection{Central Name Server}
+Our central name server is implemented using the Python twisted framework, which allowed for highly parallel and asynchronous handling of DNS queries. We deployed 2 nameservers on Amazon EC2.
+
+\subsubsection{Controller}
+Latency measurements were centrally managed from a controller running on EC2. The controller is responsible for issuing remote-procedure calls to Turbo-King servers and storing the resulting data. The controller randomly selects 2 target name servers, the first from the set of open recursive resolvers, and the second from the set of all resolvers. It then determines the 10 nearest Turbo-King servers to the first target, issues a remote procedure call to each, and stores the results in a relational database. The controller is composed of multiple threads that follow this procedure and run continuously.
+
+\subsection{Analysis}
+\label{sec:analysis}
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=\linewidth]{../figs/King_latency_dist.pdf}
+  \caption{Latency vs. Distance}
+  \label{fig:latency_dist}
+\end{figure*}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{../figs/King_distance_distrbution.pdf}
+  \caption{Distribution of distances of measured latencies}
+  \label{fig:latency_distance_distribution}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{../figs/fit_curve.pdf}
+  \caption{Linear fitting of latency vs. distance}
+  \label{fig:fit_curve}
+\end{figure}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End: 

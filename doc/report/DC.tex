@@ -1,0 +1,70 @@
+\section{Latency for DC conversations}
+
+\subsection{Methodology}
+
+Bearing in mind that the primary goal for this part is to understand the partition of latency from end-users' perspective, we designed the experiment to perform data center related tasks. We expect the model in Fig.\,\ref{fig:DC_model} to be used, and the fractions in the WAN and the DC are also shown. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{../figs/DC_model.pdf}
+  \caption{Typical user-DC communication pattern}
+  \label{fig:DC_model}
+\end{figure}
+
+As an representative user-facing service, we have chosen Google Search as the case study. One of the reason of choosing Google Search is that they provide an estimated time spent within their DC (Fig.\,\ref{fig:google_time}). From our analysis in Sec.\,\ref{sec:analysis}, this data is fairly accurate in reflecting the fraction in DC. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.85\linewidth]{../figs/GoogleTime.pdf}
+  \caption{Google Search estimated time spent within Google in the return webpage}
+  \label{fig:google_time}
+\end{figure}
+
+To measure the time for a single query, this can be easily done at the end-host side by timestamping the start and end of each query. But what to query remains a problem. Initially, we were suspecting that caching might happens at the Internet-facing router in DC. Querying the hottest words which are likely to be cached might reveal the WAN fraction. On the other side, to force the query to be processed by the DC (eliminating caching), we use random string for search. The hottest words can be found in Google Trends\footnote{http://www.google.com/trends/hottrends}, and we generate random strings comprised of lower cases, upper cases and numbers with length 32. Though the analysis in Sec.\,\ref{sec:analysis} shows a different results instead of what we have expected. This methodology is still useful to understand the problem we are initially planning to solve. 
+
+In the meantime, {\it ping} is performed to measure the networking latency from the user to Google. Since we plan to conduct this experiment in geographically distributed fashion, and Google has many user-facing servers/IPs, we have to make sure we are measuring the right one. In this case, in additional to application layer HTTP conversation, we use {\it tcpdump} to capture all the packets and find out Google's IP address to ping.
+ 
+In summary, to conduct the WAN vs. DC measurement, we issue query to Google and measure four different ``times'', shown in Table.\,\ref{tab:DC_method}.
+
+\begin{table}
+  \begin{tabular}{p{2.8cm} | p{5cm}}
+    \hline
+    type & description \\
+    \hline
+    Hot-trend-query time & the time spent to query a hot trend word to Google. \\
+    Random-query time & the time spent to query a 32-character random string.  \\
+    Ping time & the networking layer round-trip time to the responded Google IP address. \\
+    Google time & Google's estimated time spent within their DC. \\
+    \hline
+  \end{tabular}
+  \caption{Four different ``times'' measured}
+  \label{tab:DC_method}
+\end{table}
+
+% \begin{itemize}
+% \setlength{\leftmargin}{-1pt}
+% \setlength{\itemsep}{1pt}
+% \setlength{\parskip}{0pt}
+% \setlength{\parsep}{0pt}
+% \item Hot-trend-query time \\
+%   the time spent to query a hot trend word to Google. 
+% \item Random-query time -- the time spent to query a 32-character random string. 
+% \item Ping time -- the networking layer round-trip time to the responded Google IP address.
+% \item Google time -- Google's estimated time spent within their DC.
+% \end{itemize}
+
+\subsection{Analysis}
+\label{sec:analysis}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{../figs/data_center.pdf}
+  \caption{The latency measured in DC conversation experiments}
+  \label{fig:data_center}
+\end{figure}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End: 
+
