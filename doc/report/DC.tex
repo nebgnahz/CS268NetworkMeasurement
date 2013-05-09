@@ -41,10 +41,6 @@ In summary, to conduct the WAN vs. DC measurement, we issue query to Google and 
   \label{tab:DC_method}
 \end{table}
 
-\subsection{Implementation and Experiement}
-\label{sec:impl-exper}
-
-We implement this measurement script in Python, and use {\it cron} to schedule the execution every two hours. Each time, the script will first visit Google Trends webpage and obtain the hot-trend words for that hour. Together with random generated strings, we obtain a list of 20 words for query. The entire list is queried for 10 times repeatedly, and four ``times'' are recorded. Each query is conducted using Python urllib2 library through HTTP, and the query address is ``http://www.google.com/search?hl=en\&output=search\&q=\%s"
 
 % \begin{itemize}
 % \setlength{\leftmargin}{-1pt}
@@ -58,8 +54,22 @@ We implement this measurement script in Python, and use {\it cron} to schedule t
 % \item Google time -- Google's estimated time spent within their DC.
 % \end{itemize}
 
+
+\subsection{Implementation and Experiement}
+\label{sec:impl-exper}
+
+
+We implement this measurement script in Python, and use {\it cron} to schedule the execution every two hours. Each time, the script will first visit Google Trends webpage and obtain the hot-trend words for that hour. Together with random generated strings, we obtain a list of 20 words for query. 
+The entire list is queried for 10 times repeatedly, and four ``times'' are recorded. Each query is conducted using Python urllib2 library through HTTP, and the query address is \url{http://www.google.com/search?hl=en\&output=search\&q=query}.\footnote{One thing to notice about our implementation is that it's actually not allowed to send automated query to Google according to their Terms of Service. And if Google detects it, they will show the following message: ``Our systems have detected unusual traffic from your computer network.'', and the users will be required to enter an CAPTCHA. One possible workaround is to limit the query speed. So after each query, we delayed the script for 5 seconds. We should point out that there are at most $12\times20$ queries per day, which is small.}
+
+While doing the query, we use {\it tcpdump} to monitor the incoming and outgoing traffic on port 80. By inspecting the TCP traces, we can find the specific Google IP that responds our query, and we then {\it ping} it for 10 times.  {\it tcpdump} and {\it ping} are done using Python subprocess module.
+
+
 \subsection{Analysis}
 \label{sec:analysis}
+
+Present the results and describe what we learned from the data.
+Consider putting an appendix of all planetlab nodes we have used.
 
 \begin{figure}
   \centering
@@ -67,6 +77,7 @@ We implement this measurement script in Python, and use {\it cron} to schedule t
   \caption{The latency measured in DC conversation experiments}
   \label{fig:data_center}
 \end{figure}
+
 
 %%% Local Variables: 
 %%% mode: latex
