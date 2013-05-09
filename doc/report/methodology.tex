@@ -46,6 +46,13 @@ At the first level of the DNS tree we issue a query to the "in-addr.arpa" domain
 \subsubsection{Open Resolvers}
 Our methodology requires that the first DNS resolver be an open recursive resolver. To build this set, we leverage the service provided by the DNS Measurement Factory. By issuing a DNS query to the Measurement Factory name server it will check if that server is an open resolver and return the results.\cite{dnsfactory}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{../figs/geo_viz.pdf}
+  \caption{(up) Distribution of open resolvers, visualized using Google Map, (down) Distribution of PlanetLab nodes that we are using, visualized using Google Map}
+  \label{fig:geo_viz}
+\end{figure}
+
 \subsection{Latency for DC conversations}
 \label{sec:latency-dc-conv}
 Bearing in mind that the primary goal for this part is to understand the partition of latency from end-users' perspective, we designed the experiment to perform data center related tasks. We expect the model in Fig.\,\ref{fig:DC_model} to be used, and the fractions in the WAN and the DC are also shown. 
