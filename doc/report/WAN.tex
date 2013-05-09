@@ -87,7 +87,7 @@ In this section we outline the parameters used to filter our collected measureme
 	\hline
 	High Latencies & 4.8\% & 5 second timeout on results \\
 	\hline
-	Forwarder Responses & 23\% & Forwarders can have small or large impact on results depending on location relative to target server (fig ......) \\
+	Forwarder Responses & 23\% & Forwarders can have small or large impact on results depending on location relative to target server (Fig.\,\ref{fig:forwarder_viz}) \\
 	\hline
 	Zero Distance & 0.4\% & GeoIP inaccuracy, especially for DNS servers within the same AS \\
 	\hline
@@ -97,6 +97,9 @@ In this section we outline the parameters used to filter our collected measureme
   \caption{Filtering Parameters, percent of dataset, and description}
   \label{tab:filter}
 \end{table}
+
+\subsubsection{Latency vs. Distance}
+We performed our analysis by grouping measurements into 1000 km buckets and plotting the average latency (Fig.\,\ref{fig:latency_dist}). The blue error bar represents 5 - 95 percentiles in each bucket. It can be observed from the graph that, in general, latency does in fact grow with distance. The fit line in Fig.\,\ref{fig:fit_curve} shows that the relationship between latency and distance can be approximated with an increasing linear function.
 
 \begin{figure*}
   \centering
@@ -119,6 +122,12 @@ In this section we outline the parameters used to filter our collected measureme
   \label{fig:fit_curve}
 \end{figure}
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../figs/dns_forwarder.pdf}
+  \caption{A selected sample of DNS forwarders in our measurement set, where each path represents the distance between forwarder and target server}
+  \label{fig:forwarder_viz}
+\end{figure}
 
 %%% Local Variables: 
 %%% mode: latex
