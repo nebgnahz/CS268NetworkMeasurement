@@ -8,6 +8,7 @@ There are tools for measuring mobile network performance \cite{speedtest, huang2
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{../figs/mobile_networks_method.pdf}
+  \vspace{-1em}
   \caption{USB tethered computer to perform {\it traceroute} to measure the per-hop latency in cellular backbone.}
   \label{fig:mobile_networks_method}
 \end{figure}
@@ -17,7 +18,7 @@ For us, we use the system {\it traceroute} to quantify the latency for each hop 
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=1.1\linewidth]{../figs/traceroute.pdf}
-  \vspace{-2em}
+  \vspace{-1em}
   \caption{Example {\it traceroute} log from an AT\&T iPhone in Berkeley, maximum hop limited to 13, with ASN look-up turned on.}
   \label{fig:traceroute}
 \end{figure}
@@ -37,11 +38,14 @@ The same pattern holds for many other traces. And we aggregate them to answer th
 
 From this figure, we found that within the cellular backbone and part of AT\&T's backbone network (from the 2nd hop to 7th hops), the latencies are fairly stable around 40 ms, with variation about 15 ms. The numbers of responding routers are also not many. The second hop has 9 different responders, which are probably all AGWs behind the eNode-B. They doesn't seem to change based on your location (as you can see in Fig\,\ref{fig:mobile_mobile} when we were moving between Berkeley and SF). We conjecture that the fourth hop might be comprised of four load balancer, since anyway the fifth hop is consistent across all the measurements. After first 7 hops, the latency then increases a lot, and the number of routers on each hop also increase drastically. Though the experiement is done for 13 hops, drawing all of them will make the figure less expressive.
 
-Besides the second hop variation across geographical location, from Fig.\,\ref{fig:mobile_mobile}, we can also find that the latencies increase a lot in comparison to Fig.\,\ref{fig:mobile_latency}. This is in part because of the radio access technology change -- in most of the time during the trip, the phone has a connection of 4G-LTE rather than LTE. But 
+Besides the second hop variation across geographical location, from Fig.\,\ref{fig:mobile_mobile}, we can also find that the latencies increase a lot in comparison to Fig.\,\ref{fig:mobile_latency}. This is in part because of the radio access technology change -- in most of the time during the trip, the phone has a connection of 4G-LTE rather than LTE. But the latency on the first hop has also increased a lot, and mobility accounts for part of the degradation. As for the routings inside cellular backbone, again it's fairly stable.
+
+To further understand routing stability, we then take a look at each trace. In a single {\textit traceroute} log, the routing might change, and this rapidly-variable routing is called fluttering in \cite{paxson1997measurements}. For each hop, we see how many different routes the packet has taken, and draw the portion in a stacked bar plot (Fig.\,\ref{fig:mobile_fluttering}). The horizontal axis is still the hop number, the vertical counts the number of different routes in our measured data. For most of the routes within AT\&T cellular backbone, the routes are fairly stable. When approaching the WAN (starting from hop 11), routing fluttering happens more frequent probably because of crossing AS boundries.
 
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{../figs/mobile_latency.pdf}
+  \vspace{-1em}
   \caption{(up) Latency measured in each hop of AT\&T cellular networks; (down) the number of responding routers on each hop}
   \label{fig:mobile_latency}
 \end{figure}
@@ -49,17 +53,18 @@ Besides the second hop variation across geographical location, from Fig.\,\ref{f
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{../figs/mobile_sfo.pdf}
-  \caption{Measurements done when phone is moving between Berkeley and San Francisco. (up) Latency measured in each hop of AT\&T cellular networks; (down) the number of responding routers on each hop}
+  \vspace{-1em}
+  \caption{Measurements conducted when the phone is moving between Berkeley and San Francisco.\\ (up) latency measured in each hop of AT\&T cellular networks; (down) the number of responding routers on each hop}
   \label{fig:mobile_mobile}
 \end{figure}
 
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth]{../figs/routing_flaps.pdf}
-  \caption{Routing flaps within AT\&T cellular networks}
-  \label{fig:mobile_flaps}
+  \includegraphics[width=\linewidth]{../figs/mobile_fluttering.pdf}
+  \vspace{-1em}
+  \caption{Routing fluttering within AT\&T cellular networks}
+  \label{fig:mobile_fluttering}
 \end{figure}
-
 
 %%% Local Variables: 
 %%% mode: latex
