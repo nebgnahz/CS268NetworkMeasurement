@@ -1,0 +1,13 @@
+CS268
+1368206362409 1368206363288
+
+
+% python gQuery.py CS268                                                                      ✹ ✭
+CS268
+1368206362409 1368206363288
+254484
+0:00:00.879612 0:00:00.300000 None None
+
+file is tcpdump
+cat tcpdumpfile_new| grep 74.125.239.81 
+
