@@ -44,9 +44,12 @@ xlabel('hop #');
 ylabel('latency statistics');
 title('latency using traceroute');
 
-%# make all text in the figure to size 14 and bold
-set(gca,'FontSize',14,'fontWeight','bold')
-set(findall(f,'type','text'),'fontSize',16,'fontWeight','bold')
+%# make all text in the figure
+set(gca,'FontSize',16)
+set(get(gca,'XLabel'),'FontSize',18); 
+set(get(gca,'YLabel'),'FontSize',18);
+set(get(gca,'Title'),'FontSize',18);
+set(findall(f,'type','text'),'fontSize',18)
 
 
 %%
@@ -87,7 +90,10 @@ xlabel('hop #');
 ylabel('latency statistics');
 title('latency using traceroute');
 
-%# make all text in the figure to size 14 and bold
-set(gca,'FontSize',14,'fontWeight','bold')
-set(findall(f,'type','text'),'fontSize',16,'fontWeight','bold')
+%# make all text in the figure
+set(gca,'FontSize',16)
+set(get(gca,'XLabel'),'FontSize',18); 
+set(get(gca,'YLabel'),'FontSize',18);
+set(get(gca,'Title'),'FontSize',18);
+set(findall(f,'type','text'),'fontSize',18)
 

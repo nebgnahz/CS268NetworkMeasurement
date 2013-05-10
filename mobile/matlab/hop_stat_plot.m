@@ -14,7 +14,7 @@ bar(1:max_hop, [zero_count, nonzero_count]);
 %%
 % filter out ip None data
 % clear all; close all; clc;
-load hop_stat_LTE.mat;
+load hop_stat_SFO.mat;
 
 count = count(ASN~=-1);
 hop = hop(ASN~=-1);
@@ -45,5 +45,8 @@ ylabel('responding routers');
 title('number of routers on each hop');
 
 %# make all text in the figure to size 14 and bold
-set(gca,'FontSize',14,'fontWeight','bold')
-set(findall(f,'type','text'),'fontSize',16,'fontWeight','bold')
+set(gca,'FontSize',16)
+set(get(gca,'XLabel'),'FontSize',18); 
+set(get(gca,'YLabel'),'FontSize',18);
+set(get(gca,'Title'),'FontSize',18);
+set(findall(f,'type','text'),'fontSize',18)

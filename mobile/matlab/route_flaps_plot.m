@@ -18,8 +18,11 @@ legend('1', '2', '3')
 axis([0 hop_max+1 0 4500])
 xlabel('hop #');
 ylabel('number of routes');
-title('routing flaps');
+title('routing fluttering');
 
 %# make all text in the figure to size 14 and bold
-set(gca,'FontSize',14,'fontWeight','bold')
-set(findall(f,'type','text'),'fontSize',16,'fontWeight','bold')
+set(gca,'FontSize',16)
+set(get(gca,'XLabel'),'FontSize',18); 
+set(get(gca,'YLabel'),'FontSize',18);
+set(get(gca,'Title'),'FontSize',18);
+set(findall(f,'type','text'),'fontSize',18)
