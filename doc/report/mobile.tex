@@ -35,7 +35,7 @@ We being with an example trace to Google (Fig.\,\ref{fig:traceroute}). As you ca
 
 This same pattern holds for many other traces. We aggregate them to answer the following question: what are the properties of AT\&T's cellular backbone? Is the latency stable, and are the routes stable? We plot the graph in Fig\,\ref{fig:mobile_latency}. The top figure shows the latency experienced on each hop (the horizontal axis is hop number, and vertical axis is latency in milliseconds). The red bar is the mean value for each hop, and the blue error bar is 5th and 95th percentile. We have also noted the mean value on top of each bar. The bottom figure displays the routing stability within the cellular networks. We mark each different router IP in a unique color for each hop. the portion of that color within each bar represents the portion of {\textit traceroute} responses received from that router for that hop. Again, it is important to note that the first hop is the iPhone through USB tethering.
 
-\begin{figure}[!tbh]
+\begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{../figs/mobile_latency.pdf}
   \vspace{-1em}
