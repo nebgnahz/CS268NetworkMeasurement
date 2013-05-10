@@ -1,7 +1,7 @@
 
 \section{Discussion}
 \label{sec:discussion}
-
+We faced a number of issues over the course of our experiment. During our reverse DNS crawl received a number of reports of port scanning. As such, it was difficult to test our crawler during development, as Amazon would occasionally limit our available bandwidth. Initially it was difficult to manage a large number of Planet Lab nodes. Occasionally nodes crashed or reported extremely high latencies because of very poor networking conditions (a Berkeley node was a repeat offender). Our development efforts were often hampered by the very old software stack on some of these systems. Furthermore, we received notices from Columbia University because of SSH tunnels to node (we are still investigating why this was the case). We had to discard measurement results from 4/13-4/19 because MySQL decreased resolution of recorded time deltas from milliseconds to seconds.
 
 %%% Local Variables: 
 %%% mode: latex
