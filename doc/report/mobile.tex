@@ -1,19 +1,19 @@
 \section{Latency in Cellular Networks}
 
-\subsection{Methodology and Experiement}
+\subsection{Methodology and Experiment}
 \label{sec:methodology}
 
-There are tools for measuring mobile network performance \cite{speedtest, huang2011mobiperf}, but they are generally too specific and can only be applied to limited scope. It's possible to develop a whole suite of measurement tools for mobile contexts, but given the fact that there have been so many tools available \ref{sec:tools}, it would be great to reuse them. One possible approach is to use modem, which will just be another network interface in the computer. Another approach, which can readily use the smartphones that most people have, is by mobile hotspot. The mobile device will serve as first hop, and we can use all the tools on whatever platform the computer is to perform related measurements. Though in most case, people use Bluetooth or Wi-Fi for hotspot, we found that iPhone supports USB tethering. And as we will show in our data analysis part, the latency on the first hop is neglectable. Fig.\,\ref{fig:mobile_networks_method} illustrate the idea of using USB tethering.
+There are several existing tools for measuring mobile network performance \cite{speedtest, huang2011mobiperf}; however, these techniques are often too narrow in scope and can only be applied in a limited manner. We shy away from developing a whole new suite of measurement tools for mobile contexts given the fact that there are many general tools for understanding network performance (\ref{sec:tools}). We aim to reuse these existing tools in our study. We utilize mobile devices (in this case a smart phone) as a tethered network interface to a measurement system. The mobile device will serve as the first hop, allowing use to use existing tools and techniques to perform measurements. We utilize USB tethering to minimize the possibility of interference. As we will show in our data analysis, the latency of the first hop is negligible. Fig.\,\ref{fig:mobile_networks_method} illustrates our technique for probing cellular networks.
 
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{../figs/mobile_networks_method.pdf}
   \vspace{-1em}
-  \caption{USB tethered computer to perform {\textit traceroute} to measure the per-hop latency in cellular backbone.}
+  \caption{Mobile device USB tethered computer to perform {\textit traceroute}. This allows us to calculate the per-hop latency in cellular backbone.}
   \label{fig:mobile_networks_method}
 \end{figure}
 
-For us, we use the system {\textit traceroute} to quantify the latency for each hop within cellular networks. The targets for {\textit traceroute} are the top 1000 websites we believe most smartphone users will access. Since we are only interested in the cellular backbone networks, after a few initial results, we limit the maximum hop of {\textit traceroute} to 13. We've also turned on Autonomous System Number (ASN) lookups for each hop encountered. Fig.\,\ref{fig:traceroute} shows an example trace to Google.
+We utilize {\textit traceroute} to quantify the latency for each hop within cellular networks. The targets for {\textit traceroute} are the top 1000 websites. Since we are only interested in the cellular backbone networks, we limit the maximum hop count of {\textit traceroute} to 13. We also perform Autonomous System Number (ASN) lookups for each hop encountered. Fig.\,\ref{fig:traceroute} shows an example trace to Google.
 
 \begin{figure}[!htb]
   \centering
@@ -24,10 +24,9 @@ For us, we use the system {\textit traceroute} to quantify the latency for each 
 \end{figure}
 
 
-The measurement is conducted between Apr.\,11 to Apr.\,24, when the author isn't in need of his phone. And in total we've collected 191886 measurements, and each includes the timestamp, received signal strength indication (RSSI), radio type (LTE or 4G-LTE), the hop number it belongs to, ASN, hostname, host IP, and the specific delay. It's worth mentioning that the timestamp, RSSI and radio type are the same for each measurement. The reason is due to the difficulty in accessing RSSI and radio type programmatically. The author manually record those data when performing the measurements. Though timestamp can be easily done, we only use it as an indicator of the time when we conduct this measurement. There is no huge need for a finer granularity.
+The measurement was conducted between Apr.\,11 and Apr.\,24 (during periods in which we had access to a modem device). In total we have collected 191886 measurements, with each including a timestamp, received signal strength indication (RSSI), radio type (LTE or 4G-LTE), the traceroute hop number, ASN, hostname, host IP, and the specific delay. It is worth mentioning that the timestamp, RSSI and radio type are the same for each measurement. The reason is due to the difficulty in accessing RSSI and radio type programmatically. The we must manually record this data when performing the measurements.
 
-During the experiement, the author paid a trip to San Francisco (SF) through driving, and conducted two measurements for Berkeley-to-SF and SF-to-Berkeley. We will also show the results in the analysis section. 
-
+Over the course of the experiment, we performed measurements while driving to and from San Francisco (SF). We expand on these results in the analysis section. 
 
 \subsection{Analysis}
 \label{sec:analysis}
