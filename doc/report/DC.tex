@@ -7,6 +7,7 @@ Our primary goal in this section is to understand the percentage of total round-
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{../figs/DC_model.pdf}
+  \vspace{-1em}
   \caption{Typical User-DC communication pattern}
   \label{fig:DC_model}
 \end{figure}
@@ -16,6 +17,7 @@ We have chosen Google Search as a representative user-facing service for our cas
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.85\linewidth]{../figs/GoogleTime.pdf}
+  \vspace{-0.7em}
   \caption{Google Search estimated time spent within DC as presented in the search results page}
   \label{fig:google_time}
 \end{figure}
@@ -27,13 +29,16 @@ To provide context for our measurements, we perform \texttt{ICMP ping} queries t
 In Table \ref{tab:DC_method} we provide an overview of the four different ``time'' measurements derived from our experiment. One thing to notice is that Google time is present only when the query returns results. For the random 32-character random string, there is no Google time.
 
 \begin{table}
-  \begin{tabular}{p{2.8cm} | p{5cm}}
+  \begin{tabular}{p{2.3cm} | p{5.5cm}}
     \hline
     type & description \\
     \hline
     Hot-trend-query time & the time spent to query a hot trend word to Google. \\
+    \hline
     Random-query time & the time spent to query a 32-character random string.  \\
+    \hline
     Ping time & the networking layer round-trip time to the responded Google IP address. \\
+    \hline
     Google time & Google's own estimated time spent within their DC. \\
     \hline
   \end{tabular}
@@ -72,25 +77,25 @@ In Fig.\,\ref{fig:data_center}, we plot all of the obtained measurements. On the
 
 First, we noticed that random queries usually take less time than hot-trend queries. This contradicts our initial assumptions about caching. It may be the case that hot-trend queries are not cached by Google's user-facing servers. All queries may be fully processed by the data center. The difference between random query time and hot-trend query time may be accounted for if it is less work because there are no results for a random query. Hot-trends would take a longer time to process because there are associated results.  Despite the fact that many people are searching for hot-trend terms, there is also a high chance some new pages about these words appear. Because Google guarantees relatively fresh search results, having the search continuously processed on every request can provide a better search experience to the public.
 
-Another thing to notice is that though the ping time, and query time varies a lot across these test points, the Google time is relatively stable (around 0.2 seconds). So the Google portion's variation is primarily determined by the WAN performance. For ``6test.edu.cn'' machine in China, each single query takes about 1 second to finish, making the Google portion around 22\%. But generally the time within WAN and DC are fairly close for an end-user, which means that optimization on either side might benefit the user. We ask the questions "If the WAN latency is minimal, how large of a benefit will be derived from DC improvement?" and "what is the impact of good network connectivity on the part of the end-host?".
+Another thing to notice is that though the ping time, and query time varies a lot across these test points, the Google time is relatively stable (around 0.2 seconds). So the Google portion's variation is primarily determined by the WAN performance. For ``6test.edu.cn'' machine in China, each single query takes about 1 second to finish, making the Google portion around 22\%. But generally the time within WAN and DC are fairly close for an end-user, which means that optimization on either side might benefit the user. We ask the questions ``If the WAN latency is minimal, how large of a benefit will be derived from DC improvement?'' and ``what is the impact of good network connectivity on the part of the end-host?''.
 
 \begin{figure*}[!htb]
   \centering
   \includegraphics[width=\linewidth]{../figs/data_center.pdf}
+  \vspace{-1em}
   \caption{(Left) Four different ``times'' in our DC vs. WAN experiment. (Right) The average of Google time portion within a query conversation for each PlanetLab node test point.}
   \label{fig:data_center}
 \end{figure*}
 
- We present some preliminary results using \texttt{tcpdump} in example (Fig.\,\ref{fig:tcpdump}.
-
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{../figs/tcpdump.pdf}
+  \vspace{-1em}
   \caption{One example \texttt{tcpdump} analysis in Google query}
   \label{fig:tcpdump}
 \end{figure}
 
-This trace was collected in Berkeley EECS-secure wireless network when we searched the term ``CS268''. The \texttt{ping} time to Google is around 5 ms. We annotate the trace with timestamps, such as "10:19:22.752", for illustration. In a typical HTTP (TCP) conversation, after the three-way handshake, the client sends out the query -- HTTP GET, the server then responds with the data. For DC-involved services, there may be a delay since the query has be to processed. However, the server might take another strategy, as observed in Google Search -- it can send out part of the final results first (either javascript or CSS part). Then when the task is finished inside DC, the rest of the results are sent back. Each return page from Google Search is around 200KB, and separating them can largely reduce the amount of overall latency experienced by end-user. 
+ We present some preliminary results using \texttt{tcpdump} in example (Fig.\,\ref{fig:tcpdump}). This trace was collected in Berkeley EECS-secure wireless network when we searched the term ``CS268''. The \texttt{ping} time to Google is around 5 ms. We annotate the trace with timestamps, such as ``10:19:22.752'', for illustration. In a typical HTTP (TCP) conversation, after the three-way handshake, the client sends out the query -- HTTP GET, the server then responds with the data. For DC-involved services, there may be a delay since the query has be to processed. However, the server might take another strategy, as observed in Google Search -- it can send out part of the final results first (either javascript or CSS part). Then when the task is finished inside DC, the rest of the results are sent back. Each return page from Google Search is around 200KB, and separating them can largely reduce the amount of overall latency experienced by end-user. 
 
 From this graph, one possible argument is that if we optimize the DC performance, reducing the Google Time, what we end up with is reducing the idle time shown in the figure. It is actually not a large segment of the whole HTTP conversation, especially this is when the average network latency to Google is around 5 ms. For those end hosts with poor network connections, the IDLE time segment will be even larger. Additional experiments are needed to validate this argument, which we leave to future work.
 
