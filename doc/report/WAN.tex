@@ -4,7 +4,7 @@
 \subsection{Methodology}
 \label{sec:methodology}
 
-We derive our measurement methodology from King \cite{gummadi2002king} and Turbo-King \cite{leonard2008turbo}, and have developed a Turbo-King variant illustrated in Fig.\,\ref{fig:king_model}. The King method leverages DNS name servers to make measurements that approximate latency between two arbitrary end hosts. It utilizes properties of DNS to coerce recursive DNS resolvers into making outbound queries on behalf of measuring party. Turbo-King builds upon King by allowing for detection of DNS forwarders and reduction of DNS cache pollution. DNS forwarders aggregate DNS queries within a network that target at external DNS servers and can serve responses. The original King method has no means of detecting these servers, and as a result they may skew measurement results.
+We derive our measurement methodology from King \cite{gummadi2002king} and Turbo-King \cite{leonard2008turbo}, and have developed a Turbo-King variant illustrated in Fig.\,\ref{fig:king_model}. The King method leverages DNS name servers to make measurements that approximate latency between two arbitrary end-hosts. It utilizes properties of DNS to coerce recursive DNS resolvers into making outbound queries on behalf of measuring party. Turbo-King builds upon King by allowing for detection of DNS forwarders and reduction of DNS cache pollution. DNS forwarders aggregate DNS queries within a network that target at external DNS servers and can serve responses. The original King method has no means of detecting these servers, and as a result they may skew measurement results.
 
 \begin{figure}
   \centering
@@ -21,9 +21,9 @@ Our methodology is composed of 4 elements: a measurement node, a central domain 
 \setlength{\itemsep}{1pt}
 \setlength{\parskip}{0pt}
 \setlength{\parsep}{0pt}
-	\item DNS Client on measurement node will issue a request to the first target DNS server. The requested query will be of the form "qid.myAddr.mydomain.com", where qid is the query id, myAddr is an encoding of the measurement nodes public name, and mydomain is the domain controlled our central name server.
+	\item DNS Client on measurement node will issue a request to the first target DNS server. The requested query will be of the form ``qid.myAddr.mydomain.com'', where qid is the query id, myAddr is an encoding of the measurement nodes public name, and mydomain is the domain controlled our central name server.
 	\item The target server will issue a request containing the requested URL to the central name server.
-	\item The central name server will decode the "myAddr" element of the requested URL to the url of the originating measurement node. It will return a response to the querying target server with a referral to the measurement node.
+	\item The central name server will decode the ``myAddr'' element of the requested URL to the url of the originating measurement node. It will return a response to the querying target server with a referral to the measurement node.
 	\item The target name server will then issue a DNS query with the requested URL to the measurement node.
 	\item The measurement node will receive a DNS query, lookup the query id and return a referral with the corresponding second target DNS server.
 	\item The first target DNS server will issue a request to the second DNS server
@@ -43,10 +43,10 @@ It is important to note that upon the first DNS request to the second target DNS
 The Turbo-King methodology requires a large set of known open recursive name servers to generate latency measurements. An open recursive name server will respond to requests for any arbitrary domain from clients outside its domain. Only the first target name server must be an open resolver, the second server may be any DNS server that issues any response to external queries. To build a set of DNS servers, we performed a crawl of the reverse DNS tree.
 
 Reverse DNS requests take the form of requests for the ``.in-addr.arpa'' prefixed in reverse order with the octets of the IP to be resolved. Queries operate as normal DNS queries do, where in each octet is a sub-domain for which a DNS server is responsible for.
-At the first level of the DNS tree we issue a query to the ``in-addr.arpa'' domain for the first octet (1-255) and receive responses (start of authority, SOA, records) that indicate the servers responsible for the next level of the tree. We continue by issuing requests for the second octet (``{\it second}.{\it first}.in-addr.arpa'') to these servers, and we proceed similarly for the third octet. If we do not receive an SOA record skip further search down the tree that contains that prefix. At each step, we record any responses that indicate authoritative name servers. Thus, after a three level traversal we are left with a set of authoritative DNS servers. We implemented and deployed a multi-threaded crawler to Amazon EC2 that was able to complete a traversal on the order of 1 day.
+At the first level of the DNS tree we issue a query to the ``in-addr.arpa'' domain for the first octet (1-255) and receive responses (start of authority, SOA, records) that indicate the servers responsible for the next level of the tree. We continue by issuing requests for the second octet (``{\it second}.{\it first}.in-addr.arpa'') to these servers, and we proceed similarly for the third octet. If we do not receive an SOA record skip further search down the tree that contains that prefix. At each step, we record any responses that indicate authoritative name servers. Thus, after a three level traversal we are left with a set of authoritative DNS servers. We implemented and deployed a multi-threaded crawler to Amazon EC2 that was able to complete a traversal on the order of 1 day. We end up with 236733 DNS servers for our latency experiment.
 
 \subsubsection{Open Resolvers}
-Our methodology requires that the first DNS resolver be an open recursive resolver. To build this set, we leverage the service provided by the DNS Measurement Factory \cite{dnsfactory}. By issuing a DNS query to the Measurement Factory name server it will check if that server is an open resolver and return the results. The resulting DNS open resolvers have an distribution shown in the top part of Fig.\,\ref{fig:geo_viz}.
+Our methodology requires that the first DNS resolver be an open recursive resolver. To build this set, we leverage the service provided by the DNS Measurement Factory \cite{dnsfactory}. By issuing a DNS query to the Measurement Factory name server it will check if that server is an open resolver and return the results. The resulting DNS open resolvers (25270 in total) have a distribution shown in the top part of Fig.\,\ref{fig:geo_viz}.
 
 \begin{figure}
   \centering
@@ -62,7 +62,7 @@ Our methodology requires that the first DNS resolver be an open recursive resolv
 Using a combination of EC2 and PlanetLab servers, we collected approximately 5 million successful measurement results between 4/20/13 and 4/28/13.
 
 \subsubsection{Measurement Node}
-We utilized the dnspython libraries to implement our Turbo-King variant. Each measurement node runs a Turbo-King server (composed of a DNS client and server) which exposes a remote procedure call service using the RPYC library. We deployed the Turbo-King server to 56 Planet Lab nodes (shown in the bottom part of Fig.\,\ref{fig:geo_viz}).
+We utilized the dnspython libraries to implement our Turbo-King variant. Each measurement node runs a Turbo-King server (composed of a DNS client and server) which exposes a remote procedure call service using the RPYC library. We deployed the Turbo-King server to 56 PlanetLab nodes (shown in the bottom part of Fig.\,\ref{fig:geo_viz}).
 
 \subsubsection{Central Name Server}
 Our central name server is implemented using the Python Twisted framework, which allowed for highly parallel and asynchronous handling of DNS queries. We deployed 2 name-servers on Amazon EC2.
@@ -83,10 +83,10 @@ Latency measurements were centrally managed from a controller running on EC2. Th
   \label{fig:latency_distance_distribution}
 \end{figure}
 
-Fig.\,\ref{fig:latency_distance_distribution} represents the distribution of distances between target DNS servers in the collected measurements (all the points are grouped into 1000 km buckets). It is interesting to note that the distribution is bimodal (peaking at 1000 km and 8000 km). We believe this property is reflective of the inter and intra continental patterns in our DNS resolver set (fig.\,\ref{fig:geo_viz}). Resolvers are concentrated in USA and Europe, and as such we believe the high probability of randomly selecting a USA to USA or Europe to Europe target pair generates the first peak of the measurement distribution. Similarly, the second peak is generated by a USA to Europe (or vice versa) target pair.
+For each entry of our measurement results, we calculate the distance of two targets based on GeoIP information \cite{maxmind}. And the histogram (grouped into 1000 km buckets) of distances in the collected measurements is shown in Fig.\,\ref{fig:latency_distance_distribution}. It is interesting to note that the distribution is bimodal (peaking at 1000 km and 8000 km). We believe this property is reflective of the intra and inter continental patterns in our DNS resolver set. As shown in Fig.\,\ref{fig:geo_viz}, resolvers are concentrated in USA and Europe, and as such we believe the high probability of randomly selecting a USA to USA or Europe to Europe target pair generates the first peak of the measurement distribution. Similarly, the second peak is generated by a USA to Europe (or vice versa) target pair.
 
 \subsubsection{Filtering Measurements}
-In this section we outline the parameters used to filter our collected measurements before performing analysis. We will briefly discuss the impact on the dataset and rationale for using these parameters.
+In this section we outline the parameters used to filter our collected measurements before performing analysis. We have summarized their impact on the dataset and rationale for using these parameters in Table \ref{tab:filter}.
 
 \begin{table*}[!htb]
     \small
@@ -138,6 +138,8 @@ We performed our analysis by grouping measurements into 1000 km buckets and plot
   \caption{Linear fitting of latency vs. distance}
   \label{fig:fit_curve}
 \end{figure}
+
+The gap between real latency performance and spped-of-light limit can be clearly observed, and identifying the source of the gap in current Internet remains our future work. 
 
 
 %%% Local Variables: 
